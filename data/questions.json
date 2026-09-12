@@ -1,0 +1,3138 @@
+[
+  {
+    "id": "br_001",
+    "category": "Geografia",
+    "difficulty": 1,
+    "question": "Qual è la capitale del Portogallo?",
+    "answers": [
+      "Porto",
+      "Madrid",
+      "Lisbona",
+      "Coimbra"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_002",
+    "category": "Geografia",
+    "difficulty": 1,
+    "question": "In quale continente si trova il Kenya?",
+    "answers": [
+      "Europa",
+      "Africa",
+      "Asia",
+      "Oceania"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_003",
+    "category": "Geografia",
+    "difficulty": 1,
+    "question": "Quale oceano separa l'Europa dall'America del Nord?",
+    "answers": [
+      "Artico",
+      "Pacifico",
+      "Atlantico",
+      "Indiano"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_004",
+    "category": "Geografia",
+    "difficulty": 1,
+    "question": "Quale città è attraversata dalla Senna?",
+    "answers": [
+      "Vienna",
+      "Roma",
+      "Parigi",
+      "Berlino"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_005",
+    "category": "Geografia",
+    "difficulty": 1,
+    "question": "Qual è la capitale del Giappone?",
+    "answers": [
+      "Osaka",
+      "Kyoto",
+      "Seoul",
+      "Tokyo"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_006",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "Quale Stato ha come capitale Ottawa?",
+    "answers": [
+      "Nuova Zelanda",
+      "Canada",
+      "Australia",
+      "Irlanda"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_007",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "Quale catena montuosa separa Spagna e Francia?",
+    "answers": [
+      "Ande",
+      "Carpazi",
+      "Pirenei",
+      "Alpi"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_008",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "In quale paese si trova il deserto di Atacama principalmente?",
+    "answers": [
+      "Mongolia",
+      "Egitto",
+      "India",
+      "Cile"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_009",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "Quale stretto separa Europa e Africa tra Spagna e Marocco?",
+    "answers": [
+      "Gibilterra",
+      "Malacca",
+      "Bering",
+      "Bosforo"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_010",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "Quale paese circonda completamente il Lesotho?",
+    "answers": [
+      "Namibia",
+      "Sudafrica",
+      "Kenya",
+      "Botswana"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_011",
+    "category": "Geografia",
+    "difficulty": 3,
+    "question": "Qual è il lago più profondo del mondo?",
+    "answers": [
+      "Titicaca",
+      "Vittoria",
+      "Bajkal",
+      "Superiore"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_012",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "Quale fiume attraversa Budapest?",
+    "answers": [
+      "Reno",
+      "Danubio",
+      "Tamigi",
+      "Volga"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_013",
+    "category": "Geografia",
+    "difficulty": 3,
+    "question": "Qual è la capitale della Mongolia?",
+    "answers": [
+      "Astana",
+      "Tashkent",
+      "Ulan Bator",
+      "Bishkek"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_014",
+    "category": "Geografia",
+    "difficulty": 1,
+    "question": "Quale isola italiana ha Palermo come capoluogo?",
+    "answers": [
+      "Sicilia",
+      "Elba",
+      "Capri",
+      "Sardegna"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_015",
+    "category": "Storia",
+    "difficulty": 1,
+    "question": "In quale anno Cristoforo Colombo raggiunse le Americhe?",
+    "answers": [
+      "1492",
+      "1789",
+      "1517",
+      "1453"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_016",
+    "category": "Storia",
+    "difficulty": 1,
+    "question": "Quale civiltà costruì le piramidi di Giza?",
+    "answers": [
+      "Inca",
+      "Romana",
+      "Egizia",
+      "Vichinga"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_017",
+    "category": "Storia",
+    "difficulty": 1,
+    "question": "Chi fu il primo imperatore romano?",
+    "answers": [
+      "Traiano",
+      "Nerone",
+      "Adriano",
+      "Augusto"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_018",
+    "category": "Storia",
+    "difficulty": 1,
+    "question": "In quale anno iniziò la Rivoluzione francese?",
+    "answers": [
+      "1815",
+      "1789",
+      "1776",
+      "1848"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_019",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "Quale città fu capitale dell'Impero bizantino?",
+    "answers": [
+      "Atene",
+      "Ravenna",
+      "Costantinopoli",
+      "Alessandria"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_020",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "In quale anno cadde il Muro di Berlino?",
+    "answers": [
+      "1991",
+      "1979",
+      "1989",
+      "1961"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_021",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "Quale popolo fondò la città di Cartagine?",
+    "answers": [
+      "Fenici",
+      "Celti",
+      "Persiani",
+      "Etruschi"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_022",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "Chi guidò la spedizione dei Mille?",
+    "answers": [
+      "Camillo Cavour",
+      "Carlo Alberto",
+      "Giuseppe Garibaldi",
+      "Giuseppe Mazzini"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_023",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "Quale battaglia segnò la sconfitta finale di Napoleone?",
+    "answers": [
+      "Waterloo",
+      "Jena",
+      "Marengo",
+      "Austerlitz"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_024",
+    "category": "Storia",
+    "difficulty": 3,
+    "question": "In quale anno fu firmata la Magna Carta inglese?",
+    "answers": [
+      "1215",
+      "1314",
+      "1066",
+      "1455"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_025",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "Quale evento si commemora in Italia il 25 aprile?",
+    "answers": [
+      "L'Unità d'Italia",
+      "La fine della Prima guerra mondiale",
+      "La Liberazione",
+      "La nascita della Repubblica"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_026",
+    "category": "Storia",
+    "difficulty": 3,
+    "question": "Quale pace del 1648 concluse la Guerra dei trent'anni?",
+    "answers": [
+      "Pace di Versailles",
+      "Pace di Vestfalia",
+      "Pace di Augusta",
+      "Pace di Utrecht"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_027",
+    "category": "Storia",
+    "difficulty": 1,
+    "question": "Quale città romana fu sepolta dal Vesuvio nel 79 d.C.?",
+    "answers": [
+      "Pompei",
+      "Ostia",
+      "Aquileia",
+      "Capua"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_028",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "Quale civiltà aveva Tenochtitlán come capitale?",
+    "answers": [
+      "Inca",
+      "Maya",
+      "Olmeca",
+      "Azteca"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_029",
+    "category": "Scienza",
+    "difficulty": 1,
+    "question": "Qual è la formula chimica dell'acqua?",
+    "answers": [
+      "O₂",
+      "H₂O",
+      "NaCl",
+      "CO₂"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_030",
+    "category": "Scienza",
+    "difficulty": 1,
+    "question": "Quale organo pompa il sangue nel corpo umano?",
+    "answers": [
+      "Cuore",
+      "Stomaco",
+      "Fegato",
+      "Polmone"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_031",
+    "category": "Scienza",
+    "difficulty": 1,
+    "question": "Qual è il simbolo chimico dell'ossigeno?",
+    "answers": [
+      "Og",
+      "Os",
+      "O",
+      "Ox"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_032",
+    "category": "Scienza",
+    "difficulty": 1,
+    "question": "Quale forza ci mantiene sulla superficie terrestre?",
+    "answers": [
+      "Spinta di Archimede",
+      "Gravità",
+      "Magnetismo",
+      "Attrito"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_033",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Quale particella atomica ha carica negativa?",
+    "answers": [
+      "Protone",
+      "Neutrone",
+      "Elettrone",
+      "Fotone"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_034",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Qual è l'unità di misura della resistenza elettrica?",
+    "answers": [
+      "Watt",
+      "Ohm",
+      "Volt",
+      "Ampere"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_035",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Come si chiama il passaggio da solido a gas senza fase liquida?",
+    "answers": [
+      "Fusione",
+      "Sublimazione",
+      "Condensazione",
+      "Solidificazione"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_036",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Quale gas è più abbondante nell'atmosfera terrestre?",
+    "answers": [
+      "Ossigeno",
+      "Idrogeno",
+      "Azoto",
+      "Anidride carbonica"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_037",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Quanti cromosomi contiene normalmente una cellula somatica umana?",
+    "answers": [
+      "44",
+      "48",
+      "46",
+      "23"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_038",
+    "category": "Scienza",
+    "difficulty": 3,
+    "question": "Quale legge lega pressione e volume di un gas ideale a temperatura costante?",
+    "answers": [
+      "Legge di Hooke",
+      "Legge di Coulomb",
+      "Legge di Ohm",
+      "Legge di Boyle"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_039",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Un pH inferiore a 7 indica generalmente una soluzione…",
+    "answers": [
+      "Basica",
+      "Priva di acqua",
+      "Sempre neutra",
+      "Acida"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_040",
+    "category": "Scienza",
+    "difficulty": 3,
+    "question": "Quale elemento ha numero atomico 6?",
+    "answers": [
+      "Carbonio",
+      "Ossigeno",
+      "Azoto",
+      "Boro"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_041",
+    "category": "Scienza",
+    "difficulty": 1,
+    "question": "Quale strumento si usa per misurare la temperatura?",
+    "answers": [
+      "Termometro",
+      "Anemometro",
+      "Amperometro",
+      "Barometro"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_042",
+    "category": "Scienza",
+    "difficulty": 3,
+    "question": "Qual è l'unità SI della quantità di sostanza?",
+    "answers": [
+      "Mole",
+      "Chilogrammo",
+      "Kelvin",
+      "Candela"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_043",
+    "category": "Natura",
+    "difficulty": 1,
+    "question": "Quale animale è un mammifero?",
+    "answers": [
+      "Trota",
+      "Polpo",
+      "Squalo",
+      "Delfino"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_044",
+    "category": "Natura",
+    "difficulty": 1,
+    "question": "Come si chiama il processo con cui le piante usano la luce per produrre zuccheri?",
+    "answers": [
+      "Fotosintesi",
+      "Digestione",
+      "Fermentazione",
+      "Evaporazione"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_045",
+    "category": "Natura",
+    "difficulty": 1,
+    "question": "Quante zampe ha un insetto adulto tipico?",
+    "answers": [
+      "6",
+      "8",
+      "10",
+      "4"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_046",
+    "category": "Natura",
+    "difficulty": 1,
+    "question": "Quale animale passa dalla fase di bruco a quella di adulto alato?",
+    "answers": [
+      "Lumaca",
+      "Rana",
+      "Lucertola",
+      "Farfalla"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_047",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "Quale di questi alberi è una conifera?",
+    "answers": [
+      "Olivo",
+      "Abete",
+      "Faggio",
+      "Quercia"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_048",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "Quale animale è noto per deporre uova pur essendo un mammifero?",
+    "answers": [
+      "Ornitorinco",
+      "Koala",
+      "Castoro",
+      "Lontra"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_049",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "Quale tessuto vegetale trasporta principalmente acqua dalle radici?",
+    "answers": [
+      "Polline",
+      "Floema",
+      "Xilema",
+      "Epidermide"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_050",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "In quale bioma prevalgono erbe e alberi sparsi, con stagioni secche?",
+    "answers": [
+      "Taiga",
+      "Foresta pluviale",
+      "Tundra",
+      "Savana"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_051",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "Quale animale ha tre cuori?",
+    "answers": [
+      "Coccodrillo",
+      "Polpo",
+      "Aquila",
+      "Balena"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_052",
+    "category": "Natura",
+    "difficulty": 3,
+    "question": "Come si chiama l'associazione tra un fungo e un'alga o cianobatterio?",
+    "answers": [
+      "Muschio",
+      "Spora",
+      "Lichene",
+      "Felce"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_053",
+    "category": "Natura",
+    "difficulty": 3,
+    "question": "Quale gruppo comprende meduse e coralli?",
+    "answers": [
+      "Echinodermi",
+      "Molluschi",
+      "Cnidari",
+      "Anellidi"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_054",
+    "category": "Natura",
+    "difficulty": 1,
+    "question": "Quale animale è il più grande oggi vivente?",
+    "answers": [
+      "Squalo bianco",
+      "Elefante africano",
+      "Giraffa",
+      "Balenottera azzurra"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_055",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "Quale pigmento dà alle foglie il tipico colore verde?",
+    "answers": [
+      "Clorofilla",
+      "Cheratina",
+      "Melanina",
+      "Emoglobina"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_056",
+    "category": "Natura",
+    "difficulty": 3,
+    "question": "Come si chiama la relazione in cui entrambe le specie traggono beneficio?",
+    "answers": [
+      "Predazione",
+      "Mutualismo",
+      "Competizione",
+      "Parassitismo"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_057",
+    "category": "Astronomia",
+    "difficulty": 1,
+    "question": "Quale pianeta è chiamato il pianeta rosso?",
+    "answers": [
+      "Marte",
+      "Mercurio",
+      "Venere",
+      "Giove"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_058",
+    "category": "Astronomia",
+    "difficulty": 1,
+    "question": "Qual è il satellite naturale della Terra?",
+    "answers": [
+      "Io",
+      "Titano",
+      "Europa",
+      "Luna"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_059",
+    "category": "Astronomia",
+    "difficulty": 1,
+    "question": "Qual è il pianeta più grande del Sistema solare?",
+    "answers": [
+      "Terra",
+      "Saturno",
+      "Nettuno",
+      "Giove"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_060",
+    "category": "Astronomia",
+    "difficulty": 1,
+    "question": "Quale stella è al centro del Sistema solare?",
+    "answers": [
+      "Polare",
+      "Vega",
+      "Sole",
+      "Sirio"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_061",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "Quale pianeta è più vicino al Sole?",
+    "answers": [
+      "Marte",
+      "Mercurio",
+      "Venere",
+      "Terra"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_062",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "In quale galassia si trova il Sistema solare?",
+    "answers": [
+      "Galassia del Triangolo",
+      "Andromeda",
+      "Grande Nube di Magellano",
+      "Via Lattea"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_063",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "Che cosa misura un anno luce?",
+    "answers": [
+      "Una massa",
+      "Una durata",
+      "Una temperatura",
+      "Una distanza"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_064",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "Quale pianeta è famoso per il suo ampio sistema di anelli visibili?",
+    "answers": [
+      "Saturno",
+      "Marte",
+      "Mercurio",
+      "Venere"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_065",
+    "category": "Astronomia",
+    "difficulty": 3,
+    "question": "Come si chiama il confine oltre il quale nulla può uscire da un buco nero?",
+    "answers": [
+      "Fascia di Kuiper",
+      "Equatore celeste",
+      "Orizzonte degli eventi",
+      "Punto di Lagrange"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_066",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "Quale fenomeno si verifica quando la Luna si interpone fra Sole e Terra?",
+    "answers": [
+      "Eclissi lunare",
+      "Solstizio",
+      "Eclissi solare",
+      "Aurora boreale"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_067",
+    "category": "Astronomia",
+    "difficulty": 3,
+    "question": "Quale satellite di Saturno ha una densa atmosfera?",
+    "answers": [
+      "Fobos",
+      "Titano",
+      "Deimos",
+      "Europa"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_068",
+    "category": "Astronomia",
+    "difficulty": 3,
+    "question": "Quale tipo di stella compatta è composta principalmente da neutroni?",
+    "answers": [
+      "Stella di neutroni",
+      "Gigante rossa",
+      "Nana bruna",
+      "Stella di sequenza principale"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_069",
+    "category": "Astronomia",
+    "difficulty": 1,
+    "question": "Quanti pianeti riconosciuti ci sono nel Sistema solare?",
+    "answers": [
+      "7",
+      "8",
+      "9",
+      "10"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_070",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "Quale moto della Terra determina l'alternanza di giorno e notte?",
+    "answers": [
+      "Nutazione",
+      "Rotazione",
+      "Rivoluzione",
+      "Precessione"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_071",
+    "category": "Letteratura",
+    "difficulty": 1,
+    "question": "Chi ha scritto la Divina Commedia?",
+    "answers": [
+      "Ludovico Ariosto",
+      "Dante Alighieri",
+      "Francesco Petrarca",
+      "Giovanni Boccaccio"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_072",
+    "category": "Letteratura",
+    "difficulty": 1,
+    "question": "Chi ha scritto I promessi sposi?",
+    "answers": [
+      "Alessandro Manzoni",
+      "Giacomo Leopardi",
+      "Giovanni Verga",
+      "Italo Calvino"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_073",
+    "category": "Letteratura",
+    "difficulty": 1,
+    "question": "Quale personaggio di Collodi ha un naso che si allunga quando mente?",
+    "answers": [
+      "Mangiafuoco",
+      "Lucignolo",
+      "Pinocchio",
+      "Geppetto"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_074",
+    "category": "Letteratura",
+    "difficulty": 1,
+    "question": "Chi ha scritto Romeo e Giulietta?",
+    "answers": [
+      "Oscar Wilde",
+      "Jane Austen",
+      "William Shakespeare",
+      "Charles Dickens"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_075",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Quale autore ha creato il detective Sherlock Holmes?",
+    "answers": [
+      "Georges Simenon",
+      "Arthur Conan Doyle",
+      "Agatha Christie",
+      "Edgar Allan Poe"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_076",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Quale romanzo di George Orwell presenta il Grande Fratello?",
+    "answers": [
+      "Il mondo nuovo",
+      "La fattoria degli animali",
+      "Fahrenheit 451",
+      "1984"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_077",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Chi ha scritto Il piccolo principe?",
+    "answers": [
+      "Antoine de Saint-Exupéry",
+      "Albert Camus",
+      "Victor Hugo",
+      "Jules Verne"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_078",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Chi è l'autore dell'Odissea secondo la tradizione?",
+    "answers": [
+      "Omero",
+      "Virgilio",
+      "Sofocle",
+      "Ovidio"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_079",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Quale scrittrice ha scritto Orgoglio e pregiudizio?",
+    "answers": [
+      "Jane Austen",
+      "Virginia Woolf",
+      "Emily Brontë",
+      "Mary Shelley"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_080",
+    "category": "Letteratura",
+    "difficulty": 3,
+    "question": "Chi ha scritto La coscienza di Zeno?",
+    "answers": [
+      "Primo Levi",
+      "Cesare Pavese",
+      "Luigi Pirandello",
+      "Italo Svevo"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_081",
+    "category": "Letteratura",
+    "difficulty": 3,
+    "question": "Quale autore argentino ha scritto la raccolta Finzioni?",
+    "answers": [
+      "Jorge Luis Borges",
+      "Pablo Neruda",
+      "Gabriel García Márquez",
+      "Julio Cortázar"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_082",
+    "category": "Letteratura",
+    "difficulty": 3,
+    "question": "In quale romanzo compare il capitano Achab?",
+    "answers": [
+      "Ventimila leghe sotto i mari",
+      "Robinson Crusoe",
+      "Moby Dick",
+      "L'isola del tesoro"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_083",
+    "category": "Letteratura",
+    "difficulty": 1,
+    "question": "Chi ha scritto la saga di Harry Potter?",
+    "answers": [
+      "Roald Dahl",
+      "C. S. Lewis",
+      "J. K. Rowling",
+      "J. R. R. Tolkien"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_084",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Quale poeta scrisse L'infinito?",
+    "answers": [
+      "Giuseppe Ungaretti",
+      "Giacomo Leopardi",
+      "Ugo Foscolo",
+      "Eugenio Montale"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_085",
+    "category": "Arte",
+    "difficulty": 1,
+    "question": "Chi ha dipinto la Gioconda?",
+    "answers": [
+      "Michelangelo",
+      "Leonardo da Vinci",
+      "Caravaggio",
+      "Raffaello"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_086",
+    "category": "Arte",
+    "difficulty": 1,
+    "question": "In quale museo è esposta la Gioconda?",
+    "answers": [
+      "Uffizi",
+      "Louvre",
+      "Prado",
+      "British Museum"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_087",
+    "category": "Arte",
+    "difficulty": 1,
+    "question": "Chi dipinse il soffitto della Cappella Sistina?",
+    "answers": [
+      "Donatello",
+      "Botticelli",
+      "Bernini",
+      "Michelangelo"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_088",
+    "category": "Arte",
+    "difficulty": 1,
+    "question": "Quale artista è celebre per i dipinti di girasoli?",
+    "answers": [
+      "Vincent van Gogh",
+      "Claude Monet",
+      "Salvador Dalí",
+      "Edvard Munch"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_089",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "Chi ha dipinto Guernica?",
+    "answers": [
+      "Pablo Picasso",
+      "Joan Miró",
+      "Henri Matisse",
+      "Paul Klee"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_090",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "Quale movimento artistico è associato a Claude Monet?",
+    "answers": [
+      "Surrealismo",
+      "Cubismo",
+      "Impressionismo",
+      "Futurismo"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_091",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "Chi ha realizzato la scultura Il pensatore?",
+    "answers": [
+      "Gian Lorenzo Bernini",
+      "Donatello",
+      "Auguste Rodin",
+      "Antonio Canova"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_092",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "Quale pittore ha realizzato La nascita di Venere agli Uffizi?",
+    "answers": [
+      "Sandro Botticelli",
+      "Tiziano",
+      "Giotto",
+      "Tintoretto"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_093",
+    "category": "Arte",
+    "difficulty": 3,
+    "question": "Quale artista è associato ai tagli sulla tela?",
+    "answers": [
+      "Lucio Fontana",
+      "Giorgio Morandi",
+      "Renato Guttuso",
+      "Alberto Burri"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_094",
+    "category": "Arte",
+    "difficulty": 3,
+    "question": "Chi ha dipinto La persistenza della memoria, con gli orologi molli?",
+    "answers": [
+      "Salvador Dalí",
+      "Max Ernst",
+      "René Magritte",
+      "Giorgio de Chirico"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_095",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "In quale città si trova il museo del Prado?",
+    "answers": [
+      "Barcellona",
+      "Madrid",
+      "Siviglia",
+      "Valencia"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_096",
+    "category": "Arte",
+    "difficulty": 3,
+    "question": "Chi progettò la cupola di Santa Maria del Fiore a Firenze?",
+    "answers": [
+      "Andrea Palladio",
+      "Filippo Brunelleschi",
+      "Leon Battista Alberti",
+      "Donato Bramante"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_097",
+    "category": "Arte",
+    "difficulty": 1,
+    "question": "Quale colore si ottiene mescolando pigmenti blu e gialli?",
+    "answers": [
+      "Viola",
+      "Arancione",
+      "Verde",
+      "Rosso"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_098",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "Quale artista messicana è nota per i suoi autoritratti?",
+    "answers": [
+      "Frida Kahlo",
+      "Tamara de Lempicka",
+      "Georgia O'Keeffe",
+      "Berthe Morisot"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_099",
+    "category": "Musica",
+    "difficulty": 1,
+    "question": "Quante corde ha normalmente un violino?",
+    "answers": [
+      "6",
+      "8",
+      "5",
+      "4"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_100",
+    "category": "Musica",
+    "difficulty": 1,
+    "question": "Quale strumento ha tasti bianchi e neri e corde percosse da martelletti?",
+    "answers": [
+      "Fisarmonica",
+      "Clavicembalo",
+      "Organo a canne",
+      "Pianoforte"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_101",
+    "category": "Musica",
+    "difficulty": 1,
+    "question": "Chi compose Le quattro stagioni?",
+    "answers": [
+      "Giuseppe Verdi",
+      "Giacomo Puccini",
+      "Gioachino Rossini",
+      "Antonio Vivaldi"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_102",
+    "category": "Musica",
+    "difficulty": 1,
+    "question": "Da quale città inglese provenivano i Beatles?",
+    "answers": [
+      "Londra",
+      "Bristol",
+      "Liverpool",
+      "Manchester"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_103",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Chi compose Il flauto magico?",
+    "answers": [
+      "Wolfgang Amadeus Mozart",
+      "Franz Schubert",
+      "Johann Sebastian Bach",
+      "Ludwig van Beethoven"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_104",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Quale famiglia di strumenti comprende la tromba?",
+    "answers": [
+      "Percussioni a tastiera",
+      "Ottoni",
+      "Legni",
+      "Archi"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_105",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Che cosa indica il termine crescendo?",
+    "answers": [
+      "Aumento graduale dell'intensità",
+      "Riduzione della velocità",
+      "Pausa totale",
+      "Ripetizione dall'inizio"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_106",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Quale compositore scrisse la Nona sinfonia con l'Inno alla gioia?",
+    "answers": [
+      "Ludwig van Beethoven",
+      "Johannes Brahms",
+      "Franz Liszt",
+      "Gustav Mahler"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_107",
+    "category": "Musica",
+    "difficulty": 3,
+    "question": "Quanti semitoni contiene un'ottava nel sistema temperato a dodici suoni?",
+    "answers": [
+      "8",
+      "7",
+      "12",
+      "10"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_108",
+    "category": "Musica",
+    "difficulty": 3,
+    "question": "Chi compose il balletto La sagra della primavera?",
+    "answers": [
+      "Sergej Prokof'ev",
+      "Pëtr Čajkovskij",
+      "Claude Debussy",
+      "Igor Stravinskij"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_109",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Quale cantante dei Queen era noto per la sua voce e presenza scenica?",
+    "answers": [
+      "Elton John",
+      "David Bowie",
+      "Robert Plant",
+      "Freddie Mercury"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_110",
+    "category": "Musica",
+    "difficulty": 3,
+    "question": "Quale indicazione musicale richiede di pizzicare le corde?",
+    "answers": [
+      "Sostenuto",
+      "Legato",
+      "Fortissimo",
+      "Pizzicato"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_111",
+    "category": "Musica",
+    "difficulty": 1,
+    "question": "Quante linee ha un pentagramma?",
+    "answers": [
+      "5",
+      "4",
+      "7",
+      "6"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_112",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Quale genere musicale è fortemente associato all'improvvisazione e a New Orleans?",
+    "answers": [
+      "K-pop",
+      "Tango",
+      "Jazz",
+      "Flamenco"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_113",
+    "category": "Cinema",
+    "difficulty": 1,
+    "question": "Chi dirige il film Titanic del 1997?",
+    "answers": [
+      "George Lucas",
+      "Ridley Scott",
+      "Steven Spielberg",
+      "James Cameron"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_114",
+    "category": "Cinema",
+    "difficulty": 1,
+    "question": "Quale saga cinematografica include Darth Vader?",
+    "answers": [
+      "Matrix",
+      "Il Signore degli Anelli",
+      "Star Wars",
+      "Star Trek"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_115",
+    "category": "Cinema",
+    "difficulty": 1,
+    "question": "Quale oggetto perde Cenerentola nel celebre film Disney?",
+    "answers": [
+      "Un anello",
+      "Una scarpetta",
+      "Una corona",
+      "Una bacchetta"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_116",
+    "category": "Cinema",
+    "difficulty": 1,
+    "question": "Quale studio ha prodotto Toy Story del 1995?",
+    "answers": [
+      "Aardman",
+      "DreamWorks",
+      "Studio Ghibli",
+      "Pixar"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_117",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "Chi ha diretto La dolce vita?",
+    "answers": [
+      "Luchino Visconti",
+      "Federico Fellini",
+      "Sergio Leone",
+      "Vittorio De Sica"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_118",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "Quale regista ha diretto Jurassic Park del 1993?",
+    "answers": [
+      "Tim Burton",
+      "Peter Jackson",
+      "Steven Spielberg",
+      "Christopher Nolan"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_119",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "Chi interpreta il protagonista di Forrest Gump?",
+    "answers": [
+      "Tom Hanks",
+      "Robin Williams",
+      "Brad Pitt",
+      "Tom Cruise"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_120",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "In quale città si svolge principalmente il film d'animazione Ratatouille?",
+    "answers": [
+      "New York",
+      "Parigi",
+      "Londra",
+      "Roma"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_121",
+    "category": "Cinema",
+    "difficulty": 3,
+    "question": "Chi ha diretto I sette samurai?",
+    "answers": [
+      "Hayao Miyazaki",
+      "Yasujirō Ozu",
+      "Akira Kurosawa",
+      "Wong Kar-wai"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_122",
+    "category": "Cinema",
+    "difficulty": 3,
+    "question": "Quale film di Vittorio De Sica segue un padre e suo figlio alla ricerca di una bicicletta?",
+    "answers": [
+      "Umberto D.",
+      "Ladri di biciclette",
+      "Sciuscià",
+      "Miracolo a Milano"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_123",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "Quale personaggio cinematografico usa una frusta ed è archeologo?",
+    "answers": [
+      "Indiana Jones",
+      "Rocky Balboa",
+      "Jack Sparrow",
+      "James Bond"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_124",
+    "category": "Cinema",
+    "difficulty": 3,
+    "question": "Quale regista ha realizzato La città incantata?",
+    "answers": [
+      "Makoto Shinkai",
+      "Hayao Miyazaki",
+      "Satoshi Kon",
+      "Isao Takahata"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_125",
+    "category": "Cinema",
+    "difficulty": 1,
+    "question": "Quale animale è il protagonista de Il re leone?",
+    "answers": [
+      "Tigre",
+      "Lupo",
+      "Leone",
+      "Orso"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_126",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "Quale film di fantascienza del 1999 ha Neo come protagonista?",
+    "answers": [
+      "Dune",
+      "Matrix",
+      "Blade Runner",
+      "Alien"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_127",
+    "category": "Tecnologia",
+    "difficulty": 1,
+    "question": "Che cosa significa la sigla CPU?",
+    "answers": [
+      "Memoria permanente universale",
+      "Unità di stampa a colori",
+      "Unità centrale di elaborazione",
+      "Protocollo di connessione utente"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_128",
+    "category": "Tecnologia",
+    "difficulty": 1,
+    "question": "Quale dispositivo si usa principalmente per inserire testo in un computer?",
+    "answers": [
+      "Altoparlante",
+      "Monitor",
+      "Tastiera",
+      "Stampante"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_129",
+    "category": "Tecnologia",
+    "difficulty": 1,
+    "question": "Quale di questi è un browser web?",
+    "answers": [
+      "VLC",
+      "Excel",
+      "Firefox",
+      "Photoshop"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_130",
+    "category": "Tecnologia",
+    "difficulty": 1,
+    "question": "Quanti valori distinti può rappresentare un bit?",
+    "answers": [
+      "8",
+      "10",
+      "2",
+      "16"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_131",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "Quale linguaggio descrive la struttura delle pagine web?",
+    "answers": [
+      "C",
+      "Bash",
+      "HTML",
+      "SQL"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_132",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "Quale memoria perde normalmente i dati quando manca alimentazione?",
+    "answers": [
+      "Memoria flash",
+      "SSD",
+      "RAM",
+      "Disco rigido"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_133",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "A cosa serve principalmente il DNS?",
+    "answers": [
+      "Misurare la velocità della CPU",
+      "Tradurre nomi di dominio in indirizzi IP",
+      "Ricaricare batterie",
+      "Comprimere immagini"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_134",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "Quale protocollo cifra il traffico web quando usato con HTTP?",
+    "answers": [
+      "ARP",
+      "UDP",
+      "FTP",
+      "TLS"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_135",
+    "category": "Tecnologia",
+    "difficulty": 3,
+    "question": "In informatica, quale struttura segue il principio FIFO?",
+    "answers": [
+      "Albero binario",
+      "Pila",
+      "Insieme non ordinato",
+      "Coda"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_136",
+    "category": "Tecnologia",
+    "difficulty": 3,
+    "question": "Quale complessità ha una ricerca binaria su una sequenza ordinata?",
+    "answers": [
+      "O(n²)",
+      "O(n!)",
+      "O(2ⁿ)",
+      "O(log n)"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_137",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "Quale linguaggio si usa comunemente per interrogare database relazionali?",
+    "answers": [
+      "SVG",
+      "SQL",
+      "Markdown",
+      "CSS"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_138",
+    "category": "Tecnologia",
+    "difficulty": 3,
+    "question": "Che cosa garantisce principalmente una funzione hash crittografica sui dati?",
+    "answers": [
+      "La connessione a Internet",
+      "Un'impronta di lunghezza fissa",
+      "Una compressione reversibile",
+      "La duplicazione automatica"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_139",
+    "category": "Tecnologia",
+    "difficulty": 1,
+    "question": "Quale simbolo separa nome utente e dominio in un indirizzo email?",
+    "answers": [
+      "%",
+      "&",
+      "@",
+      "#"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_140",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "Quale sistema di numerazione usa solo 0 e 1?",
+    "answers": [
+      "Decimale",
+      "Ottale",
+      "Esadecimale",
+      "Binario"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_141",
+    "category": "Sport",
+    "difficulty": 1,
+    "question": "Quanti giocatori per squadra scendono in campo nel calcio a 11?",
+    "answers": [
+      "10",
+      "9",
+      "11",
+      "12"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_142",
+    "category": "Sport",
+    "difficulty": 1,
+    "question": "Quale sport usa un canestro?",
+    "answers": [
+      "Hockey",
+      "Pallavolo",
+      "Pallacanestro",
+      "Rugby"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_143",
+    "category": "Sport",
+    "difficulty": 1,
+    "question": "In quale sport si disputa il torneo di Wimbledon?",
+    "answers": [
+      "Cricket",
+      "Tennis",
+      "Badminton",
+      "Golf"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_144",
+    "category": "Sport",
+    "difficulty": 1,
+    "question": "Quale sport si pratica in piscina usando quattro stili principali?",
+    "answers": [
+      "Ciclismo",
+      "Canottaggio",
+      "Nuoto",
+      "Scherma"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_145",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Quanto è lunga una maratona ufficiale?",
+    "answers": [
+      "40 km",
+      "50 km",
+      "21,0975 km",
+      "42,195 km"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_146",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Quale colore ha la maglia del leader del Tour de France?",
+    "answers": [
+      "Verde",
+      "Giallo",
+      "Rosa",
+      "Rosso"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_147",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Quanti cerchi compongono il simbolo olimpico?",
+    "answers": [
+      "7",
+      "4",
+      "6",
+      "5"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_148",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Nel tennis, quale punteggio indica parità dopo 40-40?",
+    "answers": [
+      "Let",
+      "Ace",
+      "Love",
+      "Deuce"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_149",
+    "category": "Sport",
+    "difficulty": 3,
+    "question": "Nel rugby a 15, quanti punti vale una meta senza trasformazione?",
+    "answers": [
+      "6",
+      "7",
+      "5",
+      "3"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_150",
+    "category": "Sport",
+    "difficulty": 3,
+    "question": "Quale attrezzo NON appartiene alla ginnastica ritmica individuale?",
+    "answers": [
+      "Cerchio",
+      "Cavallo con maniglie",
+      "Nastro",
+      "Palla"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_151",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Quanti giocatori di una squadra sono normalmente in campo nella pallavolo?",
+    "answers": [
+      "5",
+      "6",
+      "8",
+      "7"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_152",
+    "category": "Sport",
+    "difficulty": 3,
+    "question": "In quale specialità atletica si superano ostacoli e una riviera d'acqua?",
+    "answers": [
+      "Salto triplo",
+      "110 metri ostacoli",
+      "3000 metri siepi",
+      "Decathlon"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_153",
+    "category": "Sport",
+    "difficulty": 1,
+    "question": "Quale sport è associato al Giro d'Italia?",
+    "answers": [
+      "Ciclismo",
+      "Automobilismo",
+      "Motociclismo",
+      "Podismo"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_154",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Negli scacchi, quale pezzo si muove a L?",
+    "answers": [
+      "Cavallo",
+      "Alfiere",
+      "Torre",
+      "Re"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_155",
+    "category": "Matematica",
+    "difficulty": 1,
+    "question": "Quanto fa 7 × 8?",
+    "answers": [
+      "56",
+      "64",
+      "48",
+      "54"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_156",
+    "category": "Matematica",
+    "difficulty": 1,
+    "question": "Quanti lati ha un esagono?",
+    "answers": [
+      "7",
+      "5",
+      "8",
+      "6"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_157",
+    "category": "Matematica",
+    "difficulty": 1,
+    "question": "Qual è la metà di 90?",
+    "answers": [
+      "40",
+      "55",
+      "30",
+      "45"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_158",
+    "category": "Matematica",
+    "difficulty": 1,
+    "question": "Quanto vale il 10% di 250?",
+    "answers": [
+      "10",
+      "20",
+      "50",
+      "25"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_159",
+    "category": "Matematica",
+    "difficulty": 2,
+    "question": "Qual è la radice quadrata di 144?",
+    "answers": [
+      "14",
+      "12",
+      "16",
+      "11"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_160",
+    "category": "Matematica",
+    "difficulty": 2,
+    "question": "Qual è la somma degli angoli interni di un triangolo piano?",
+    "answers": [
+      "180°",
+      "270°",
+      "360°",
+      "90°"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_161",
+    "category": "Matematica",
+    "difficulty": 2,
+    "question": "Quale di questi numeri è primo?",
+    "answers": [
+      "21",
+      "33",
+      "29",
+      "27"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_162",
+    "category": "Matematica",
+    "difficulty": 2,
+    "question": "Quanto vale 2 elevato alla quinta potenza?",
+    "answers": [
+      "10",
+      "32",
+      "64",
+      "16"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_163",
+    "category": "Matematica",
+    "difficulty": 3,
+    "question": "Qual è la derivata di x² rispetto a x?",
+    "answers": [
+      "x",
+      "2x",
+      "2",
+      "x³"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_164",
+    "category": "Matematica",
+    "difficulty": 3,
+    "question": "Quanto vale il fattoriale di 5?",
+    "answers": [
+      "25",
+      "60",
+      "120",
+      "100"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_165",
+    "category": "Matematica",
+    "difficulty": 2,
+    "question": "Un quadrato ha lato 5 cm: qual è la sua area?",
+    "answers": [
+      "10 cm²",
+      "25 cm²",
+      "20 cm²",
+      "15 cm²"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_166",
+    "category": "Matematica",
+    "difficulty": 3,
+    "question": "Qual è il logaritmo in base 10 di 1000?",
+    "answers": [
+      "100",
+      "2",
+      "3",
+      "10"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_167",
+    "category": "Matematica",
+    "difficulty": 1,
+    "question": "Quanto fa 3/4 espresso in percentuale?",
+    "answers": [
+      "75%",
+      "50%",
+      "25%",
+      "34%"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_168",
+    "category": "Matematica",
+    "difficulty": 2,
+    "question": "Qual è il minimo comune multiplo di 6 e 8?",
+    "answers": [
+      "16",
+      "12",
+      "24",
+      "48"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_169",
+    "category": "Personaggi",
+    "difficulty": 1,
+    "question": "Chi formulò la teoria della relatività?",
+    "answers": [
+      "Charles Darwin",
+      "Isaac Newton",
+      "Galileo Galilei",
+      "Albert Einstein"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_170",
+    "category": "Personaggi",
+    "difficulty": 1,
+    "question": "Chi fu il primo essere umano a camminare sulla Luna?",
+    "answers": [
+      "Michael Collins",
+      "Neil Armstrong",
+      "Buzz Aldrin",
+      "Yuri Gagarin"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_171",
+    "category": "Personaggi",
+    "difficulty": 1,
+    "question": "Chi è noto per la teoria dell'evoluzione per selezione naturale?",
+    "answers": [
+      "Gregor Mendel",
+      "Dmitrij Mendeleev",
+      "Louis Pasteur",
+      "Charles Darwin"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_172",
+    "category": "Personaggi",
+    "difficulty": 1,
+    "question": "Quale scienziata vinse due Nobel in Fisica e Chimica?",
+    "answers": [
+      "Rosalind Franklin",
+      "Rita Levi-Montalcini",
+      "Marie Curie",
+      "Ada Lovelace"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_173",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Chi guidò la lotta nonviolenta per l'indipendenza dell'India?",
+    "answers": [
+      "Nelson Mandela",
+      "Martin Luther King",
+      "Sun Yat-sen",
+      "Mahatma Gandhi"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_174",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Quale donna fu la prima a volare nello spazio?",
+    "answers": [
+      "Mae Jemison",
+      "Sally Ride",
+      "Valentina Tereškova",
+      "Samantha Cristoforetti"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_175",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Chi è associato alle leggi dell'ereditarietà studiate sui piselli?",
+    "answers": [
+      "Carl Linnaeus",
+      "Alexander Fleming",
+      "Gregor Mendel",
+      "Robert Koch"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_176",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Quale infermiera è celebre per il suo lavoro durante la guerra di Crimea?",
+    "answers": [
+      "Maria Montessori",
+      "Florence Nightingale",
+      "Clara Barton",
+      "Emmeline Pankhurst"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_177",
+    "category": "Personaggi",
+    "difficulty": 3,
+    "question": "Quale matematica scrisse note sulla macchina analitica di Babbage?",
+    "answers": [
+      "Sophie Germain",
+      "Ipazia",
+      "Emmy Noether",
+      "Ada Lovelace"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_178",
+    "category": "Personaggi",
+    "difficulty": 3,
+    "question": "Chi dimostrò l'ultimo teorema di Fermat negli anni Novanta?",
+    "answers": [
+      "John Nash",
+      "Alan Turing",
+      "Kurt Gödel",
+      "Andrew Wiles"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_179",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Chi dipinse l'affresco L'ultima cena a Milano?",
+    "answers": [
+      "Raffaello",
+      "Leonardo da Vinci",
+      "Giotto",
+      "Piero della Francesca"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_180",
+    "category": "Personaggi",
+    "difficulty": 3,
+    "question": "Quale scienziata italiana vinse il Nobel per la Medicina nel 1986?",
+    "answers": [
+      "Fabiola Gianotti",
+      "Maria Montessori",
+      "Margherita Hack",
+      "Rita Levi-Montalcini"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_181",
+    "category": "Personaggi",
+    "difficulty": 1,
+    "question": "Chi fu il primo presidente degli Stati Uniti?",
+    "answers": [
+      "George Washington",
+      "John Adams",
+      "Abraham Lincoln",
+      "Thomas Jefferson"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_182",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Quale esploratore raggiunse il Polo Sud nel dicembre 1911?",
+    "answers": [
+      "Ernest Shackleton",
+      "Roald Amundsen",
+      "Fridtjof Nansen",
+      "Robert Scott"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_183",
+    "category": "Invenzioni",
+    "difficulty": 1,
+    "question": "Chi è associato alla stampa a caratteri mobili metallici nell'Europa del XV secolo?",
+    "answers": [
+      "Johannes Gutenberg",
+      "Blaise Pascal",
+      "Leonardo da Vinci",
+      "Isaac Newton"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_184",
+    "category": "Invenzioni",
+    "difficulty": 1,
+    "question": "Quale invenzione permette di osservare oggetti molto piccoli?",
+    "answers": [
+      "Telescopio",
+      "Periscopio",
+      "Microscopio",
+      "Sestante"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_185",
+    "category": "Invenzioni",
+    "difficulty": 1,
+    "question": "Quale apparecchio trasforma energia meccanica in energia elettrica?",
+    "answers": [
+      "Altoparlante",
+      "Frigorifero",
+      "Lampadina",
+      "Generatore"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_186",
+    "category": "Invenzioni",
+    "difficulty": 1,
+    "question": "Quale invenzione consente di orientarsi sfruttando il campo magnetico terrestre?",
+    "answers": [
+      "Termometro",
+      "Clessidra",
+      "Barometro",
+      "Bussola"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_187",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Chi creò il World Wide Web al CERN?",
+    "answers": [
+      "Steve Jobs",
+      "Linus Torvalds",
+      "Bill Gates",
+      "Tim Berners-Lee"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_188",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Quali fratelli realizzarono il celebre volo a motore del 1903 a Kitty Hawk?",
+    "answers": [
+      "Wright",
+      "Grimm",
+      "Lumière",
+      "Montgolfier"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_189",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Quale invenzione è legata ai fratelli Lumière?",
+    "answers": [
+      "Telefono",
+      "Cinematografo",
+      "Fonografo",
+      "Telegrafo"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_190",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Chi scoprì la penicillina nel 1928?",
+    "answers": [
+      "Edward Jenner",
+      "Louis Pasteur",
+      "Alexander Fleming",
+      "Robert Koch"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_191",
+    "category": "Invenzioni",
+    "difficulty": 3,
+    "question": "Quale inventore ideò il primo motore diesel funzionante negli anni 1890?",
+    "answers": [
+      "Rudolf Diesel",
+      "Karl Benz",
+      "James Watt",
+      "Nikola Tesla"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_192",
+    "category": "Invenzioni",
+    "difficulty": 3,
+    "question": "Quale strumento ideato da Evangelista Torricelli misura la pressione atmosferica?",
+    "answers": [
+      "Anemometro",
+      "Igrometro",
+      "Calorimetro",
+      "Barometro"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_193",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Chi sviluppò il sistema di lettura e scrittura tattile a sei punti?",
+    "answers": [
+      "Louis Braille",
+      "Alexander Graham Bell",
+      "Thomas Edison",
+      "Samuel Morse"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_194",
+    "category": "Invenzioni",
+    "difficulty": 3,
+    "question": "Quale tecnologia usa l'amplificazione della luce per emissione stimolata?",
+    "answers": [
+      "Dinamo",
+      "Sonar",
+      "Radar",
+      "Laser"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_195",
+    "category": "Invenzioni",
+    "difficulty": 1,
+    "question": "Che cosa misura principalmente un orologio?",
+    "answers": [
+      "La pressione",
+      "La massa",
+      "L'umidità",
+      "Il tempo"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_196",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Quale dispositivo inventato da Alessandro Volta produceva corrente elettrica?",
+    "answers": [
+      "Alternatore",
+      "Pila",
+      "Diodo",
+      "Transistor"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_197",
+    "category": "Cultura del mondo",
+    "difficulty": 1,
+    "question": "In quale paese ha origine il sushi?",
+    "answers": [
+      "Messico",
+      "Egitto",
+      "Giappone",
+      "Grecia"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_198",
+    "category": "Cultura del mondo",
+    "difficulty": 1,
+    "question": "Quale lingua si parla principalmente in Brasile?",
+    "answers": [
+      "Portoghese",
+      "Francese",
+      "Spagnolo",
+      "Italiano"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_199",
+    "category": "Cultura del mondo",
+    "difficulty": 1,
+    "question": "In quale paese si trova il Taj Mahal?",
+    "answers": [
+      "Cina",
+      "India",
+      "Iran",
+      "Thailandia"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_200",
+    "category": "Cultura del mondo",
+    "difficulty": 1,
+    "question": "Quale città italiana è celebre per gondole e canali?",
+    "answers": [
+      "Siena",
+      "Bologna",
+      "Venezia",
+      "Torino"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_201",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "Quale festa messicana onora i defunti con altari e offerte?",
+    "answers": [
+      "Oktoberfest",
+      "Hanami",
+      "Día de Muertos",
+      "Holi"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_202",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "Quale bevanda tradizionale giapponese si ottiene dalla fermentazione del riso?",
+    "answers": [
+      "Tequila",
+      "Sidro",
+      "Sake",
+      "Cachaça"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_203",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "Quale danza è associata ad Argentina e Uruguay?",
+    "answers": [
+      "Polka",
+      "Tango",
+      "Flamenco",
+      "Valzer"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_204",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "Quale alfabeto si usa comunemente per scrivere il russo?",
+    "answers": [
+      "Ebraico",
+      "Greco",
+      "Arabo",
+      "Cirillico"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_205",
+    "category": "Cultura del mondo",
+    "difficulty": 3,
+    "question": "Come si chiama l'arte giapponese di piegare la carta?",
+    "answers": [
+      "Origami",
+      "Kintsugi",
+      "Ikebana",
+      "Bonsai"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_206",
+    "category": "Cultura del mondo",
+    "difficulty": 3,
+    "question": "Quale tradizione giapponese consiste nel riparare ceramiche evidenziando le fratture con oro?",
+    "answers": [
+      "Origami",
+      "Kintsugi",
+      "Sumi-e",
+      "Shodō"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_207",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "Quale paese è associato al piatto chiamato paella?",
+    "answers": [
+      "Portogallo",
+      "Marocco",
+      "Francia",
+      "Spagna"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_208",
+    "category": "Cultura del mondo",
+    "difficulty": 3,
+    "question": "Quale antico sito in Giordania è famoso per le facciate scavate nella roccia?",
+    "answers": [
+      "Petra",
+      "Persepoli",
+      "Efeso",
+      "Palmira"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_209",
+    "category": "Cultura del mondo",
+    "difficulty": 1,
+    "question": "Quale monumento è un simbolo di Parigi?",
+    "answers": [
+      "Torre Eiffel",
+      "Big Ben",
+      "Porta di Brandeburgo",
+      "Colosseo"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_210",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "Quale strumento aborigeno australiano è un lungo tubo suonato a fiato?",
+    "answers": [
+      "Koto",
+      "Sitar",
+      "Didgeridoo",
+      "Balalaika"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_211",
+    "category": "Logica",
+    "difficulty": 1,
+    "question": "Quale numero completa la sequenza 2, 4, 6, 8, …?",
+    "answers": [
+      "12",
+      "16",
+      "9",
+      "10"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_212",
+    "category": "Logica",
+    "difficulty": 1,
+    "question": "Se oggi è lunedì, che giorno sarà tra tre giorni?",
+    "answers": [
+      "Domenica",
+      "Venerdì",
+      "Giovedì",
+      "Mercoledì"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_213",
+    "category": "Logica",
+    "difficulty": 1,
+    "question": "Quale parola non appartiene al gruppo: mela, pera, carota, banana?",
+    "answers": [
+      "Pera",
+      "Carota",
+      "Mela",
+      "Banana"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_214",
+    "category": "Logica",
+    "difficulty": 1,
+    "question": "Se tutti i gatti sono mammiferi e Milo è un gatto, Milo è…",
+    "answers": [
+      "Un rettile",
+      "Un pesce",
+      "Un mammifero",
+      "Un uccello"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_215",
+    "category": "Logica",
+    "difficulty": 2,
+    "question": "Quale numero completa la sequenza 3, 6, 12, 24, …?",
+    "answers": [
+      "30",
+      "48",
+      "42",
+      "36"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_216",
+    "category": "Logica",
+    "difficulty": 2,
+    "question": "Anna è più alta di Luca, Luca è più alto di Marco. Chi è il più basso?",
+    "answers": [
+      "Luca",
+      "Anna",
+      "Marco",
+      "Non si può stabilire"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_217",
+    "category": "Logica",
+    "difficulty": 2,
+    "question": "Hai 3 mele e ne prendi altre 2. Quante mele hai in tutto?",
+    "answers": [
+      "6",
+      "3",
+      "1",
+      "5"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_218",
+    "category": "Logica",
+    "difficulty": 2,
+    "question": "Quale numero completa la sequenza 1, 4, 9, 16, …?",
+    "answers": [
+      "20",
+      "24",
+      "25",
+      "32"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_219",
+    "category": "Logica",
+    "difficulty": 3,
+    "question": "Una moneta equa viene lanciata due volte. Qual è la probabilità di ottenere due teste?",
+    "answers": [
+      "1",
+      "1/4",
+      "1/2",
+      "3/4"
+    ],
+    "correct_index": 1,
+    "explanation": ""
+  },
+  {
+    "id": "br_220",
+    "category": "Logica",
+    "difficulty": 3,
+    "question": "Se A implica B e B è falso, quale conclusione è valida?",
+    "answers": [
+      "A è vero",
+      "A e B sono sempre veri",
+      "A è falso",
+      "B è vero"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_221",
+    "category": "Logica",
+    "difficulty": 2,
+    "question": "In una gara superi chi è al secondo posto. In quale posizione ti trovi?",
+    "answers": [
+      "Terzo",
+      "Quarto",
+      "Primo",
+      "Secondo"
+    ],
+    "correct_index": 3,
+    "explanation": ""
+  },
+  {
+    "id": "br_222",
+    "category": "Logica",
+    "difficulty": 3,
+    "question": "Cinque macchine identiche producono cinque pezzi in cinque minuti. Quanti minuti servono a cento macchine per cento pezzi?",
+    "answers": [
+      "500",
+      "100",
+      "5",
+      "20"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  },
+  {
+    "id": "br_223",
+    "category": "Logica",
+    "difficulty": 1,
+    "question": "Se una scatola contiene solo palline rosse, di che colore sarà una pallina estratta?",
+    "answers": [
+      "Rossa",
+      "Gialla",
+      "Blu",
+      "Verde"
+    ],
+    "correct_index": 0,
+    "explanation": ""
+  },
+  {
+    "id": "br_224",
+    "category": "Logica",
+    "difficulty": 2,
+    "question": "Quale lettera continua la sequenza A, C, E, G, … nell'alfabeto internazionale?",
+    "answers": [
+      "K",
+      "J",
+      "I",
+      "H"
+    ],
+    "correct_index": 2,
+    "explanation": ""
+  }
+]

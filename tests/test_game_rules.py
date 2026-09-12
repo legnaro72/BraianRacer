@@ -1,0 +1,99 @@
+from concurrent.futures import ThreadPoolExecutor
+
+from brain_racer.config import QUIZ_SECONDS, REVEAL_SECONDS
+from brain_racer.models import GameSession
+from conftest import event, finish_drive
+
+
+def test_collisions_duplicate_shield_and_invulnerability(svc, player):
+    gid = svc.new_game(player)
+    svc.clock.advance(50)
+    hit = event("COLLISION", "hit-one", group=1, at=5)
+    svc.events(gid, player, 1, [hit, hit])
+    svc.events(gid, player, 1, [hit, event("COLLISION", "other-id-same-object", group=1, at=7)])
+    svc.events(gid, player, 1, [event("COLLISION", "invulnerable", group=2, at=5.5)])
+    assert svc.snapshot(player, game_id=gid)["game"]["lives"] == 2
+    svc.events(gid, player, 1, [event("BONUS_COLLECTED", "shield", group=5),
+                                event("COLLISION", "shield-impact", group=6, at=16)])
+    game = svc.snapshot(player, game_id=gid)["game"]
+    assert game["lives"] == 2 and not game["shield"]
+
+
+def test_star_and_spoofed_totals_rejected(svc, player):
+    gid = svc.new_game(player)
+    svc.events(gid, player, 1, [event("BONUS_COLLECTED", "too-soon", group=1),
+                                event("PROGRESS_UPDATE", "warp", progress=20)])
+    assert svc.snapshot(player, game_id=gid)["game"]["progress"] == 0
+    svc.clock.advance(20)
+    star = event("BONUS_COLLECTED", "star", group=1, score=999999)
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        list(pool.map(lambda _: svc.events(gid, player, 1, [star]), range(8)))
+    svc.events(gid, player, 1, [event("BONUS_COLLECTED", "new-id-same-star", group=1)])
+    game = svc.snapshot(player, game_id=gid)["game"]
+    assert game["score"] == 1 and game["stars"] == 1
+
+
+def test_full_single_player_loop_and_timeout(svc, player):
+    gid = svc.new_game(player)
+    svc.clock.advance(55)
+    finish_drive(svc, player, gid)
+    quiz = svc.snapshot(player, game_id=gid)["game"]
+    assert quiz["screen_phase"] == "QUIZ"
+    assert "correct_index" not in quiz["question"]
+    correct = svc.bank.by_id[quiz["question"]["id"]]["correct_index"]
+    svc.answer(gid, player, 1, 0, correct)
+    svc.answer(gid, player, 1, 0, (correct + 1) % 4)
+    assert svc.snapshot(player, game_id=gid)["game"]["score"] == 1
+    svc.clock.advance(REVEAL_SECONDS)
+    second = svc.snapshot(player, game_id=gid)["game"]
+    wrong = (svc.bank.by_id[second["question"]["id"]]["correct_index"] + 1) % 4
+    svc.answer(gid, player, 1, 1, wrong)
+    svc.clock.advance(REVEAL_SECONDS)
+    svc.snapshot(player, game_id=gid)
+    svc.clock.advance(QUIZ_SECONDS)
+    timeout = svc.snapshot(player, game_id=gid)["game"]
+    assert timeout["answer"]["choice"] is None and timeout["score"] == -3
+    assert timeout["lives"] == 3
+    svc.clock.advance(REVEAL_SECONDS)
+    summary = svc.snapshot(player, game_id=gid)["game"]
+    assert summary["screen_phase"] == "LEVEL_SUMMARY"
+    assert (summary["round_correct"], summary["round_wrong"]) == (1, 2)
+    svc.next_level(gid, player)
+    next_game = svc.snapshot(player, game_id=gid)["game"]
+    assert next_game["level"] == 2 and next_game["score"] == -3
+    assert next_game["difficulty"]["speed"] > quiz["difficulty"]["speed"]
+
+
+def test_elimination_saves_and_stale_events_do_nothing(svc, player):
+    gid = svc.new_game(player)
+    svc.clock.advance(40)
+    for i in range(3):
+        svc.events(gid, player, 1, [event("COLLISION", f"hit{i}", group=i, at=5+i*2)])
+    snap = svc.snapshot(player, game_id=gid)
+    assert snap["game"]["screen_phase"] == "GAME_OVER"
+    assert snap["stats"]["games"] == 1
+    svc.events(gid, player, 1, [event("BONUS_COLLECTED", "late", group=1)])
+    assert svc.snapshot(player, game_id=gid)["game"]["score"] == 0
+
+
+def test_refresh_resumes_persistent_state(svc, player):
+    gid = svc.new_game(player)
+    assert svc.resume(player) == {"game_id": gid}
+    from brain_racer.game_service import GameService
+    restored = GameService(svc.db, svc.bank, svc.clock)
+    assert restored.snapshot(player, game_id=gid)["game"]["id"] == gid
+
+
+def test_accelerated_finish_is_accepted_but_impossible_finish_is_not(svc, player):
+    from brain_racer.config import difficulty
+    from brain_racer.course import course
+    gid = svc.new_game(player)
+    game = svc.snapshot(player, game_id=gid)["game"]
+    cfg = difficulty(1)
+    minimum = (course(game["seed"], 1)[-1]["spawn"] + 1.25 / cfg["speed"]) / cfg["maxAcceleration"]
+    svc.clock.advance(4 + minimum - 5)
+    finish_drive(svc, player, gid)
+    assert svc.snapshot(player, game_id=gid)["game"]["phase"] == "DRIVING"
+    svc.clock.advance(6)
+    finish_drive(svc, player, gid)
+    assert svc.snapshot(player, game_id=gid)["game"]["phase"] == "QUIZ"

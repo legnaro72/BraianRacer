@@ -1,0 +1,23 @@
+# Deployment template, not an active deployment.
+# These are paid persistent resources: review the price in Render before applying.
+services:
+  - type: web
+    name: brain-racer
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: python scripts/serve.py
+    healthCheckPath: /_stcore/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.12
+      - key: DATABASE_URL
+        fromDatabase:
+          name: brain-racer-db
+          property: connectionString
+databases:
+  - name: brain-racer-db
+    databaseName: brain_racer
+    user: brain_racer
+    plan: 0.1c-256mb
+    ipAllowList: []

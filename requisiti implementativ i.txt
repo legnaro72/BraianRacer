@@ -1,0 +1,2055 @@
+# BRAIN RACER
+
+## Full Development Specification for Codex
+
+I want you to build a polished, highly engaging web game called **Brain Racer**.
+
+This should NOT look like a simple Streamlit demo.
+
+It should feel like a small arcade game with a real visual identity, smooth gameplay, persistent player profiles, leaderboards and a multiplayer mode.
+
+The application must be built around **Python + Streamlit**, but the arcade driving portion should execute client-side in the browser for smooth animation and controls.
+
+The final project must launch with:
+
+```bash
+streamlit run app.py
+```
+
+Do not stop at scaffolding, pseudocode, mockups or TODOs.
+
+Produce a complete working application.
+
+---
+
+# 1. PRODUCT VISION
+
+Brain Racer combines two different skills:
+
+**REFLEXES + KNOWLEDGE**
+
+The player must first survive an arcade driving challenge.
+
+If they reach the finish line, they face a short general-knowledge quiz.
+
+The fundamental game loop is:
+
+DRIVE
+→ SURVIVE
+→ REACH THE FINISH LINE
+→ ANSWER 3 QUESTIONS
+→ EARN OR LOSE POINTS
+→ ADVANCE TO A HARDER LEVEL
+→ REPEAT
+
+The visual experience should be energetic and arcade-like.
+
+The intellectual part should feel competitive rather than educational or school-like.
+
+The player should have the feeling:
+
+> “I have to be fast with my hands and fast with my brain.”
+
+---
+
+# 2. LANGUAGE
+
+The complete application UI must be in **Italian**.
+
+Code, comments and technical documentation may be in English.
+
+Examples of UI terminology:
+
+* Brain Racer
+* Guida. Pensa. Vinci.
+* Giocatore
+* Livello
+* Vite
+* Punteggio
+* Classifica
+* Percorso
+* Traguardo
+* Risposta corretta
+* Risposta sbagliata
+* Prossima domanda
+* Livello completato
+* Eliminato
+* Game Over
+* Gioca ancora
+* Crea stanza
+* Entra in una stanza
+* Codice stanza
+* In attesa degli altri giocatori
+* Tutti pronti
+* Partenza tra…
+* Classifica della gara
+
+---
+
+# 3. TECHNOLOGY
+
+Use:
+
+* Python
+* Streamlit
+* Streamlit Custom Components v2 where appropriate
+* HTML5 Canvas
+* JavaScript
+* CSS
+* SQLAlchemy
+* SQLite for local development
+* PostgreSQL when a DATABASE_URL is configured
+* pytest for important backend/game-logic tests
+
+Prefer standard libraries and well-maintained dependencies.
+
+Avoid unnecessary frameworks.
+
+Do NOT use React unless genuinely necessary.
+
+Do NOT use an external videogame engine.
+
+Do NOT require an external AI API to run the game.
+
+The application should work without OpenAI, Anthropic or other AI API keys.
+
+---
+
+# 4. IMPORTANT ARCHITECTURAL REQUIREMENT
+
+Do NOT implement the driving gameplay through repeated Streamlit buttons and Python reruns.
+
+The arcade game must run client-side.
+
+Use a Streamlit Custom Component v2 containing HTML/CSS/JavaScript and an HTML5 Canvas.
+
+JavaScript should manage:
+
+* animation loop;
+* keyboard input;
+* touch input;
+* car movement;
+* road scrolling;
+* obstacle movement;
+* collisions;
+* particles;
+* bonuses;
+* sound effects;
+* visual effects;
+* local frame-rate-independent physics.
+
+Use `requestAnimationFrame()`.
+
+Aim for approximately 60 FPS on modern phones and desktop browsers.
+
+Python should manage:
+
+* player identity;
+* application navigation;
+* persistent scores;
+* quiz question selection;
+* authoritative score updates;
+* database operations;
+* leaderboard;
+* multiplayer rooms;
+* multiplayer synchronization;
+* round state;
+* match results.
+
+The JavaScript component must communicate significant game events back to Python.
+
+Do NOT send every animation frame to Python.
+
+Only synchronize meaningful events and periodic lightweight snapshots.
+
+Examples:
+
+* GAME_STARTED
+* PROGRESS_UPDATE
+* BONUS_COLLECTED
+* COLLISION
+* LIFE_LOST
+* LEVEL_COMPLETED
+* PLAYER_ELIMINATED
+* GAME_ABORTED
+
+---
+
+# 5. PROJECT STRUCTURE
+
+Create a clean maintainable repository.
+
+Suggested structure:
+
+```text
+brain-racer/
+│
+├── app.py
+├── requirements.txt
+├── README.md
+├── .gitignore
+├── .env.example
+│
+├── brain_racer/
+│   ├── __init__.py
+│   ├── config.py
+│   ├── database.py
+│   ├── models.py
+│   ├── leaderboard.py
+│   ├── questions.py
+│   ├── scoring.py
+│   ├── multiplayer.py
+│   ├── game_service.py
+│   └── utils.py
+│
+├── assets/
+│   ├── game.js
+│   ├── game.css
+│   └── optional lightweight assets
+│
+├── data/
+│   └── questions.json
+│
+└── tests/
+    ├── test_scoring.py
+    ├── test_questions.py
+    ├── test_database.py
+    ├── test_rooms.py
+    └── test_game_rules.py
+```
+
+You may adapt this structure if there is a technically better alternative.
+
+The only important constraint is that the complete application must start using:
+
+```bash
+streamlit run app.py
+```
+
+---
+
+# 6. PLAYER PROFILE
+
+On first access, show a visually polished welcome screen.
+
+Ask the player for:
+
+**Nickname**
+
+Requirements:
+
+* 3–16 characters;
+* trim spaces;
+* sanitize input;
+* reject empty names;
+* allow letters, numbers, `_` and `-`;
+* protect the UI from HTML/script injection.
+
+Create a random internal UUID for the player.
+
+Persist the player identity locally in the browser when technically practical so that refreshing the page does not require creating a new player every time.
+
+Do not rely only on the nickname as database primary key.
+
+Different users may choose the same nickname.
+
+The UI can distinguish duplicate nicknames using a short player tag if needed.
+
+Example:
+
+`Mario #7F3A`
+
+The game should greet returning players.
+
+Example:
+
+**Bentornato, Mario!**
+
+Show personal statistics:
+
+* best score;
+* highest level;
+* games played;
+* multiplayer victories;
+* correct quiz percentage.
+
+---
+
+# 7. HOME SCREEN
+
+Create a visually impressive home screen.
+
+Title:
+
+# BRAIN RACER
+
+Subtitle:
+
+**Guida. Pensa. Vinci.**
+
+Main choices:
+
+### PARTITA SINGOLA
+
+### MULTIPLAYER
+
+Additional sections:
+
+* Top 10
+* Le mie statistiche
+* Come si gioca
+
+Use a modern arcade aesthetic.
+
+Avoid making it look like a business dashboard.
+
+---
+
+# 8. VISUAL DESIGN
+
+Create a distinctive arcade/neon identity.
+
+Suggested visual language:
+
+* dark background;
+* asphalt road;
+* glowing cyan/magenta/yellow accents;
+* bold typography;
+* subtle gradients;
+* neon outlines;
+* cards with translucent surfaces;
+* animated score counters;
+* dynamic level banners;
+* particles and sparks;
+* smooth transitions.
+
+Do not overload the page.
+
+The actual game area must always remain immediately understandable.
+
+Provide responsive layouts for:
+
+* desktop;
+* tablet;
+* smartphone portrait;
+* smartphone landscape.
+
+On mobile, prioritize gameplay over decorative panels.
+
+---
+
+# 9. THE CAR GAME
+
+Use a top-down arcade perspective.
+
+The player's car remains approximately in the lower third of the screen.
+
+The road moves toward the player.
+
+The player can move horizontally and, if useful, slightly vertically.
+
+Desktop controls:
+
+* Left Arrow / A
+* Right Arrow / D
+* optional Up / W
+* optional Down / S
+
+Mobile controls must be excellent.
+
+Support:
+
+* large touch LEFT / RIGHT controls;
+
+and preferably:
+
+* drag/swipe steering.
+
+If easy and reliable, support optional device tilt controls as an experimental option, but this must NOT be required.
+
+---
+
+# 10. RESPONSIVENESS OF GAME CANVAS
+
+The actual physics world must use normalized coordinates.
+
+Different screen resolutions must not alter game difficulty.
+
+A player on a large monitor must NOT have an advantage over a player using a small smartphone.
+
+Separate:
+
+**logical game dimensions**
+
+from:
+
+**rendered canvas dimensions**
+
+Scale graphics to screen size.
+
+---
+
+# 11. ROAD GENERATION
+
+The road should feel alive rather than static.
+
+Include:
+
+* lane markings;
+* roadside scenery;
+* perspective movement;
+* road signs;
+* occasional visual variations.
+
+Levels can gradually introduce:
+
+* narrower road sections;
+* curves;
+* construction areas;
+* moving traffic;
+* faster scrolling;
+* increased obstacle density.
+
+Do not create physically realistic vehicle simulation.
+
+Gameplay should remain arcade-style and immediately understandable.
+
+---
+
+# 12. OBSTACLES
+
+Include multiple obstacle types.
+
+Examples:
+
+### Static obstacles
+
+* traffic cones;
+* barriers;
+* potholes;
+* roadworks;
+* oil spots.
+
+### Dynamic obstacles
+
+* slower cars;
+* trucks;
+* cars changing lane;
+* moving barriers.
+
+Introduce difficult obstacles gradually.
+
+Level 1 should be forgiving.
+
+Higher levels should become significantly more challenging.
+
+---
+
+# 13. COLLISION SYSTEM
+
+The player starts with:
+
+**3 lives**
+
+On collision:
+
+* lose 1 life;
+* play collision animation;
+* screen shake;
+* sparks/particles;
+* short sound effect;
+* approximately 1–1.5 seconds invulnerability.
+
+Do not allow the same obstacle to remove multiple lives.
+
+If lives reach zero:
+
+**GAME OVER**
+
+Stop the game cleanly.
+
+---
+
+# 14. POWER-UPS
+
+Add useful but understandable power-ups.
+
+At minimum:
+
+### STAR
+
++1 point
+
+### SHIELD
+
+Protects against one collision.
+
+### SLOW TIME
+
+Temporarily reduces world speed.
+
+Optional:
+
+### MAGNET
+
+Attracts nearby stars.
+
+### EXTRA LIFE
+
+Rare power-up. Maximum lives should be capped, for example at 5.
+
+Power-ups should have:
+
+* clear icons;
+* glow effect;
+* feedback when collected;
+* temporary indicator when active.
+
+---
+
+# 15. LEVEL OBJECTIVE
+
+Each driving level must have a finite finish line.
+
+Do not make each level endless.
+
+For Level 1, approximately:
+
+**20 successfully passed obstacle groups**
+
+should be enough.
+
+Display progress visually.
+
+For example:
+
+`Percorso 14 / 20`
+
+Also include a graphical progress bar.
+
+At the end:
+
+* show a finish line;
+* trigger a brief celebration;
+* fade out driving gameplay;
+* transition into quiz mode.
+
+---
+
+# 16. LEVEL PROGRESSION
+
+Difficulty must increase according to a controlled difficulty curve.
+
+Possible parameters:
+
+* road speed;
+* obstacle spawn rate;
+* moving vehicle frequency;
+* obstacle width;
+* road width;
+* reaction time;
+* obstacle combinations;
+* power-up rarity.
+
+Implement a difficulty function rather than manually duplicating every level.
+
+For example conceptually:
+
+```python
+difficulty = f(level)
+```
+
+Level 1:
+easy.
+
+Level 2:
+slightly faster.
+
+Level 3:
+moving vehicles introduced.
+
+Level 4:
+road becomes narrower.
+
+Level 5:
+more complex obstacle patterns.
+
+Level 6+:
+combine previous mechanics increasingly.
+
+Difficulty must increase but remain playable.
+
+---
+
+# 17. QUIZ SYSTEM
+
+Reaching the finish line unlocks the intellectual challenge.
+
+Each level presents exactly:
+
+# 3 QUESTIONS
+
+Each question must have:
+
+* question text;
+* 4 answers;
+* exactly one correct answer;
+* category;
+* difficulty;
+* optional short explanation.
+
+Topics should include:
+
+* Geography
+* History
+* Science
+* Nature
+* Astronomy
+* Literature
+* Art
+* Music
+* Cinema
+* Technology
+* Sport
+* Mathematics
+* Famous people
+* Inventions
+* World culture
+* Logic
+
+All questions and answers must be written in Italian.
+
+---
+
+# 18. QUESTION DATABASE
+
+Create at least:
+
+# 200 GENERAL-KNOWLEDGE QUESTIONS
+
+Preferably 250+ if practical.
+
+Store them in:
+
+```text
+data/questions.json
+```
+
+Suggested schema:
+
+```json
+{
+  "id": "geo_001",
+  "category": "Geografia",
+  "difficulty": 1,
+  "question": "Qual è la capitale del Portogallo?",
+  "answers": [
+    "Lisbona",
+    "Porto",
+    "Madrid",
+    "Coimbra"
+  ],
+  "correct_index": 0,
+  "explanation": "Lisbona è la capitale e la città più popolosa del Portogallo."
+}
+```
+
+Validate the question database automatically at application startup.
+
+Check:
+
+* unique IDs;
+* exactly four answers;
+* valid correct index;
+* no empty question;
+* no duplicate answers in the same question.
+
+Questions must not repeat during the same game unless the question pool has been exhausted.
+
+---
+
+# 19. QUESTION DIFFICULTY
+
+Questions should scale somewhat with level.
+
+Example:
+
+Levels 1–2:
+mostly easy.
+
+Levels 3–4:
+easy + medium.
+
+Levels 5–7:
+mostly medium.
+
+Levels 8+:
+medium + difficult.
+
+Do not make every advanced question obscure trivia.
+
+The game should reward broad cultural knowledge.
+
+---
+
+# 20. QUIZ TIMER
+
+Each question should have a countdown.
+
+Suggested default:
+
+**15 seconds**
+
+Show a visual countdown bar.
+
+If time expires:
+
+treat the answer as wrong.
+
+The answer cannot be changed after submission.
+
+After answering:
+
+Correct:
+
+**+1**
+
+Wrong:
+
+**-2**
+
+Timeout:
+
+**-2**
+
+Lives are NOT lost for quiz mistakes.
+
+Immediately show:
+
+* correct/wrong animation;
+* score change;
+* correct answer;
+* optional one-sentence explanation.
+
+Then continue.
+
+---
+
+# 21. SCORE SYSTEM
+
+The fundamental scoring rule must remain:
+
+Correct quiz answer:
+
+**+1 point**
+
+Wrong quiz answer:
+
+**-2 points**
+
+Star collected:
+
+**+1 point**
+
+Do not prevent negative scores.
+
+A player may finish with a negative score.
+
+Display score changes clearly:
+
+`+1`
+
+or:
+
+`-2`
+
+with animated feedback.
+
+---
+
+# 22. LEVEL SUMMARY
+
+After the three questions, show an attractive summary screen.
+
+Include:
+
+* level completed;
+* driving bonuses;
+* quiz answers correct;
+* quiz answers wrong;
+* points earned/lost this level;
+* total score;
+* remaining lives;
+* current personal record.
+
+Show:
+
+**CONTINUA AL LIVELLO SUCCESSIVO**
+
+---
+
+# 23. SINGLE PLAYER MODE
+
+Single player continues until:
+
+* player loses all lives;
+* player voluntarily exits.
+
+Levels should have no fixed maximum.
+
+At Game Over, save:
+
+* player;
+* score;
+* highest level reached;
+* quiz correct count;
+* quiz incorrect count;
+* stars collected;
+* duration;
+* date/time.
+
+Then show:
+
+* final score;
+* personal best;
+* rank if the score enters the leaderboard;
+* replay button;
+* return to home.
+
+---
+
+# 24. GLOBAL TOP 10
+
+Implement a persistent leaderboard.
+
+Show the best:
+
+# TOP 10 PLAYERS
+
+At minimum display:
+
+| Pos | Giocatore | Punti | Livello |
+| --- | --------- | ----- | ------- |
+
+Highlight the current player.
+
+Use deterministic ranking.
+
+Primary ranking:
+
+1. highest score.
+
+Tie breakers:
+
+2. highest level;
+3. highest remaining lives;
+4. shortest duration.
+
+Do not allow repeated entries from the same exact game session.
+
+Optionally provide leaderboards for:
+
+* All Time;
+* Oggi;
+* Questa settimana.
+
+All Time is mandatory.
+
+---
+
+# 25. DATABASE
+
+For development:
+
+use SQLite.
+
+Example:
+
+```text
+brain_racer.db
+```
+
+For deployed multiplayer:
+
+support PostgreSQL.
+
+Read a connection URL from environment/secrets.
+
+Example variable:
+
+```text
+DATABASE_URL
+```
+
+If DATABASE_URL is not defined:
+
+fallback to SQLite automatically.
+
+Keep database access behind a clean data-access layer.
+
+Do not scatter raw SQL throughout app.py.
+
+---
+
+# 26. DATABASE MODEL
+
+Create appropriate SQLAlchemy models.
+
+At minimum consider:
+
+## players
+
+* id
+* nickname
+* player_tag
+* created_at
+* last_seen_at
+
+## game_sessions
+
+* id
+* player_id
+* mode
+* started_at
+* ended_at
+* final_score
+* max_level
+* lives_remaining
+* duration_ms
+* correct_answers
+* wrong_answers
+* stars_collected
+* status
+
+## rooms
+
+* id
+* room_code
+* host_player_id
+* status
+* created_at
+* started_at
+* current_level
+* game_seed
+* phase
+* phase_deadline
+
+## room_players
+
+* room_id
+* player_id
+* joined_at
+* ready
+* status
+* score
+* lives
+* level
+* progress
+* finish_time
+* last_seen_at
+
+Add additional fields/tables when useful.
+
+Use migrations or safe table initialization.
+
+Never destroy existing data when starting the application.
+
+---
+
+# 27. MULTIPLAYER MODE
+
+Create a true shared multiplayer experience.
+
+Target:
+
+**2–6 players**
+
+Each player can play from a different:
+
+* smartphone;
+* tablet;
+* laptop;
+* browser.
+
+Users must access the same deployed Streamlit application.
+
+Provide two actions:
+
+### CREA STANZA
+
+### ENTRA IN UNA STANZA
+
+Creating a room generates a short human-readable room code.
+
+Example:
+
+`RACE42`
+
+Avoid ambiguous characters if practical.
+
+---
+
+# 28. MULTIPLAYER LOBBY
+
+The lobby should display:
+
+* room code;
+* host;
+* list of connected players;
+* ready status;
+* current player highlighted.
+
+Each participant can press:
+
+**SONO PRONTO**
+
+Host can start only when at least 2 players are present.
+
+Show:
+
+`2 / 6 giocatori`
+
+When everyone is ready, host presses:
+
+# INIZIA GARA
+
+---
+
+# 29. SYNCHRONIZED START
+
+Do not start each browser independently when the host clicks.
+
+Use a shared server timestamp.
+
+Host sets a future start time approximately:
+
+**3–5 seconds ahead**
+
+All players receive the timestamp.
+
+Display:
+
+3
+2
+1
+VIA!
+
+Each browser starts its local game against that same logical start time.
+
+Use UTC server timestamps.
+
+---
+
+# 30. MULTIPLAYER GAME PHILOSOPHY
+
+Do NOT attempt to transmit every car coordinate between clients at 60 FPS.
+
+That is unnecessary and inappropriate for this architecture.
+
+Each player's actual driving simulation runs locally in their browser.
+
+The server synchronizes only game state.
+
+Examples:
+
+* progress;
+* level;
+* score;
+* lives;
+* finish status;
+* elimination status;
+* quiz phase;
+* match phase.
+
+This should create the perception of synchronous multiplayer without turning Streamlit into a realtime game server.
+
+---
+
+# 31. SAME COURSE FOR ALL PLAYERS
+
+A multiplayer round must be fair.
+
+The server must generate and store a:
+
+**game_seed**
+
+All participants receive the same seed.
+
+Obstacle generation should be deterministic from:
+
+* game seed;
+* level.
+
+Therefore players face equivalent courses regardless of device.
+
+Use normalized coordinates so viewport size does not affect difficulty.
+
+---
+
+# 32. LIVE OPPONENT STATUS
+
+During multiplayer driving, show a compact race panel.
+
+Example:
+
+```text
+1. Luca      ████████████  82%   ❤️❤️
+2. Anna      ██████████    71%   ❤️❤️❤️
+3. Marco     ███████       54%   ❤️
+```
+
+Do not render competitors' actual cars on the player's road unless it can be done reliably.
+
+Progress bars are sufficient and clearer.
+
+Refresh opponent state approximately every:
+
+**0.5–1.0 seconds**
+
+Use Streamlit fragment-based periodic refresh or an equivalent efficient mechanism.
+
+Do not refresh the whole arcade component unnecessarily.
+
+---
+
+# 33. MULTIPLAYER ROUND FLOW
+
+A multiplayer match should consist of multiple levels.
+
+Recommended default:
+
+# 5 LEVELS
+
+Each level has:
+
+1. synchronized driving phase;
+2. finish/wait phase;
+3. synchronized quiz;
+4. round ranking;
+5. next level.
+
+The host does not manually start every level.
+
+The match progresses automatically after the initial start.
+
+---
+
+# 34. DRIVING PHASE DEADLINE
+
+Prevent one player from blocking the entire multiplayer match forever.
+
+Each driving round has a maximum duration.
+
+Suggested:
+
+**60–90 seconds depending on level**
+
+Players who reach the finish line wait in a visually attractive:
+
+**PIT STOP**
+
+screen.
+
+Show live status of other players.
+
+If all active players finish early:
+
+start the quiz early.
+
+Otherwise:
+
+wait until the round deadline.
+
+---
+
+# 35. PLAYER WHO DOES NOT FINISH
+
+If a player does not reach the finish line before the driving deadline:
+
+mark:
+
+**DNF – Traguardo non raggiunto**
+
+That player:
+
+* does not receive driving completion benefits;
+* loses one life;
+* does not answer that round's quiz.
+
+Do NOT remove quiz points artificially.
+
+If that life loss reaches zero:
+
+the player is eliminated.
+
+Eliminated players can spectate the remaining match.
+
+---
+
+# 36. MULTIPLAYER QUIZ
+
+All eligible players should receive the same three questions.
+
+Store question IDs server-side before quiz start.
+
+Do not let each browser randomly choose different questions.
+
+Questions should appear simultaneously.
+
+Each question has a shared deadline.
+
+Suggested:
+
+**12–15 seconds**
+
+When a player answers:
+
+lock their answer.
+
+Do not reveal the correct answer until:
+
+* everyone eligible has answered;
+
+or:
+
+* timer expires.
+
+Then reveal results simultaneously.
+
+This prevents one player from helping another unintentionally.
+
+---
+
+# 37. MULTIPLAYER LIVE QUIZ STATUS
+
+During the question, the UI may display:
+
+`3 / 5 giocatori hanno risposto`
+
+Do NOT reveal who chose which answer before the question closes.
+
+After close, show:
+
+* correct answer;
+* explanation;
+* score change;
+* how many players answered correctly.
+
+---
+
+# 38. ROUND CLASSIFICATION
+
+At the end of every level, display temporary ranking.
+
+Example:
+
+```text
+1. 🥇 Anna       12 punti
+2. 🥈 Luca        9 punti
+3. 🥉 Marco       7 punti
+4.    Sara        2 punti
+```
+
+Also show:
+
+* lives;
+* quiz result;
+* finish time;
+* current level.
+
+Use attractive animations when ranking positions change.
+
+---
+
+# 39. MULTIPLAYER WINNER
+
+The match normally ends after Level 5.
+
+It can end earlier if only one non-eliminated player remains.
+
+Winner ranking:
+
+1. highest total score;
+2. most lives remaining;
+3. most levels finished;
+4. total driving time as final tie breaker.
+
+Show a podium screen.
+
+Use:
+
+🥇
+🥈
+🥉
+
+Highlight:
+
+# CAMPIONE BRAIN RACER
+
+Save multiplayer results to database.
+
+Track multiplayer wins in player statistics.
+
+---
+
+# 40. DISCONNECTION HANDLING
+
+Multiplayer must tolerate temporary loss of connection.
+
+Each player has:
+
+`last_seen_at`
+
+If a player disappears briefly:
+
+do not immediately eliminate them.
+
+Allow a reasonable grace period.
+
+If the player reconnects during the match using the same local player identity:
+
+restore them when practical.
+
+If disconnected beyond the timeout:
+
+mark as disconnected.
+
+Do not freeze the match because one player left.
+
+---
+
+# 41. PLAYER PRESENCE
+
+Update player heartbeat periodically while in a multiplayer room.
+
+Do it efficiently.
+
+Do not write to the database on every animation frame.
+
+A heartbeat every few seconds is sufficient.
+
+---
+
+# 42. CONCURRENCY
+
+Database operations used in multiplayer must be concurrency-safe.
+
+Avoid race conditions such as:
+
+* two hosts starting the match;
+* a player joining a full room;
+* phase advancing twice;
+* duplicate quiz scoring;
+* duplicate game results.
+
+Important actions should be idempotent.
+
+Quiz answers must be recorded only once.
+
+Score updates must not be duplicated if Streamlit reruns.
+
+---
+
+# 43. SERVER-AUTHORITATIVE RULES
+
+The client-side game can report events, but Python should remain authoritative for important score calculations.
+
+Do not blindly accept a client sending:
+
+`score = 999999`
+
+Instead report events such as:
+
+* collected_star;
+* level_complete;
+* quiz_answer.
+
+Calculate official score server-side when possible.
+
+For this casual game, sophisticated anti-cheat is unnecessary, but basic validation should exist.
+
+Examples:
+
+* impossible progress jumps;
+* impossible bonus quantities;
+* duplicate event IDs;
+* duplicate quiz answer.
+
+---
+
+# 44. EVENT IDS
+
+Important client events should contain unique IDs.
+
+Example:
+
+```json
+{
+  "event_id": "uuid",
+  "event_type": "BONUS_COLLECTED",
+  "timestamp": 123456789,
+  "payload": {}
+}
+```
+
+Store/process events idempotently where duplication could affect score.
+
+---
+
+# 45. SOUND
+
+Add optional arcade sound effects.
+
+Examples:
+
+* countdown;
+* start;
+* collect star;
+* shield;
+* collision;
+* finish;
+* correct answer;
+* wrong answer;
+* game over;
+* victory.
+
+Prefer Web Audio API or lightweight local assets.
+
+Provide a clear:
+
+🔊 / 🔇
+
+toggle.
+
+Never autoplay intrusive audio before the player interacts with the page.
+
+---
+
+# 46. HAPTIC FEEDBACK
+
+On supported mobile browsers, optionally use:
+
+```javascript
+navigator.vibrate()
+```
+
+for:
+
+* collision;
+* bonus;
+* countdown;
+* finish.
+
+It must gracefully do nothing if unsupported.
+
+---
+
+# 47. VISUAL EFFECTS
+
+Use tasteful effects:
+
+* particle sparks;
+* star glow;
+* collision flash;
+* screen shake;
+* finish-line confetti;
+* score popups;
+* smooth quiz transitions;
+* animated countdown;
+* podium celebration.
+
+Keep performance high.
+
+Do not use enormous image/video files.
+
+---
+
+# 48. PERFORMANCE
+
+The arcade component must remain smooth on normal modern smartphones.
+
+Targets:
+
+* approximately 60 FPS when possible;
+* no database operation inside the animation loop;
+* no full Streamlit rerun for every game frame;
+* minimal network synchronization;
+* avoid unnecessary dependencies.
+
+Pause animation when browser tab is inactive if practical.
+
+---
+
+# 49. SESSION STATE
+
+Use `st.session_state` appropriately for per-browser UI/session information.
+
+Do NOT use it as the global multiplayer database.
+
+Global data shared among different users must live in the database.
+
+---
+
+# 50. REFRESH STRATEGY
+
+Use targeted fragment updates for information such as:
+
+* multiplayer opponent progress;
+* lobby presence;
+* room status;
+* phase countdown where appropriate;
+* live leaderboard.
+
+Do not rerender unrelated portions of the page.
+
+---
+
+# 51. SECURITY
+
+This is a casual game, but apply basic security practices.
+
+Requirements:
+
+* parameterized SQL / ORM;
+* nickname sanitization;
+* no raw user HTML injection;
+* secrets outside source code;
+* validate room codes;
+* validate event payloads;
+* protect database errors from being dumped to end users.
+
+Never place database credentials directly in repository code.
+
+---
+
+# 52. DATABASE CONFIGURATION
+
+Support Streamlit secrets and/or environment variables.
+
+Provide a `.env.example` or documentation such as:
+
+```text
+DATABASE_URL=postgresql+psycopg://...
+```
+
+The repository must contain no actual credentials.
+
+---
+
+# 53. EMPTY / ERROR STATES
+
+Handle gracefully:
+
+* database unavailable;
+* room not found;
+* room full;
+* host disconnected;
+* duplicate nickname;
+* malformed question data;
+* player refreshing the browser;
+* player navigating backward;
+* temporary multiplayer synchronization error.
+
+Show friendly Italian messages.
+
+Do not expose Python tracebacks in normal UI.
+
+---
+
+# 54. PLAYER STATISTICS
+
+Create a personal profile/statistics view.
+
+Show:
+
+* partite giocate;
+* record personale;
+* livello massimo;
+* stelle raccolte;
+* domande corrette;
+* domande sbagliate;
+* percentuale risposte corrette;
+* multiplayer giocati;
+* multiplayer vinti.
+
+Optionally include a small chart of recent scores.
+
+Do not let this section dominate the game.
+
+---
+
+# 55. ACHIEVEMENTS
+
+If implementation remains clean, add lightweight achievements.
+
+Examples:
+
+### PRIMA CORSA
+
+Completa la prima partita.
+
+### CERVELLONE
+
+Rispondi correttamente a 10 domande consecutive.
+
+### PILOTA PERFETTO
+
+Completa un livello senza collisioni.
+
+### SOPRAVVISSUTO
+
+Raggiungi il livello 10.
+
+### COLLEZIONISTA
+
+Raccogli 50 stelle.
+
+### CAMPIONE
+
+Vinci una partita multiplayer.
+
+Achievements should be secondary.
+
+Do not compromise core gameplay to implement them.
+
+---
+
+# 56. GAME STATE MACHINE
+
+Implement explicit state machines.
+
+Single-player states could include:
+
+```text
+HOME
+DRIVING
+LEVEL_FINISH
+QUIZ
+LEVEL_SUMMARY
+GAME_OVER
+```
+
+Multiplayer states could include:
+
+```text
+LOBBY
+COUNTDOWN
+DRIVING
+WAITING_FOR_PLAYERS
+QUIZ
+ROUND_RESULTS
+NEXT_ROUND
+MATCH_RESULTS
+CLOSED
+```
+
+Avoid a collection of loosely related booleans.
+
+State transitions should be explicit and testable.
+
+---
+
+# 57. DETERMINISTIC RANDOMNESS
+
+For multiplayer, use seeded randomness.
+
+Given:
+
+```text
+room_seed + level
+```
+
+the generated road/obstacle sequence should be equivalent for every player.
+
+Do not rely on JavaScript `Math.random()` without seeded PRNG for multiplayer course generation.
+
+Create a deterministic PRNG.
+
+---
+
+# 58. ACCESSIBILITY
+
+Provide:
+
+* strong contrast;
+* readable font sizes;
+* sufficiently large touch controls;
+* keyboard controls;
+* text labels in addition to color where necessary.
+
+Correct/wrong quiz feedback must not rely only on green/red.
+
+---
+
+# 59. README
+
+Create a high-quality README explaining:
+
+## What Brain Racer is
+
+## Features
+
+## Project structure
+
+## Local installation
+
+Example:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+Also provide Windows equivalent where appropriate.
+
+Explain:
+
+## SQLite mode
+
+## PostgreSQL mode
+
+## Multiplayer deployment
+
+## Streamlit secrets
+
+## Running tests
+
+```bash
+pytest
+```
+
+---
+
+# 60. REQUIREMENTS.TXT
+
+Pin sensible compatible dependency versions.
+
+Do not include unused libraries.
+
+Include everything required to run the project from a clean Python environment.
+
+---
+
+# 61. TESTS
+
+Write actual tests.
+
+At minimum test:
+
+### Scoring
+
+* correct = +1
+* wrong = -2
+* timeout = -2
+* star = +1
+
+### Lives
+
+* collision removes one life;
+* repeated collision event cannot double-charge;
+* DNF multiplayer behavior.
+
+### Questions
+
+* exactly 4 answers;
+* valid correct index;
+* no duplicate question IDs;
+* selection avoids repeats;
+* multiplayer players receive same question set.
+
+### Leaderboard
+
+* correct ordering;
+* tie breakers;
+* Top 10 limit.
+
+### Rooms
+
+* create room;
+* join room;
+* maximum player limit;
+* ready system;
+* host start;
+* invalid room code;
+* duplicate processing protection.
+
+### Match state
+
+* correct phase transitions;
+* game ends after configured number of rounds;
+* player elimination;
+* winner selection.
+
+---
+
+# 62. LOGGING
+
+Add useful server-side logging.
+
+Log:
+
+* startup;
+* database connection;
+* room creation;
+* player join/leave;
+* match start/end;
+* unexpected errors.
+
+Do not spam logs with every animation frame or progress tick.
+
+---
+
+# 63. CONFIGURATION
+
+Centralize game configuration.
+
+Example:
+
+```python
+STARTING_LIVES = 3
+MAX_LIVES = 5
+QUESTIONS_PER_LEVEL = 3
+QUIZ_SECONDS = 15
+MULTIPLAYER_MAX_PLAYERS = 6
+MULTIPLAYER_LEVELS = 5
+```
+
+Do not spread magic numbers throughout the application.
+
+---
+
+# 64. POLISH REQUIREMENTS
+
+This project should feel like a finished MVP rather than an internal prototype.
+
+Pay special attention to:
+
+* spacing;
+* typography;
+* visual hierarchy;
+* mobile layout;
+* transitions;
+* loading states;
+* button feedback;
+* animations;
+* score feedback;
+* countdowns;
+* Game Over;
+* leaderboard;
+* multiplayer lobby;
+* final podium.
+
+Use CSS deliberately.
+
+Do not leave Streamlit's default appearance untouched.
+
+Hide unnecessary Streamlit chrome where appropriate without breaking functionality.
+
+---
+
+# 65. DO NOT OVERENGINEER
+
+The game should be ambitious visually and functionally, but its architecture should remain understandable.
+
+Avoid:
+
+* microservices;
+* Redis unless absolutely required;
+* Celery;
+* Kubernetes;
+* separate API server;
+* complicated authentication;
+* external game servers;
+* unnecessary frontend frameworks.
+
+Python + Streamlit + JS component + SQL database is enough.
+
+---
+
+# 66. DEVELOPMENT PRIORITY
+
+Build in this order:
+
+PHASE 1
+Core database and state models.
+
+PHASE 2
+Player creation and persistence.
+
+PHASE 3
+Single-player client-side driving game.
+
+PHASE 4
+Python ↔ JavaScript game event integration.
+
+PHASE 5
+Quiz system and scoring.
+
+PHASE 6
+Single-player complete game loop.
+
+PHASE 7
+Persistent leaderboard and statistics.
+
+PHASE 8
+Multiplayer room/lobby system.
+
+PHASE 9
+Synchronized multiplayer rounds.
+
+PHASE 10
+Polish, sound, effects, achievements and responsive optimization.
+
+Do not begin with decorative features before proving the complete gameplay loop.
+
+---
+
+# 67. ACCEPTANCE TEST — SINGLE PLAYER
+
+Before declaring the project complete, manually verify:
+
+1. Open application.
+2. Create player.
+3. Start single-player game.
+4. Car responds smoothly to keyboard.
+5. Car responds smoothly to mobile touch.
+6. Obstacles appear.
+7. Collision removes exactly one life.
+8. Shield works.
+9. Star gives +1.
+10. Finish line appears.
+11. Player enters quiz.
+12. Exactly 3 questions are asked.
+13. Correct answer gives +1.
+14. Wrong answer gives -2.
+15. Timeout gives -2.
+16. Score persists into next level.
+17. Next level becomes harder.
+18. Game continues through multiple levels.
+19. Losing last life triggers Game Over.
+20. Result is saved.
+21. Leaderboard updates.
+22. Starting a new game resets game state but does not delete player statistics.
+
+---
+
+# 68. ACCEPTANCE TEST — MULTIPLAYER
+
+Also manually verify using at least two independent browser sessions.
+
+Ideally test one desktop and one mobile-sized browser.
+
+Verify:
+
+1. Player A creates a room.
+2. Player B joins using room code.
+3. Both appear in lobby.
+4. Both mark ready.
+5. Host starts match.
+6. Both see synchronized countdown.
+7. Both receive equivalent deterministic course.
+8. Both drive independently.
+9. Opponent progress updates.
+10. One player can finish before the other.
+11. Finished player enters waiting/pit-stop state.
+12. Quiz starts for eligible players.
+13. Both receive exactly the same questions.
+14. Answers remain private until round close.
+15. Scores update correctly.
+16. Round ranking is identical on both devices.
+17. Level 2 begins synchronously.
+18. Difficulty increases.
+19. Match completes.
+20. Podium is identical on all devices.
+21. Results are persisted.
+22. Multiplayer victory appears in player statistics.
+
+---
+
+# 69. FAILURE TESTS
+
+Also test:
+
+* refresh during lobby;
+* refresh during a match;
+* player closes browser;
+* player reconnects;
+* host disappears;
+* third player joins;
+* room reaches maximum capacity;
+* invalid room code;
+* database temporarily raises an exception;
+* double-click answer;
+* duplicated game event;
+* very narrow mobile display.
+
+Fix obvious issues rather than merely documenting them.
+
+---
+
+# 70. FINAL DELIVERY
+
+When implementation is finished, provide:
+
+1. complete source code;
+2. requirements.txt;
+3. questions database;
+4. database initialization;
+5. tests;
+6. README;
+7. Streamlit secrets/environment example;
+8. instructions for local execution;
+9. instructions for PostgreSQL deployment;
+10. brief explanation of the multiplayer architecture.
+
+Run the tests.
+
+Fix failures.
+
+Check for syntax errors.
+
+Ensure:
+
+```bash
+streamlit run app.py
+```
+
+starts the application successfully.
+
+---
+
+# 71. IMPORTANT CODING INSTRUCTION
+
+Do not provide only an explanation of how this could be built.
+
+BUILD IT.
+
+When reasonable technical decisions are missing from this specification, make good engineering decisions yourself rather than stopping to ask me.
+
+Prefer a working, cohesive implementation over excessive abstraction.
+
+If a feature proves incompatible with Streamlit, implement the closest robust solution and document the trade-off in README rather than leaving the feature unfinished.
+
+---
+
+# 72. FINAL QUALITY BAR
+
+The end result should NOT feel like:
+
+“a Streamlit questionnaire with a small animation.”
+
+It should feel like:
+
+**an arcade game that happens to use Streamlit as its platform.**
+
+The three strongest aspects should be:
+
+**1. Smooth driving gameplay**
+
+**2. Strong quiz/game loop**
+
+**3. Fun shared multiplayer competition**
+
+Make Brain Racer visually memorable, responsive, replayable and fun.
