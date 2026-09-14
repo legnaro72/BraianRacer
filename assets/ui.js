@@ -10,41 +10,13 @@ const icons = {
 function button(label, action, cls='primary', extra='') {
   return `<button class="btn ${cls}" data-action="${action}" ${extra}>${label}</button>`;
 }
-function heroArt() {
-  return `<div class="hero-art" aria-hidden="true">
-    <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
-    <div class="art-label"><span class="pulse"></span> RIFLESSI + CONOSCENZA</div>
-    <svg class="hero-road" viewBox="0 0 560 430" fill="none">
-      <defs><linearGradient id="asphalt" x1="160" y1="60" x2="450" y2="420"><stop stop-color="#202a35"/><stop offset="1" stop-color="#11161f"/></linearGradient>
-      <linearGradient id="body" x1="0" x2="80" y2="140"><stop stop-color="#ffffff"/><stop offset=".6" stop-color="#fff0e8"/><stop offset="1" stop-color="#d9a4ba"/></linearGradient>
-      <filter id="glow"><feGaussianBlur stdDeviation="6"/></filter></defs>
-      <g transform="rotate(27 280 215)">
-      <path d="M142-60h276v610H142z" fill="url(#asphalt)"/>
-      <path d="M144-60v610m272-610v610" stroke="#79e4e8" stroke-width="2" opacity=".65"/>
-      <path d="M151-60v610m258-610v610" stroke="#42525d" stroke-width="3" stroke-dasharray="20 20"/>
-      <path d="M231-60v610m95-610v610" stroke="#687483" stroke-width="2" stroke-dasharray="32 35" opacity=".6"/>
-      <path d="M280 216v240" stroke="#ceff5f" stroke-width="42" opacity=".06" filter="url(#glow)"/>
-      <path d="M260 280v210m40-200v200" stroke="#cfff61" stroke-width="2" opacity=".25"/>
-      <g transform="translate(249 155)">
-      <rect x="-8" y="18" width="12" height="28" rx="4" fill="#03070a"/><rect x="58" y="18" width="12" height="28" rx="4" fill="#03070a"/>
-      <rect x="-8" y="83" width="12" height="28" rx="4" fill="#03070a"/><rect x="58" y="83" width="12" height="28" rx="4" fill="#03070a"/>
-      <rect x="0" width="62" height="127" rx="15" fill="url(#body)"/>
-      <path d="m10 30 42 0 4 24H6l4-24Z" fill="#162c32"/><path d="M12 96h38l5 16H7l5-16Z" fill="#172d30"/>
-      <path d="M27 0h8v26h-8zm0 59h8v28h-8z" fill="#d781a8"/>
-      <rect x="6" y="7" width="14" height="7" rx="2" fill="#f4fff3"/><rect x="42" y="7" width="14" height="7" rx="2" fill="#f4fff3"/>
-      <text x="31" y="79" text-anchor="middle" fill="#ba7194" font-size="19">♥</text><text x="31" y="142" text-anchor="middle" fill="#f8c3da" font-size="10">IRENE &amp; DANIELE</text><path d="M8 120h11m25 0h11" stroke="#ff686d" stroke-width="4"/>
-      <path d="m5 3-24-90h63L19 3m24 0L21-87h67L57 3" fill="#d9ffeb" opacity=".04"/>
-      </g>
-      <g transform="translate(350 90)"><circle r="22" fill="#ceff5f" opacity=".12"/><path d="m0-14 4 9 10 1-8 7 3 10-9-6-9 6 3-10-8-7 10-1z" fill="#dcff85"/></g>
-      <g transform="translate(196 50)"><path d="m0-18 14 34h-28z" fill="#db9155"/><path d="M-6 0H6" stroke="#ffe3af" stroke-width="5"/></g>
-      <g transform="translate(170 350)"><path d="M0 0h230v22H0z" fill="#e3e8dc" opacity=".7"/><path d="M0 0h23v11H0zm46 0h23v11H46zm46 0h23v11H92zm46 0h23v11h-23zm46 0h23v11h-23zM23 11h23v11H23zm46 0h23v11H69zm46 0h23v11h-23zm46 0h23v11h-23zm46 0h23v11h-23z" fill="#131a23"/></g>
-      </g>
-    </svg>
-    <div class="floating-chip chip-brain"><span>✦</span><div>VIVA GLI SPOSI<strong>Irene ♥ Daniele</strong></div></div>
-    <div class="floating-chip chip-star"><b>★</b><div>OGNI STELLA CONTA<strong>+1 punto</strong></div></div>
-    <div class="art-caption">01 / IL TUO PROSSIMO RECORD TI ASPETTA</div>
-  </div>`;
+function coupleArt(context='page', message='Che bello avervi qui con noi!', pose='hug') {
+  return `<aside class="couple-hosts couple-hosts-${context}" aria-label="Gli sposi vi accompagnano">
+    <div class="couple-portrait pose-${pose}" role="img" aria-label="Irene e Daniele in versione cartoon: ${pose==='dance'?'un ballo':pose==='jump'?'un salto di gioia':'un abbraccio'}"></div>
+    <div class="couple-greeting"><strong>Irene <span>♥</span> Daniele</strong><p>${esc(message)}</p></div>
+  </aside>`;
 }
+function heroArt() {return coupleArt('hero','La nostra festa è più bella con voi.','dance');}
 
 class BrainUI {
   constructor(parent, component) {
@@ -134,7 +106,7 @@ class BrainUI {
       '<span class="edition">ARCADE / VOL. 01</span>'}</div></header>${d.player&&!active?`<nav class="mobile-nav" aria-label="Menu smartphone">${[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥']].map(([page,label])=>`<button data-action="NAV" data-page="${page}" class="${d.page===page?'selected':''}">${label}</button>`).join('')}</nav>`:''}`;
   }
   footer() {return `<footer><span>${icons.flag} BRAIN RACER <i>·</i> Riflessi veloci. Mente accesa.</span><span>Fatto per giocare. Ancora una volta. <span class="tiny-dot"></span></span></footer>`;}
-  intro(eyebrow,title,description='') {return `<div class="page-intro"><span class="eyebrow">${eyebrow}</span><h1>${title}</h1>${description?`<p>${description}</p>`:''}</div>`;}
+  intro(eyebrow,title,description='') {return `<div class="page-intro with-couple"><div class="intro-copy"><span class="eyebrow">${eyebrow}</span><h1>${title}</h1>${description?`<p>${description}</p>`:''}</div>${coupleArt('page')}</div>`;}
   render(view) {
     const d=this.data,g=d.game,r=d.room;
     if(view==='LOADING')return `<div class="center-state"><div class="loader"></div><h2>Prepariamo la griglia.</h2><p>Il tuo prossimo record parte da qui.</p></div>`;
@@ -158,14 +130,14 @@ class BrainUI {
   home(welcome) {
     const d=this.data,s=d.stats;
     return `<section class="hero"><div class="hero-copy"><span class="eyebrow"><span class="pulse"></span> IRENE & DANIELE · UNA VITA A TUTTO GAS</span>
-      <h1>BRAIN<br><em>RACER<span class="title-dot">.</span></em></h1><h2>Guida. Pensa. Vinci.</h2>
-      <p>Schiva gli ostacoli. Conquista il traguardo.<br>Metti alla prova la tua mente. Il record è tuo.</p>
-      <div class="hero-tags"><span>${icons.bolt} Riflessi</span><b>+</b><span>✦ Conoscenza</span><b>=</b><span class="lime-text">Una corsa diversa.</span></div>
-      ${welcome?`<form class="register" data-form="register"><label for="nickname">PRIMA DI PARTIRE, COME TI CHIAMI?</label><div class="input-row"><input id="nickname" name="nickname" placeholder="Il tuo nickname" minlength="3" maxlength="16" required autocomplete="nickname"><button type="submit" class="btn primary">In pista ${icons.arrow}</button></div><small>3–16 caratteri · lettere, numeri, _ e -</small></form>`:
-      `<div class="welcome-back"><span class="avatar small">${esc(d.player.nickname.slice(0,2).toUpperCase())}</span><span>Bentornato, <strong>${esc(d.player.nickname)}.</strong> Pronto a superarti?</span></div>`}</div>${heroArt()}</section>
+      <h1>Irene <span class="wedding-and">&</span><br><em>Daniele</em></h1><h2>Oggi si festeggia. Insieme a voi!</h2>
+      <p>Un pensiero da custodire, una corsa da condividere.<br>Lascia un augurio agli sposi e unisciti alla festa!</p>
+      <div class="hero-tags"><span>♥ Dediche</span><span>✿ Amici</span><span>★ Una corsa insieme</span></div>
+      ${welcome?`<form class="register" data-form="register"><label for="nickname">METTI IL TUO NICK E LASCIA UNA DEDICA AGLI SPOSI</label><div class="input-row"><input id="nickname" name="nickname" placeholder="Il tuo nickname" minlength="3" maxlength="16" required autocomplete="nickname"><button type="submit" class="btn primary">Lascia una dedica ♥</button></div><small>Oppure scegli una gara qui sotto. 3–16 caratteri · lettere, numeri, _ e -</small></form>`:
+      `<div class="welcome-back"><span class="avatar small">${esc(d.player.nickname.slice(0,2).toUpperCase())}</span><span>Bentornato, <strong>${esc(d.player.nickname)}.</strong> La festa ti aspetta!</span></div><div class="dedication-invite"><span class="dedication-heart">♥</span><div><h3>Un pensiero per gli sposi</h3><p>Il tuo augurio diventa un ricordo da conservare.</p></div>${button("Lascia una dedica", "NAV", "primary", 'data-page="DEDICATIONS"')}</div>`}</div>${heroArt()}</section>
       <section class="mode-section"><div class="section-heading"><h2><span class="section-number">01</span> Scegli la tua sfida</h2><span>IL PROSSIMO TRAGUARDO INIZIA QUI</span></div>
-      <div class="mode-grid"><button class="mode-card single" data-action="${welcome?'FOCUS_NAME':'START_SINGLE'}"><div class="mode-top"><span class="feature-icon">${icons.car}</span><span class="pill">1 GIOCATORE</span></div><div class="mode-bottom"><div><h3>Partita singola</h3><p>Tu, la strada e il tuo prossimo record.</p></div><span class="circle-arrow">${icons.arrow}</span></div><div class="mode-track"></div></button>
-      <button class="mode-card multi" data-action="${welcome?'FOCUS_NAME':'NAV'}" data-page="MULTIPLAYER"><div class="mode-top"><span class="feature-icon">${icons.people}</span><span class="pill">2–6 GIOCATORI</span></div><div class="mode-bottom"><div><h3>Multiplayer</h3><p>Stessa pista. Stesse domande. Un campione.</p></div><span class="circle-arrow">${icons.arrow}</span></div><div class="mode-track"></div></button></div></section>
+      <div class="mode-grid"><button class="mode-card single" data-action="${welcome?'FOCUS_NAME':'START_SINGLE'}"><div class="mode-top"><span class="feature-icon">${icons.car}</span><span class="pill">1 GIOCATORE</span></div><div class="mode-bottom"><div><h3>Partita singola</h3><p>Accompagna gli sposi verso il prossimo traguardo.</p></div><span class="circle-arrow">${icons.arrow}</span></div><div class="mode-track"></div></button>
+      <button class="mode-card multi" data-action="${welcome?'FOCUS_NAME':'NAV'}" data-page="MULTIPLAYER"><div class="mode-top"><span class="feature-icon">${icons.people}</span><span class="pill">2–6 GIOCATORI</span></div><div class="mode-bottom"><div><h3>Multiplayer</h3><p>Invita gli amici: la festa continua in pista!</p></div><span class="circle-arrow">${icons.arrow}</span></div><div class="mode-track"></div></button></div></section>
       <section class="home-bottom"><div class="leader-preview"><div class="section-heading"><h2>${icons.trophy} Top 10</h2>${welcome?'':`<button class="text-link" data-action="NAV" data-page="LEADERBOARD">Classifica completa ↗</button>`}</div>${this.leaderboard(true)}</div>
       <div class="record-panel"><span class="eyebrow">${welcome?'LA FORMULA È SEMPLICE':'IL TUO RECORD PERSONALE'}</span>${welcome?`<h3>Mani sul volante.<br>Mente sulla vittoria.</h3><p>3 vite. 3 domande a livello.<br>Quante volte riesci a superarti?</p><div class="score-rules"><span>★ <b>+1</b> stella</span><span>✓ <b>+1</b> corretta</span><span>× <b>−2</b> errata</span></div>`:
       `<div class="record-number">${s.best}<span>PT</span></div><div class="record-details"><span><b>${s.level}</b> Livello massimo</span><span><b>${s.games}</b> Partite giocate</span></div><button class="text-link" data-action="NAV" data-page="STATS">Le mie statistiche ${icons.arrow}</button>`}</div></section>`;
@@ -221,7 +193,7 @@ class BrainUI {
       <div class="race-layout"><section class="race-main"><div class="race-hud"><div><span>PUNTEGGIO</span><strong data-local-score>${g.score}</strong></div><div class="hud-lives"><span>VITE</span><strong data-local-lives>${'♥'.repeat(g.lives)}</strong></div><div><span>PERCORSO</span><strong class="progress-text" data-local-progress>${g.progress} / ${g.difficulty.groups}</strong></div></div><div class="route-bar"><i data-local-bar style="width:${g.progress/g.difficulty.groups*100}%"></i></div>
       <div class="canvas-wrap"><canvas tabindex="0" aria-label="Pista di Brain Racer. Usa le frecce sinistra e destra, A e D, o trascina per guidare."></canvas></div>
       <div class="touch-controls wedding-controls"><button data-steer="arrowleft" aria-label="Sterza a sinistra">←<span>SINISTRA</span></button><button data-steer="arrowup" data-accelerator aria-label="Tieni premuto per accelerare">↑<span>ACCELERA<small>×1,00</small></span></button><button data-steer="arrowright" aria-label="Sterza a destra">→<span>DESTRA</span></button></div><div class="wedding-plaque"><b>Irene <span>♥</span> Daniele</b><small data-power>Raccogli i bonus</small></div></section>
-      <aside class="race-sidebar">${r?`<section class="panel opponents-panel"><span class="eyebrow">LA GARA IN DIRETTA</span><div data-opponents>${this.opponents()}</div><div class="deadline-note">Tempo gara <b data-countdown data-end="${r.deadline}"></b></div></section>`:
+      <aside class="race-sidebar">${coupleArt("race","In viaggio insieme a te!")}${r?`<section class="panel opponents-panel"><span class="eyebrow">LA GARA IN DIRETTA</span><div data-opponents>${this.opponents()}</div><div class="deadline-note">Tempo gara <b data-countdown data-end="${r.deadline}"></b></div></section>`:
       `<section class="panel mission"><span class="eyebrow">LA TUA MISSIONE</span><span class="feature-icon lime">${icons.flag}</span><h2>Prima il traguardo.<br>Poi la sfida.</h2><p>Supera ${g.difficulty.groups} gruppi di ostacoli per sbloccare le 3 domande di questo livello.</p><div class="mini-record"><span>IL TUO RECORD</span><strong>${this.data.stats.best} <small>PT</small></strong></div></section>`}
       <section class="panel bonus-guide"><h3>Una marcia in più</h3><div><b class="lime-text">★</b><span>Stella<small>+1 punto</small></span></div><div><b class="cyan-text">⬡</b><span>Scudo<small>Assorbe un urto</small></span></div><div><b class="lavender-text">◷</b><span>Tempo lento<small>4 secondi per respirare</small></span></div></section>
       <div class="drive-controls"><span><kbd>←</kbd> <kbd>→</kbd> sterza · <kbd>↑</kbd> <kbd>W</kbd> accelera</span>${r?'':button('Ⅱ Pausa','PAUSE','secondary')} ${button(r?'Lascia la gara':'Termina partita',r?'CONFIRM_LEAVE':'CONFIRM_ABORT','ghost')}</div></aside></div>`;
@@ -236,7 +208,7 @@ class BrainUI {
     if(!q)return this.pit();
     const answer=g.answer,eligible=g.eligible;
     const title=reveal?(eligible?(answer?.correct?'Risposta corretta!':'Risposta sbagliata.'):'Ecco la risposta.'):'Adesso, pensa veloce.';
-    return `<div class="quiz-top"><span class="eyebrow">LIVELLO ${String(g.level).padStart(2,'0')} · SFIDA DI CONOSCENZA</span><span class="score-chip">${g.score} <small>PT</small></span></div>
+    return `${coupleArt('quiz',reveal?'Un passo in più verso la festa!':'Facciamo il tifo per te!',reveal?'jump':'dance')}<div class="quiz-top"><span class="eyebrow">LIVELLO ${String(g.level).padStart(2,'0')} · SFIDA DI CONOSCENZA</span><span class="score-chip">${g.score} <small>PT</small></span></div>
       <section class="quiz-panel ${reveal?'revealed':''}"><div class="quiz-meta"><span class="pill">${esc(q.category)}</span><div class="question-steps">${[0,1,2].map(i=>`<i class="${i===g.qindex?'current':i<g.qindex?'complete':''}"></i>`).join('')}<span>${g.qindex+1} / 3</span></div></div>
       <div class="quiz-timing"><span>${reveal?'PROSSIMA TAPPA TRA':'TEMPO A DISPOSIZIONE'}</span><b data-countdown data-end="${g.deadline}"></b></div><div class="quiz-timer"><i data-timer-bar data-end="${g.deadline}" data-duration="${reveal?3:15}"></i></div>
       <span class="quiz-kicker">${title}</span><h1>${esc(q.question)}</h1>
@@ -248,13 +220,13 @@ class BrainUI {
   }
   summary() {
     const g=this.data.game,delta=g.score-g.round_score;
-    return `<section class="result-hero"><div class="result-symbol">${icons.flag}</div><span class="eyebrow">BEN FATTO, PILOTA</span><h1>Livello ${g.level} completato<span class="lime-text">.</span></h1><p>La prossima strada è un po' più veloce.<br>Il tuo cervello è già pronto.</p><div class="total-score">${g.score}<small>PUNTI TOTALI</small></div></section>
+    return `${coupleArt("celebration","Questo traguardo è anche vostro!","jump")}<section class="result-hero"><div class="result-symbol">${icons.flag}</div><span class="eyebrow">BEN FATTO, PILOTA</span><h1>Livello ${g.level} completato<span class="lime-text">.</span></h1><p>La prossima strada è un po' più veloce.<br>Il tuo cervello è già pronto.</p><div class="total-score">${g.score}<small>PUNTI TOTALI</small></div></section>
       <div class="summary-grid">${[['Stelle raccolte',g.round_stars],['Corrette',g.round_correct],['Sbagliate',g.round_wrong],['Punti del livello',(delta>0?'+':'')+delta],['Vite rimaste','♥'.repeat(g.lives)],['Record personale',this.data.stats.best]].map(([l,v])=>`<div class="stat-card"><span>${l}</span><strong>${v}</strong></div>`).join('')}</div>
       <div class="center-actions">${button('Continua al livello successivo '+icons.arrow,'NEXT_LEVEL')}${button('Concludi e salva','ABORT','ghost')}</div>`;
   }
   gameOver() {
     const g=this.data.game,rank=this.data.leaderboard.find(p=>p.player_id===this.data.player.id);
-    return `<section class="result-hero"><span class="eyebrow">LA CORSA FINISCE. LA SFIDA CONTINUA.</span><h1>GAME <em>OVER.</em></h1><p>${g.score>=this.data.stats.best?'Il tuo record personale è qui.':'Un’altra corsa. Un nuovo traguardo.'}</p><div class="total-score">${g.score}<small>PUNTEGGIO FINALE</small></div><div class="result-chips"><span>Livello ${g.level}</span><span>Record ${this.data.stats.best} PT</span>${rank?`<span>#${rank.rank} in classifica personale</span>`:''}</div></section>
+    return `${coupleArt("celebration","Questo traguardo è anche vostro!","jump")}<section class="result-hero"><span class="eyebrow">LA CORSA FINISCE. LA SFIDA CONTINUA.</span><h1>GAME <em>OVER.</em></h1><p>${g.score>=this.data.stats.best?'Il tuo record personale è qui.':'Un’altra corsa. Un nuovo traguardo.'}</p><div class="total-score">${g.score}<small>PUNTEGGIO FINALE</small></div><div class="result-chips"><span>Livello ${g.level}</span><span>Record ${this.data.stats.best} PT</span>${rank?`<span>#${rank.rank} in classifica personale</span>`:''}</div></section>
       <div class="center-actions">${button('Gioca ancora '+icons.arrow,'REPLAY')}${button('Torna al garage','HOME','secondary')}</div><div class="save-note">✓ Risultato salvato. Il prossimo record ti aspetta.</div>`;
   }
   pit() {

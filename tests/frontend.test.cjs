@@ -34,10 +34,20 @@ test('keyboard steering is independent of rendered resolution and frame rate',()
   assert.ok(a.state.x>.5);
 });
 
+test('viewport geometry preserves sprite proportions on wide and portrait displays',()=>{
+  for(const [width,height] of [[1920,800],[390,650],[960,360]]) {
+    const e=host(width,height).make();
+    assert.ok(Math.abs(e.sceneWidth()/720-width/height)<1e-10);
+    e.dragging=true;e.steer({clientX:0});
+    for(let i=0;i<60;i++)e.update(1/60);
+    assert.ok(e.state.x>=.5-e.cfg.roadWidth/2+36/e.sceneWidth()-1e-8);
+  }
+});
+
 test('pointer steering moves toward drag target within the road bounds',()=>{
   const e=host().make();e.dragging=true;e.steer({clientX:0});
   for(let i=0;i<60;i++)e.update(1/60);
-  assert.ok(e.state.x>=.1249&&e.state.x<.2);
+  assert.ok(e.state.x>.2&&e.state.x<.3);
 });
 
 test('collision deducts one life, cannot repeat, and shields absorb one hit',()=>{

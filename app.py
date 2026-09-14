@@ -1,5 +1,6 @@
 """Launch with: streamlit run app.py"""
 import logging
+import base64
 import os
 from pathlib import Path
 
@@ -15,13 +16,13 @@ from brain_racer.questions import QuestionBank
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("brain_racer")
-st.set_page_config(page_title="Brain Racer · Guida. Pensa. Vinci.", page_icon="🏁", layout="wide",
+st.set_page_config(page_title="Irene & Daniele · La corsa degli sposi", page_icon="🏁", layout="wide",
                    initial_sidebar_state="collapsed")
 st.html("""<style>
 header[data-testid="stHeader"],footer,#MainMenu{display:none}
 .stMainBlockContainer{max-width:1440px;padding:0 24px 20px!important}
 [data-testid="stVerticalBlock"]{gap:0}
-body{background:#0a0b10} @media(max-width:640px){.stMainBlockContainer{padding:0 10px!important}}
+body{background:#fff8ef} @media(max-width:640px){.stMainBlockContainer{padding:0 10px!important}}
 [data-stale="true"]{opacity:1!important}
 </style>""")
 
@@ -45,9 +46,15 @@ def service():
 @st.cache_resource
 def renderer(asset_revision):
     assets = ROOT / "assets"
+    image_vars = []
+    for name in ("cartoon", "dance", "hug", "jump"):
+        portrait = base64.b64encode((assets / f"couple-{name}.png").read_bytes()).decode("ascii")
+        key = "couple-image" if name == "cartoon" else f"couple-{name}"
+        image_vars.append(f'--{key}:url("data:image/png;base64,{portrait}")')
+    portrait_css = '#brain-app{' + ';'.join(image_vars) + '}'
     return components.component(
         "brain_racer_arcade", html='<div id="brain-app"></div>',
-        css=(assets / "game.css").read_text(encoding="utf-8"),
+        css=(assets / "game.css").read_text(encoding="utf-8") + portrait_css,
         js="\n".join((assets / f).read_text(encoding="utf-8") for f in ("course.js", "game.js", "ui.js")),
         isolate_styles=True,
     )
@@ -65,7 +72,7 @@ def dispatch(svc, command):
         return
     if action == "REGISTER" and not pid:
         pid, token = svc.register(command.get("nickname"))
-        st.session_state.update(player_id=pid, identity_token=token, booted=True)
+        st.session_state.update(player_id=pid, identity_token=token, booted=True, page="DEDICATIONS")
         return
     if not pid:
         return
@@ -151,7 +158,8 @@ def arcade():
                 payload.update(svc.snapshot(ss.player_id))
                 payload["message"] = str(exc)
         asset_revision = tuple((ROOT / "assets" / f).stat().st_mtime_ns
-                               for f in ("game.css", "course.js", "game.js", "ui.js"))
+                               for f in ("game.css", "course.js", "game.js", "ui.js", "couple-cartoon.png",
+                                         "couple-dance.png", "couple-hug.png", "couple-jump.png"))
         renderer(asset_revision)(data=payload, key="arcade_component", on_packet_change=lambda: None,
                    default={"packet": []}, width="stretch")
     except (SQLAlchemyError, PyMongoError, OSError, ValueError):
