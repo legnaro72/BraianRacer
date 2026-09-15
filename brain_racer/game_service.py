@@ -524,7 +524,7 @@ class GameService:
             p = s.get(Player, player_id)
             if not p:
                 raise RuleError("Profilo non trovato.")
-            if now - p.last_seen_at > 5:
+            if now - (p.last_seen_at or 0) > 5:
                 p.last_seen_at = now
             result = {"now": now, "player": {"id": p.id, "nickname": p.nickname, "tag": p.player_tag}}
             if room_id:
