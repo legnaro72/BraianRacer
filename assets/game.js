@@ -6,13 +6,42 @@ const safeStorage = {
 const makeId = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 class ArcadeAudio {
-  constructor() { this.muted = safeStorage.get('br:mute') !== 'false'; }
+  constructor() {
+    this.muted = safeStorage.get('br:mute') !== 'false';
+    this.onVisibility = () => {
+      if(document.hidden)this.music?.pause();else this.startMusic();
+    };
+    document.addEventListener?.('visibilitychange',this.onVisibility);
+  }
+  startMusic() {
+    if(this.muted || this.disposed || document.hidden)return;
+    if(!this.music){
+      this.music=new window.Audio('app/static/main.mp3');
+      this.music.loop=true;this.music.volume=.22;this.music.preload='none';
+      this.music.hidden=true;this.music.setAttribute('aria-hidden','true');
+      document.body.append(this.music);
+    }
+    if(this.music.paused && !this.musicStarting){
+      this.musicStarting=true;
+      // Mobile browsers require the initial play to originate from a user gesture.
+      this.music.play().catch(()=>{}).finally(()=>{this.musicStarting=false;});
+    }
+  }
   unlock() {
     const Audio = window.AudioContext || window.webkitAudioContext;
     if (Audio && !this.context) this.context = new Audio();
     this.context?.resume().catch(() => {});
+    this.startMusic();
   }
-  toggle() { this.muted = !this.muted; safeStorage.set('br:mute', String(this.muted)); this.unlock(); }
+  toggle() {
+    this.muted = !this.muted; safeStorage.set('br:mute', String(this.muted));
+    if(this.muted)this.music?.pause();else this.unlock();
+  }
+  destroy() {
+    this.disposed=true;document.removeEventListener?.('visibilitychange',this.onVisibility);
+    this.music?.pause();this.music?.remove();
+    this.context?.close().catch(()=>{});
+  }
   play(kind) {
     if (this.muted || !this.context || this.context.state !== 'running') return;
     const frequencies = {star:880, shield:600, slow:260, collision:90, finish:1046,

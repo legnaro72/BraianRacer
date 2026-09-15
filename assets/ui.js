@@ -273,8 +273,9 @@ class BrainUI {
   }
   click(event) {
     const el=event.target.closest('[data-action]');if(!el||el.disabled)return;
-    this.audio.unlock();const action=el.dataset.action;
+    const action=el.dataset.action;
     if(action==='SOUND'){this.audio.toggle();el.textContent=this.audio.muted?'♪̸':'♫';el.setAttribute('aria-label',this.audio.muted?'Attiva audio':'Disattiva audio');return;}
+    this.audio.unlock();
     if(action==='FOCUS_NAME'){this.root.querySelector('#nickname')?.focus();return;}
     if(action==='PAUSE'){this.engine?.togglePause();el.textContent=this.engine?.paused?'▶ Riprendi':'Ⅱ Pausa';return;}
     if(action==='BOUQUET'){if(this.engine?.state.started)this.engine.throwBouquet();return;}
@@ -307,7 +308,7 @@ class BrainUI {
       this.dedicationSaving=true;
     }
   }
-  destroy() {clearInterval(this.interval);this.engine?.destroy();}
+  destroy() {clearInterval(this.interval);this.engine?.destroy();this.audio.destroy();}
 }
 
 export default function(component) {
