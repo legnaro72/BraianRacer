@@ -12,3 +12,4 @@ showErrorDetails = false
 
 [server]
 headless = true
+enableStaticServing = true

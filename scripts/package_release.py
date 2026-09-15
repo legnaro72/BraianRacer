@@ -5,7 +5,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 ROOT = Path(__file__).resolve().parent.parent
 ROOT_FILES = ["app.py", "requirements.txt", "README.md", "DEPLOY_STREAMLIT.md", "pytest.ini", ".env.example",
               ".gitignore", ".dockerignore", "Dockerfile", "compose.yaml", "render.yaml", "Procfile"]
-FOLDERS = ["brain_racer", "assets", "data", "scripts", "tests", ".github/workflows"]
+FOLDERS = ["brain_racer", "assets", "static", "android", "data", "scripts", "tests", ".github/workflows"]
 
 
 def package(destination=None):

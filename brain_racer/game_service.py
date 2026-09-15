@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import math
 import re
 import secrets
 import time
@@ -32,6 +33,7 @@ def initial_state(seed, now):
             "used": [], "questions": [], "qindex": 0, "start_at": now + COUNTDOWN_SECONDS,
             "deadline": None, "progress": 0, "collected": [], "hit": [],
             "shield": False, "last_collision": -100, "round_score": 0,
+            "balloon_hit": [], "hearts": 0, "round_hearts": 0, "last_bouquet": -100,
             "round_stars": 0, "round_correct": 0, "round_wrong": 0,
             "finished_levels": 0, "driving_ms": 0, "acks": []}
 
@@ -154,6 +156,7 @@ class GameService:
             return  # Spectating does not inflate the highest level reached.
         st.update(phase="DRIVING" if st["lives"] > 0 else "ELIMINATED", level=level,
                   start_at=start_at, progress=0, collected=[], hit=[], shield=False,
+                  balloon_hit=[], round_hearts=0, last_bouquet=-100,
                   last_collision=-100, round_score=st["score"], round_stars=0,
                   round_correct=0, round_wrong=0, questions=[], qindex=0, acks=[], finish_time=None)
         save_state(g)
@@ -249,6 +252,27 @@ class GameService:
                         elif bonus == "shield":
                             st["shield"] = True
                         accepted = True
+                elif kind == "BALLOON_POPPED" and valid_group and layout[group]["balloon"]:
+                    target = layout[group]
+                    shot, hit_at, course_t, aim = (payload.get(k) for k in ("shot_at", "at", "course_t", "aim"))
+                    numbers = all(type(v) in (int, float) and math.isfinite(v) for v in (shot, hit_at, course_t, aim))
+                    if numbers:
+                        target_x = .5 + (target["balloonLane"] - 1) * cfg["roadWidth"] / 3
+                        if level >= 4:
+                            target_x += math.sin(course_t * .12) * .025
+                        if (group not in st.setdefault("balloon_hit", [])
+                                and 0 <= shot <= hit_at <= elapsed + .5
+                                and .03 <= hit_at - shot <= 1.5
+                                and shot - st.get("last_bouquet", -100) >= .5
+                                and target["spawn"] <= course_t <= target["spawn"] + 1.15 / cfg["speed"]
+                                and course_t <= fastest_course_time + .3
+                                and 0 <= aim <= 1 and abs(aim - target_x) <= .16):
+                            st["balloon_hit"].append(group)
+                            st["last_bouquet"] = shot
+                            st["score"] += 2
+                            st["hearts"] = st.get("hearts", 0) + 1
+                            st["round_hearts"] = st.get("round_hearts", 0) + 1
+                            accepted = True
                 elif kind == "COLLISION" and reachable and group not in st["hit"]:
                     # Use simulation timestamps to validate invulnerability even in a retried batch.
                     hit_at = payload.get("at")

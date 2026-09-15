@@ -13,6 +13,7 @@ function createCourse(seed, level, cfg) {
     const second = cfg.double && rand() < .25 ? (lane + 1) % 3 : null;
     const bonus = i % 3 === 1 ? 'star' : i % 8 === 5 ? 'shield' : i % 8 === 7 ? 'slow' : null;
     groups.push({id: i, lane, kind, second, bonus, bonusLane: (lane + 2) % 3,
+                 balloon: i % 2 === 0, balloonLane: (lane + 1) % 3,
                  spawn: 1 + i * cfg.interval});
   }
   return groups;

@@ -1,6 +1,5 @@
 """Launch with: streamlit run app.py"""
 import logging
-import base64
 import os
 from pathlib import Path
 
@@ -48,9 +47,9 @@ def renderer(asset_revision):
     assets = ROOT / "assets"
     image_vars = []
     for name in ("cartoon", "dance", "hug", "jump"):
-        portrait = base64.b64encode((assets / f"couple-{name}.png").read_bytes()).decode("ascii")
         key = "couple-image" if name == "cartoon" else f"couple-{name}"
-        image_vars.append(f'--{key}:url("data:image/png;base64,{portrait}")')
+        revision = (ROOT / "static" / f"couple-{name}.png").stat().st_mtime_ns
+        image_vars.append(f'--{key}:url("app/static/couple-{name}.png?v={revision}")')
     portrait_css = '#brain-app{' + ';'.join(image_vars) + '}'
     return components.component(
         "brain_racer_arcade", html='<div id="brain-app"></div>',
@@ -158,8 +157,8 @@ def arcade():
                 payload.update(svc.snapshot(ss.player_id))
                 payload["message"] = str(exc)
         asset_revision = tuple((ROOT / "assets" / f).stat().st_mtime_ns
-                               for f in ("game.css", "course.js", "game.js", "ui.js", "couple-cartoon.png",
-                                         "couple-dance.png", "couple-hug.png", "couple-jump.png"))
+                               for f in ("game.css", "course.js", "game.js", "ui.js")) + tuple(
+                                   p.stat().st_mtime_ns for p in sorted((ROOT / "static").glob("couple-*.png")))
         renderer(asset_revision)(data=payload, key="arcade_component", on_packet_change=lambda: None,
                    default={"packet": []}, width="stretch")
     except (SQLAlchemyError, PyMongoError, OSError, ValueError):

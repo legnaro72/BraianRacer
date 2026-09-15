@@ -6,6 +6,8 @@
 .env
 .streamlit/secrets.toml
 artifacts
+.android-private
+android
 tests
 data/questions_source.tsv
 requisiti*

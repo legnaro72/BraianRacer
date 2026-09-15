@@ -10,6 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
 COPY --chown=arcade:arcade app.py ./
 COPY --chown=arcade:arcade brain_racer/ ./brain_racer/
 COPY --chown=arcade:arcade assets/ ./assets/
+COPY --chown=arcade:arcade static/ ./static/
 COPY --chown=arcade:arcade data/questions.json ./data/questions.json
 COPY --chown=arcade:arcade scripts/serve.py ./scripts/serve.py
 COPY --chown=arcade:arcade .streamlit/config.toml ./.streamlit/config.toml

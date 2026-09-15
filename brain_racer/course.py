@@ -24,5 +24,6 @@ def course(seed, level):
         bonus = "star" if i % 3 == 1 else ("shield" if i % 8 == 5 else ("slow" if i % 8 == 7 else None))
         groups.append({"id": i, "lane": lane, "kind": kind, "second": second,
                        "bonus": bonus, "bonusLane": (lane + 2) % 3,
+                       "balloon": i % 2 == 0, "balloonLane": (lane + 1) % 3,
                        "spawn": 1 + i * cfg["interval"]})
     return groups

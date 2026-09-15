@@ -50,6 +50,22 @@ test('pointer steering moves toward drag target within the road bounds',()=>{
   assert.ok(e.state.x>.2&&e.state.x<.3);
 });
 
+test('perspective projects distant targets smaller and converges at the horizon',()=>{
+  const e=host().make(),far=e.project(.2,0),near=e.project(.2,.8);
+  assert.ok(near.scale>far.scale && near.y>far.y);
+  assert.ok(Math.abs(far.x-e.sceneWidth()/2)<Math.abs(near.x-e.sceneWidth()/2));
+  assert.ok(Math.abs(e.project(.5,.8).y-598)<1e-8);
+});
+
+test('bouquet hits a heart once and respects the throw cooldown',()=>{
+  const e=host().make(),g=e.course.find(g=>g.balloon);
+  e.state.x=e.laneX(g.balloonLane);e.state.t=g.spawn+.42/e.cfg.speed;e.state.real=5;
+  e.throwBouquet();e.throwBouquet();assert.equal(e.bouquets.length,1);
+  for(let i=0;i<40;i++){e.state.real+=.02;e.state.t+=.02;e.updateBouquets(.02);}
+  assert.equal(e.state.score,2);assert.deepEqual([...e.state.balloon_hit],[g.id]);
+  assert.equal(e.state.pending.filter(p=>p.event_type==='BALLOON_POPPED').length,1);
+});
+
 test('collision deducts one life, cannot repeat, and shields absorb one hit',()=>{
   const e=host().make(),g=e.course[0];
   e.state.real=10;e.hit(g);e.hit(g);

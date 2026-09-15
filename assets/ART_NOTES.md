@@ -1,5 +1,11 @@
 # Irene e Daniele — ritratto cartoon
 
+Le immagini definitive sono ora in `static/couple-{cartoon,dance,hug,jump}.png`, servite come file con cache del browser. Non incorporarle in variabili CSS base64: superano i limiti di dimensione accettati dal browser. Il CSS applica sfocatura e opacità soltanto allo sfondo, non ai personaggi principali.
+
+Pose aggiunte con imagegen integrato, tutte dal medesimo ritratto cartoon: ballo romantico con abito in movimento e mano sollevata; abbraccio in piedi con visi sorridenti; salto di gioia mano nella mano con piedi sollevati. Prompt comune: identità e stile invariati, Irene con capelli scuri mossi e pizzo bianco, Daniele rasato con completo blu e cravatta avorio; figure intere con margine, fondo avorio, niente testo o persone aggiuntive.
+
+L'icona Android è in `android/res/drawable-nodpi/couple_icon.png`: ritratto quadrato di teste e spalle della stessa coppia, sfondo rosa e avorio, fiori arancio, senza scritte, prodotto con imagegen.
+
 Revisione cartoon: teste ed espressioni più grandi, forme arrotondate, ombre semplificate e contorni più leggibili, mantenendo volti e abiti del ritratto precedente. Fondo avorio. Generazione tramite imagegen integrato. La gara ora occupa tutta la finestra; l'auto è ingrandita a 1,6× e la geometria del Canvas mantiene le proporzioni delle sagome su schermi larghi e verticali.
 
 Asset: `couple-cartoon.png`. Generato con lo strumento integrato imagegen a partire dalla foto di Irene e da due fotogrammi del video degli sposi forniti dall'utente. Gli originali non sono inclusi nel pacchetto di pubblicazione.

@@ -45,6 +45,8 @@ class DrivingEngine {
       score:data.score, shield:data.shield, slowUntil:0, invulnerableUntil:-1,
       hit:[...data.hit], collected:[...data.collected], pending:[], done:false, started:false};
     this.keys = new Set(); this.particles = []; this.popups = []; this.lastFrame = 0;
+    this.state.balloon_hit ||= [...(data.balloon_hit || [])];
+    this.bouquets=[];this.lastBouquet=this.state.last_bouquet ?? -100;
     this.state.acceleration = Math.max(1, Math.min(this.cfg.maxAcceleration || 1.6, this.state.acceleration || 1));
     this.frame = 0; this.lastSend = 0; this.shake = 0; this.countdown = null;
     this.offset = data.serverNow * 1000 - Date.now(); this.paused = false;
@@ -59,7 +61,7 @@ class DrivingEngine {
     }
     this.onKeyDown = e => {
       if (['INPUT','TEXTAREA'].includes(e.target.tagName)) return;
-      if (['ArrowLeft','ArrowRight','ArrowUp','a','A','d','D','w','W','Shift',' '].includes(e.key)) {
+      if (['ArrowLeft','ArrowRight','ArrowUp','a','A','d','D','w','W','f','F','Shift',' '].includes(e.key)) {
         e.preventDefault(); this.audio.unlock();
         if (e.key === ' ' && !e.repeat) this.togglePause(); else this.keys.add(e.key.toLowerCase());
       }
@@ -92,6 +94,7 @@ class DrivingEngine {
     this.target = Math.max(.1, Math.min(.9, (e.clientX - rect.left) / rect.width));
   }
   sceneWidth() { return this.canvas.height ? 720*this.canvas.width/this.canvas.height : 480; }
+  carScale() { return Math.min(1.55,Math.max(1,this.sceneWidth()/600)); }
   project(x,travel) {
     const depth=Math.max(0,(travel+.12)/.92), scale=.10+.90*depth*depth;
     return {x:this.sceneWidth()/2+(x-.5)*this.sceneWidth()*scale,
@@ -143,6 +146,33 @@ class DrivingEngine {
     if (group.bonus === 'slow') { s.slowUntil=s.real+4; this.popup('TEMPO LENTO', '#b5a0ff'); }
     this.audio.play(group.bonus); this.burst(s.x,.78,'#eab447',12); this.vibrate(15);
   }
+  throwBouquet() {
+    const s=this.state;
+    if(s.done||this.paused||s.real-this.lastBouquet<.65)return;
+    this.lastBouquet=s.real;s.last_bouquet=s.real;
+    this.bouquets.push({x:s.x,travel:.8,shot_at:s.real,life:1.2});
+    this.audio.play('star');
+  }
+  updateBouquets(dt) {
+    const s=this.state;
+    if(this.keys.has('f'))this.throwBouquet();
+    for(const b of this.bouquets){
+      b.travel-=dt*1.05;b.life-=dt;
+      for(const g of this.course){
+        if(!g.balloon||s.balloon_hit.includes(g.id)||b.life<=0)continue;
+        const t=-.12+(s.t-g.spawn)*this.cfg.speed;
+        if(t<0||t>.92)continue;
+        if(Math.abs(t-b.travel)<.07&&Math.abs(this.laneX(g.balloonLane)-b.x)<40/this.sceneWidth()){
+          b.life=0;s.balloon_hit.push(g.id);s.score+=2;
+          this.event('BALLOON_POPPED',{group:g.id,shot_at:b.shot_at,at:s.real,course_t:s.t,aim:b.x});
+          const p=this.project(this.laneX(g.balloonLane),t);
+          this.burst(p.x/this.sceneWidth(),(p.y-72*p.scale)/720,'#ef6997',35);
+          this.popup('♥ +2 PUNTI','#bf3e75');this.audio.play('correct');this.vibrate(20);break;
+        }
+      }
+    }
+    this.bouquets=this.bouquets.filter(b=>b.life>0&&b.travel>-.1);
+  }
   loop(timestamp) {
     const dt = Math.min(.035, Math.max(0,(timestamp-(this.lastFrame || timestamp))/1000));
     this.lastFrame = timestamp;
@@ -179,12 +209,13 @@ class DrivingEngine {
     // Exponential response is stable at different frame rates and eases on release.
     s.acceleration = targetSpeed + (s.acceleration - targetSpeed) * Math.exp(-5 * dt);
     s.real+=dt; s.t+=dt*s.acceleration*(s.real<s.slowUntil?.62:1);
+    this.updateBouquets(dt);
     let direction = (this.keys.has('arrowright')||this.keys.has('d')?1:0)
                   -(this.keys.has('arrowleft')||this.keys.has('a')?1:0);
     if(this.dragging && this.target !== undefined) direction = Math.sign(this.target-s.x);
     let move=direction*dt*.85;
     if(this.dragging && Math.abs(move)>Math.abs(this.target-s.x)) move=this.target-s.x;
-    const carMargin=Math.min(this.cfg.roadWidth/4,78/this.sceneWidth());
+    const carMargin=Math.min(this.cfg.roadWidth/4,78*this.carScale()/this.sceneWidth());
     s.x=Math.max(.5-this.cfg.roadWidth/2+carMargin,Math.min(.5+this.cfg.roadWidth/2-carMargin,s.x+move));
     for(const g of this.course) {
       const y=-.12+(s.t-g.spawn)*this.cfg.speed;
@@ -194,8 +225,8 @@ class DrivingEngine {
       const visualRatio=480/this.sceneWidth();
       const halfW=(g.kind==='truck'?.057:.042)*visualRatio;
       const halfH=['car','truck'].includes(g.kind)?.082:.038;
-      if(Math.abs(y-.8)<halfH+.075 && Math.abs(x-s.x)<halfW+.14*visualRatio) this.hit(g);
-      if(g.second!==null && Math.abs(y-.8)<.11 && Math.abs(this.laneX(g.second)-s.x)<.18*visualRatio) this.hit(g);
+      if(Math.abs(y-.8)<halfH+.075 && Math.abs(x-s.x)<halfW+.14*visualRatio*this.carScale()) this.hit(g);
+      if(g.second!==null && Math.abs(y-.8)<.11 && Math.abs(this.laneX(g.second)-s.x)<(.04+.14*this.carScale())*visualRatio) this.hit(g);
       if(g.bonus && !s.collected.includes(g.id) && Math.abs(y-.8)<.095
            && Math.abs(this.laneX(g.bonusLane)-s.x)<.095*visualRatio) this.collect(g);
       if(s.done) break;
@@ -247,7 +278,7 @@ class DrivingEngine {
     c.restore();
   }
   weddingCar(x,y) {
-    const c=this.ctx;c.save();c.translate(x,y);
+    const c=this.ctx;c.save();c.translate(x,y);c.scale(this.carScale(),this.carScale());
     c.fillStyle='#65485655';c.beginPath();c.ellipse(0,22,85,23,0,0,Math.PI*2);c.fill();
     this.roundRect(-76,-12,23,48,9,'#454253');this.roundRect(53,-12,23,48,9,'#454253');
     // Sculpted front of the convertible, with the couple above the windscreen.
@@ -308,13 +339,30 @@ class DrivingEngine {
       const t=-.12+((i*.13+s.t*this.cfg.speed*.65)%1.35);
       for(const side of [-1,1])things.push({t,type:'tree',x:.5+side*(this.cfg.roadWidth/2+.09),id:i});
     }
-    for(const g of this.course){const t=-.12+(s.t-g.spawn)*this.cfg.speed;if(t>=-.12&&t<1.12)things.push({t,type:'group',g});}
+    for(const g of this.course){const t=-.12+(s.t-g.spawn)*this.cfg.speed;if(t>=-.12&&t<1.12){
+      things.push({t,type:'group',g});
+      if(g.balloon&&!s.balloon_hit.includes(g.id))things.push({t,type:'heart',x:this.laneX(g.balloonLane)});
+    }}
+    for(const b of this.bouquets)things.push({t:b.travel,type:'bouquet',x:b.x});
     const last=this.course[this.course.length-1],finish=-.12+(s.t-last.spawn-this.cfg.interval*.4)*this.cfg.speed;
     if(finish>=-.12&&finish<1.2)things.push({t:finish,type:'finish'});
     things.push({t:.8,type:'player'});
     things.sort((a,b)=>a.t-b.t);
     for(const thing of things){
       const t=thing.t;
+      if(thing.type==='heart'||thing.type==='bouquet'){
+        const p=this.project(thing.x,t);c.save();c.translate(p.x,p.y-72*p.scale);c.scale(p.scale,p.scale);
+        if(thing.type==='heart'){
+          c.strokeStyle='#a9788277';c.lineWidth=1.5;c.beginPath();c.moveTo(0,23);c.bezierCurveTo(12,35,-10,40,0,57);c.stroke();
+          const g=c.createLinearGradient(-22,-25,20,22);g.addColorStop(0,'#ffb7cf');g.addColorStop(.45,'#ee598e');g.addColorStop(1,'#b93970');c.fillStyle=g;
+          c.beginPath();c.moveTo(0,25);c.bezierCurveTo(-52,-4,-22,-42,0,-19);c.bezierCurveTo(22,-42,52,-4,0,25);c.fill();
+          c.strokeStyle='#ffe6ed';c.lineWidth=3;c.beginPath();c.moveTo(-20,-9);c.quadraticCurveTo(-20,-22,-10,-19);c.stroke();
+        }else{
+          c.rotate(-.35);c.strokeStyle='#629465';c.lineWidth=5;c.beginPath();c.moveTo(0,19);c.lineTo(-6,-5);c.moveTo(0,19);c.lineTo(7,-5);c.stroke();
+          for(const [xx,yy,col] of [[-8,-8,'#ff9e65'],[7,-10,'#ef759f'],[0,-19,'#ffc57b'],[0,-4,'#ffb1c7']]){c.fillStyle=col;c.beginPath();c.arc(xx,yy,8,0,Math.PI*2);c.fill();c.strokeStyle='#fff1db';c.lineWidth=1.5;c.stroke();}
+          c.fillStyle='#fff2e4';c.fillRect(-6,9,12,5);
+        }c.restore();continue;
+      }
       if(thing.type==='finish'){
         for(let row=0;row<2;row++)for(let col=0;col<16;col++)this.roadQuad(left+col*this.cfg.roadWidth/16,left+(col+1)*this.cfg.roadWidth/16,t+row*.015,t+(row+1)*.015,(row+col)%2?'#fff8ec':'#7a526d');
         const f=this.project(.5,t);c.fillStyle='#93536d';c.textAlign='center';c.font=`bold ${Math.max(8,22*f.scale)}px sans-serif`;c.fillText('VIVA GLI SPOSI!',f.x,f.y-12*f.scale);continue;

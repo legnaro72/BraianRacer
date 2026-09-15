@@ -35,6 +35,10 @@ Apri l'indirizzo mostrato da Streamlit. Non servono API key, account esterni, No
 
 ## Cosa include
 
+- **Bouquet e cuori**: premi **F** o tocca **✿ BOUQUET** per lanciare fiori. Ogni palloncino a cuore colpito vale **+2 punti**, assegnati una sola volta dal server. Puoi tenere premuto per lanciare a intervalli regolari.
+- **Pista a tutta finestra in prospettiva**: orizzonte, alberi e oggetti che crescono avvicinandosi, cabrio con i volti cartoon degli sposi. È una proiezione prospettica su Canvas, non un motore WebGL con modelli 3D.
+- **Tre pose degli sposi** (ballo, abbraccio, salto) e sfondo tenue sfocato. Le immagini sono servite da `static/`: questa cartella deve essere pubblicata insieme al codice e `server.enableStaticServing` deve restare attivo.
+- **APK Android firmato**: client della stessa web app, con icona degli sposi. Istruzioni di installazione e compilazione in [android/README.md](android/README.md).
 - Auto degli sposi **Irene e Daniele**, con fiocchi, bouquet e targa I&D. Tieni premuto **↑**, **W**, **Shift** o **ACCELERA** sul touch per accelerare gradualmente fino a 1,6×.
 - Pagina **Dediche**: ogni giocatore può lasciare un messaggio pubblico agli sposi, firmato con nickname e tag, fino a 800 caratteri, modificabile dal proprio profilo.
 - Canvas animato con `requestAnimationFrame`, controlli A/D e frecce, pulsanti touch e trascinamento. Coordinate logiche 480 × 720 e movimento indipendente dalla risoluzione.

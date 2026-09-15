@@ -14,4 +14,9 @@ def test_release_contains_source_and_excludes_local_secrets(tmp_path):
     assert "brain-racer/app.py" in names
     assert "brain-racer/data/questions.json" in names
     assert "brain-racer/render.yaml" in names
+    assert "brain-racer/static/couple-hug.png" in names
+    assert "brain-racer/static/couple-dance.png" in names
+    assert "brain-racer/static/couple-jump.png" in names
+    assert "brain-racer/android/AndroidManifest.xml" in names
+    assert not any(".android-private" in p or p.endswith((".jks", ".apk")) for p in names)
     assert not any(".venv" in p or p.endswith((".db", "secrets.toml", ".pyc", "/.env")) for p in names)
