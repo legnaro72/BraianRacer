@@ -1,6 +1,7 @@
 """Launch with: streamlit run app.py"""
 import logging
 import os
+import time
 from pathlib import Path
 
 import streamlit as st
@@ -72,6 +73,8 @@ def dispatch(svc, command):
     if action == "REGISTER" and not pid:
         pid, token = svc.register(command.get("nickname"))
         st.session_state.update(player_id=pid, identity_token=token, booted=True, page="DEDICATIONS")
+        if command.get("play"):
+            st.session_state.game_id = svc.new_game(pid)
         return
     if not pid:
         return
@@ -123,7 +126,7 @@ def dispatch(svc, command):
         st.session_state.game_id = svc.new_game(pid)
 
 
-@st.fragment(run_every=1)
+@st.fragment(run_every=0.5)
 def arcade():
     ss = st.session_state
     ss.setdefault("seen_commands", [])
@@ -131,12 +134,14 @@ def arcade():
     try:
         svc = service()
         packets = ss.get("arcade_component", {}).get("packet") or []
+        changed = False
         if isinstance(packets, list):
             for command in packets[-120:]:
                 if not isinstance(command, dict) or not isinstance(command.get("id"), str):
                     continue
                 if command["id"] in ss.seen_commands:
                     continue
+                changed = True
                 try:
                     dispatch(svc, command)
                     ss.pop("message", None)
@@ -149,8 +154,19 @@ def arcade():
             payload["identity_token"] = ss.identity_token
         if ss.get("player_id"):
             try:
-                payload.update(svc.snapshot(ss.player_id, ss.get("game_id"), ss.get("room_id"),
-                                            include_dedications=ss.page == "DEDICATIONS"))
+                cache_key = (ss.player_id, ss.get("game_id"), ss.get("room_id"), ss.page)
+                cached = ss.get("menu_snapshot")
+                active = bool(ss.get("game_id") or ss.get("room_id"))
+                if not active and not changed and cached and cached[0] == cache_key and time.monotonic()-cached[1] < 3:
+                    payload.update(cached[2])
+                    payload["now"] = time.time()
+                else:
+                    snapshot = svc.snapshot(ss.player_id, ss.get("game_id"), ss.get("room_id"),
+                                            include_dedications=ss.page == "DEDICATIONS" and not (ss.get("game_id") or ss.get("room_id")),
+                                            compact=True)
+                    payload.update(snapshot)
+                    if not active:
+                        ss.menu_snapshot = (cache_key, time.monotonic(), snapshot)
             except RuleError as exc:
                 ss.pop("room_id", None)
                 ss.pop("game_id", None)

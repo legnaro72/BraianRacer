@@ -27,10 +27,10 @@ def save_state(obj):
     flag_modified(obj, "state")
 
 
-def initial_state(seed, now):
+def initial_state(seed, now, countdown=0):
     return {"phase": "DRIVING", "level": 1, "seed": seed, "score": 0,
             "lives": STARTING_LIVES, "stars": 0, "correct": 0, "wrong": 0,
-            "used": [], "questions": [], "qindex": 0, "start_at": now + COUNTDOWN_SECONDS,
+            "used": [], "questions": [], "qindex": 0, "start_at": now + countdown,
             "deadline": None, "progress": 0, "collected": [], "hit": [],
             "shield": False, "last_collision": -100, "round_score": 0,
             "balloon_hit": [], "hearts": 0, "round_hearts": 0, "last_bouquet": -100,
@@ -148,7 +148,7 @@ class GameService:
         with self.db.transaction() as s:
             g = self._owned(s, game_id, player_id)
             if g.mode == "single" and g.state["phase"] == "LEVEL_SUMMARY":
-                self._reset_round(g, g.state["level"] + 1, self.clock() + COUNTDOWN_SECONDS)
+                self._reset_round(g, g.state["level"] + 1, self.clock())
 
     def _reset_round(self, g, level, start_at):
         st = g.state
@@ -386,7 +386,7 @@ class GameService:
                               deadline=start + difficulty(1)["deadline"])
             for member in members:
                 g = GameSession(player_id=member.player_id, room_id=room.id, mode="multi",
-                                started_at=now, state=initial_state(room.state["seed"], now))
+                                started_at=now, state=initial_state(room.state["seed"], now, COUNTDOWN_SECONDS))
                 s.add(g)
             save_state(room)
             log.info("Match started: %s", room.room_code)
@@ -517,7 +517,8 @@ class GameService:
         state["difficulty"] = difficulty(state["level"])
         return state
 
-    def snapshot(self, player_id, game_id=None, room_id=None, include_dedications=False):
+    def snapshot(self, player_id, game_id=None, room_id=None, include_dedications=False,
+                 compact=False):
         now = self.clock()
         with self.db.transaction() as s:
             p = s.get(Player, player_id)
@@ -556,8 +557,10 @@ class GameService:
                 result["game"] = self._public_game(s, g)
             s.flush()
             # Compact data, also used by end screens. No client-submitted totals are trusted.
-            result["stats"] = statistics(s, player_id)
-            result["leaderboard"] = top_players(s)
+            phase = result.get("game", {}).get("screen_phase")
+            if not compact or phase not in ("DRIVING", "QUIZ", "REVEAL"):
+                result["stats"] = statistics(s, player_id)
+                result["leaderboard"] = top_players(s)
             if include_dedications:
                 result["dedications"] = []
                 for dedication in s.find(Dedication, order_by=("-created_at", "player_id")):

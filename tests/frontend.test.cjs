@@ -119,3 +119,49 @@ test('dedication markup escapes HTML supplied by a player',()=>{
   vm.runInContext(ui+'\nglobalThis.escapeText=esc;',context);
   assert.equal(context.escapeText('<img src=x onerror="alert(1)">'), '&lt;img src=x onerror=&quot;alert(1)&quot;&gt;');
 });
+const uiSource=fs.readFileSync(path.join(assets,'ui.js'),'utf8').replace('export default function(component)', 'function renderer(component)');
+function uiHost(){
+  let now=100000;
+  class ClockDate extends Date {static now(){return now;}}
+  const context=vm.createContext({Date:ClockDate,Math,Number,makeId:()=>String(now++),setInterval:()=>1,clearInterval(){}});
+  vm.runInContext(uiSource+'\nglobalThis.UI=BrainUI;',context);
+  const ui=Object.create(context.UI.prototype), timer={dataset:{end:115},textContent:''};
+  const bar={dataset:{end:115,duration:15},style:{},classList:{toggle(){}}};
+  const answer={disabled:false,dataset:{action:'ANSWER',choice:'0'},classList:{add(){}}};
+  ui.data={booted:true,player:{id:'p'},game:{id:'g',level:1,qindex:0,screen_phase:'QUIZ',answered:false},command_acks:[]};
+  ui.pending=[];ui.audio={unlock(){}};ui.component={setStateValue(){}};ui.lastPacket=now;
+  ui.root={querySelectorAll:s=>s==='[data-countdown]'?[timer]:s==='[data-timer-bar]'?[bar]:s==='.answer'?[answer]:[]};
+  return {ui,timer,bar,answer,setTime:t=>now=t};
+}
+test('answer locks immediately, freezes timer, and sends only once before acknowledgement',()=>{
+  const {ui,timer,bar,answer,setTime}=uiHost();
+  ui.click({target:{closest:()=>answer}});
+  assert.equal(answer.disabled,true);assert.equal(ui.pending.length,1);
+  ui.tick();const frozen=timer.textContent, width=bar.style.width;
+  setTime(105000);ui.tick();
+  assert.equal(timer.textContent,frozen);assert.equal(bar.style.width,width);
+  answer.disabled=false;ui.click({target:{closest:()=>answer}}); // Simulated stale rerender.
+  assert.equal(ui.pending.length,1);
+  ui.data.game.screen_phase='REVEAL';ui.tick();assert.notEqual(timer.textContent,frozen);
+});
+test('rapid play/replay clicks produce a single start command',()=>{
+  const {ui}=uiHost();ui.send('REPLAY');ui.send('REPLAY');ui.send('START_SINGLE');
+  assert.equal(ui.pending.length,1);assert.equal(ui.pending[0].action,'REPLAY');
+});
+test('new game id never restores a finished engine session',()=>{
+  const h=host(),old=h.make();old.state.done=true;old.state.score=99;old.state.lives=0;old.persist();
+  h.data.id='fresh';const next=h.make();
+  assert.equal(next.state.done,false);assert.equal(next.state.score,0);assert.equal(next.state.lives,3);
+  assert.equal(next.state.t,0);assert.equal(next.state.pending.length,0);
+});
+
+test('touching the track fires immediately, keeps steering and respects cooldown/pause',()=>{
+  const e=host().make();e.state.started=true;
+  const touch={preventDefault(){},pointerType:'touch',pointerId:1,clientX:250};
+  e.down(touch);assert.equal(e.bouquets.length,1);assert.equal(e.dragging,true);
+  e.down(touch);assert.equal(e.bouquets.length,1);
+  e.up();assert.equal(e.dragging,false);
+  e.state.real+=1;e.paused=true;e.down(touch);assert.equal(e.bouquets.length,1);
+  e.paused=false;e.down(touch);assert.equal(e.bouquets.length,2);
+  e.state.real+=1;e.state.done=true;e.down(touch);assert.equal(e.bouquets.length,2);
+});

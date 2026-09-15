@@ -97,3 +97,65 @@ def test_accelerated_finish_is_accepted_but_impossible_finish_is_not(svc, player
     svc.clock.advance(6)
     finish_drive(svc, player, gid)
     assert svc.snapshot(player, game_id=gid)["game"]["phase"] == "QUIZ"
+
+
+def test_immediate_start_and_replay_reset(svc, player):
+    gid = svc.new_game(player)
+    first = svc.snapshot(player, game_id=gid)["game"]
+    assert first["start_at"] == svc.clock()
+    svc.clock.advance(40)
+    for i in range(3):
+        svc.events(gid, player, 1, [event("COLLISION", f"death{i}", group=i, at=5+i*2)])
+    assert svc.snapshot(player, game_id=gid)["game"]["screen_phase"] == "GAME_OVER"
+    svc.abort(gid, player)
+    replay = svc.new_game(player)
+    assert replay != gid
+    g = svc.snapshot(player, game_id=replay)["game"]
+    assert g["start_at"] == svc.clock()
+    assert g["lives"] == 3 and g["level"] == 1 and g["phase"] == "DRIVING"
+    for field in ("score", "progress", "stars", "hearts", "correct", "wrong", "qindex", "driving_ms"):
+        assert g[field] == 0
+    for field in ("hit", "collected", "balloon_hit", "acks"):
+        assert g[field] == []
+    assert g["deadline"] is None and not g["shield"]
+    svc.events(gid, player, 1, [event("COLLISION", "stale", group=4, at=15)])
+    assert svc.snapshot(player, game_id=replay)["game"]["lives"] == 3
+
+
+def test_early_answers_stop_deadline_and_advance_exactly_once(svc, player):
+    gid = svc.new_game(player)
+    svc.clock.advance(55)
+    finish_drive(svc, player, gid)
+    for index in range(3):
+        q = svc.snapshot(player, game_id=gid)["game"]
+        assert q["qindex"] == index and q["screen_phase"] == "QUIZ"
+        old_deadline = q["deadline"]
+        correct = svc.bank.by_id[q["question"]["id"]]["correct_index"]
+        svc.clock.advance(.1)
+        svc.answer(gid, player, 1, index, correct)
+        reveal = svc.snapshot(player, game_id=gid)["game"]
+        assert reveal["screen_phase"] == "REVEAL"
+        assert reveal["deadline"] < old_deadline - 10
+        assert reveal["deadline"] - svc.clock() < 1
+        svc.answer(gid, player, 1, index, (correct+1)%4)
+        svc.clock.advance(REVEAL_SECONDS)
+        after = svc.snapshot(player, game_id=gid)["game"]
+        svc.answer(gid, player, 1, index, correct)  # Delayed duplicate of previous question.
+        again = svc.snapshot(player, game_id=gid)["game"]
+        assert again["qindex"] == after["qindex"]
+        assert again["score"] == index+1
+    assert again["screen_phase"] == "LEVEL_SUMMARY"
+
+
+def test_active_compact_snapshot_avoids_aggregate_queries(svc, player, monkeypatch):
+    gid = svc.new_game(player)
+    def unexpected(*args):
+        raise AssertionError("Aggregate query during active game")
+    with monkeypatch.context() as m:
+        m.setattr("brain_racer.game_service.statistics", unexpected)
+        m.setattr("brain_racer.game_service.top_players", unexpected)
+        snapshot = svc.snapshot(player, game_id=gid, compact=True)
+        assert "stats" not in snapshot and "leaderboard" not in snapshot
+    svc.abort(gid, player)
+    snapshot = svc.snapshot(player, game_id=gid, compact=True)
+    assert snapshot["stats"]["games"] == 1 and "leaderboard" in snapshot

@@ -72,6 +72,7 @@ class DrivingEngine {
     window.addEventListener('keyup', this.onKeyUp);
     window.addEventListener('blur', this.onBlur);
     this.down = e => { e.preventDefault(); canvas.focus(); this.audio.unlock();
+      if ((e.pointerType === 'touch' || e.pointerType === 'pen') && this.state.started) this.throwBouquet();
       this.dragging = true; canvas.setPointerCapture(e.pointerId); this.steer(e); };
     this.move = e => { if (this.dragging) { e.preventDefault(); this.steer(e); } };
     this.up = () => { this.dragging = false; };

@@ -58,3 +58,15 @@
 .screen-driving .bouquet-control{background:#e985ae;color:#fff;border:1px solid #bf5e8b;box-shadow:0 3px 0 #b9527f}
 .screen-driving .touch-controls{gap:8px}.screen-driving .touch-controls button{max-width:210px}.screen-driving .touch-controls button span{font-size:9px}
 @media(max-width:640px){.hero{padding:14px;margin-top:12px}.hero-copy{padding:0}.page-intro.with-couple{padding:20px 14px;grid-template-columns:minmax(0,1fr) 145px}.couple-hosts-page .couple-portrait{height:215px}.screen-driving .touch-controls{gap:5px;padding-left:7px;padding-right:7px}.screen-driving .touch-controls button{padding:4px;gap:3px;font-size:23px}.screen-driving .touch-controls button span{font-size:7px}.screen-driving .touch-controls button small{font-size:8px}}
+
+/* Keep the first action above the fold without removing the wedding artwork. */
+.hero-copy{display:flex;flex-direction:column;align-items:flex-start}
+.hero-copy>*{order:3}.hero-copy>.eyebrow{order:0}.hero-copy>h1{order:1}
+.hero-copy>.register,.hero-copy>.play-now{order:2;margin:12px 0}
+.play-now{min-width:220px;min-height:54px;font-size:20px}
+.register>.btn.secondary{margin-top:12px}.register small{display:block}
+.quick-replay{position:absolute;inset:30% 0 auto;z-index:10;text-align:center;padding:24px;background:#fff8eff2}
+.quick-replay h1{margin:0 0 18px}.quick-replay .btn{min-width:220px;min-height:56px}
+.screen-game_over .result-hero{padding-top:24px}
+.btn[aria-busy="true"]{cursor:progress}
+@media(max-width:640px){.hero h1{font-size:42px;margin:10px 0}.hero h1 br{display:none}.hero h1 em{margin-left:8px}.hero .hero-tags{display:none}.hero-copy>.register{width:100%;margin:8px 0;padding:14px}.register .input-row{gap:8px}.register input{min-height:44px}.hero-copy>.play-now{width:100%;margin:8px 0}.hero-copy>.eyebrow{font-size:9px}.screen-game_over h1{font-size:42px}}

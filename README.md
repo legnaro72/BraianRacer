@@ -38,7 +38,7 @@ Apri l'indirizzo mostrato da Streamlit. Non servono API key, account esterni, No
 - **Bouquet e cuori**: premi **F** o tocca **✿ BOUQUET** per lanciare fiori. Ogni palloncino a cuore colpito vale **+2 punti**, assegnati una sola volta dal server. Puoi tenere premuto per lanciare a intervalli regolari.
 - **Pista a tutta finestra in prospettiva**: orizzonte, alberi e oggetti che crescono avvicinandosi, cabrio con i volti cartoon degli sposi. È una proiezione prospettica su Canvas, non un motore WebGL con modelli 3D.
 - **Tre pose degli sposi** (ballo, abbraccio, salto) e sfondo tenue sfocato. Le immagini sono servite da `static/`: questa cartella deve essere pubblicata insieme al codice e `server.enableStaticServing` deve restare attivo.
-- **APK Android firmato**: client della stessa web app, con icona degli sposi. Istruzioni di installazione e compilazione in [android/README.md](android/README.md).
+- **APK Android firmato**: apre direttamente https://irenedaniele.streamlit.app/ senza configurazione URL, con icona degli sposi. Istruzioni di installazione e compilazione in [android/README.md](android/README.md).
 - Auto degli sposi **Irene e Daniele**, con fiocchi, bouquet e targa I&D. Tieni premuto **↑**, **W**, **Shift** o **ACCELERA** sul touch per accelerare gradualmente fino a 1,6×.
 - Pagina **Dediche**: ogni giocatore può lasciare un messaggio pubblico agli sposi, firmato con nickname e tag, fino a 800 caratteri, modificabile dal proprio profilo.
 - Canvas animato con `requestAnimationFrame`, controlli A/D e frecce, pulsanti touch e trascinamento. Coordinate logiche 480 × 720 e movimento indipendente dalla risoluzione.
@@ -151,7 +151,7 @@ LOBBY → COUNTDOWN → DRIVING → QUIZ ↔ REVEAL
 
 La partenza è un timestamp UTC futuro di quattro secondi; il client stima lo scarto dell'orologio usando l'ora del server. La simulazione usa delta temporali limitati per evitare salti dopo blocchi della scheda. Il networking Streamlit non consente precisione da e-sport: chi riceve tardi il countdown può iniziare leggermente dopo, ma le scadenze restano condivise.
 
-Il server apre il quiz quando tutti i piloti attivi hanno concluso o scadono **85 secondi**. Un DNF perde una vita e salta il quiz, senza penalità ai punti. I tre ID domanda sono salvati prima del quiz. Le risposte restano private e non vengono valutate pubblicamente finché tutti gli aventi diritto hanno risposto o scade il timer. Ogni rivelazione dura tre secondi, ogni riepilogo sette. I livelli successivi partono automaticamente.
+Il server apre il quiz quando tutti i piloti attivi hanno concluso o scadono **85 secondi**. Un DNF perde una vita e salta il quiz, senza penalità ai punti. I tre ID domanda sono salvati prima del quiz. Le risposte restano private e non vengono valutate pubblicamente finché tutti gli aventi diritto hanno risposto o scade il timer. Ogni rivelazione dura 0,6 secondi (più il tempo di aggiornamento del client), ogni riepilogo sette. I livelli successivi partono automaticamente.
 
 Un heartbeat scrive la presenza circa ogni tre secondi. La perdita di connessione ha una tolleranza di **40 secondi**; poi il giocatore viene eliminato. In lobby l'host viene sostituito automaticamente. Durante la gara l'avanzamento non richiede l'host: qualunque client connesso può far avanzare la macchina a stati. Se nessuno è connesso non gira alcun processo in background: le scadenze vengono riconciliate al successivo accesso. Nascondere la scheda sospende l'animazione locale; in multiplayer il tempo server continua.
 
@@ -210,3 +210,10 @@ Per modificare il mazzo, aggiorna `data/questions_source.tsv` ed esegui `python 
 ## Collaudo manuale consigliato prima della pubblicazione
 
 Usa due profili browser indipendenti, uno a dimensione smartphone. Verifica partenza comune, progressi, pit stop, quiz identico, segretezza della prima risposta, rivelazione comune, livello successivo e podio. Prova refresh e disconnessione, e controlla lo scorrimento a 320 px e in orizzontale. Il comportamento degli effetti sonori, della vibrazione e dei gesti fisici dipende dal dispositivo: prova anche su un telefono reale. La configurazione PostgreSQL va verificata contro il database di destinazione prima del deployment.
+
+
+### Avvio rapido e controlli touch
+
+In singolo la partita parte senza countdown: dalla home si inserisce il nickname e si preme **Gioca**, oppure si sceglie separatamente di lasciare una dedica. **Gioca ancora** è disponibile direttamente al Game Over e crea una nuova partita con stato azzerato. Toccare la pista con un dito o una penna lancia un bouquet; trascinare continua a sterzare. Restano disponibili F e il pulsante dedicato.
+
+Il timer del quiz si ferma localmente alla scelta, la risposta viene inviata subito e i pulsanti vengono bloccati. In multiplayer si attende ancora la risposta degli altri giocatori per mantenere la stessa domanda per tutti. Streamlit aggiorna lo stato ogni 0,5 secondi: durante guida e quiz evita le aggregazioni di statistiche/classifica; nei menu riutilizza la snapshot per un massimo di tre secondi, invalidandola a ogni comando.

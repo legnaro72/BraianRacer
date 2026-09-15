@@ -36,11 +36,19 @@ class BrainUI {
     this.interval=setInterval(()=>this.tick(),100);
   }
   send(action, payload={}) {
+    if(['START_SINGLE','REPLAY','REGISTER','NEXT_LEVEL'].includes(action)) {
+      if(this.pending.some(p=>['START_SINGLE','REPLAY','REGISTER','NEXT_LEVEL'].includes(p.action)))return;
+      this.root.querySelectorAll('[data-action="START_SINGLE"],[data-action="REPLAY"],[data-action="NEXT_LEVEL"],.register button').forEach(b=>{
+        b.disabled=true;b.textContent='Partenza…';b.setAttribute('aria-busy','true');
+      });
+    }
     const command={id:makeId(),action,...payload};this.pending.push(command);this.flush();
   }
   flush() {this.lastPacket=Date.now();this.component.setStateValue('packet',[...this.pending]);}
   update(component) {
-    this.component=component;this.data=component.data;
+    this.component=component;this.data={...component.data,
+      stats:component.data.stats||this.data?.stats||{best:0},
+      leaderboard:component.data.leaderboard||this.data?.leaderboard||[]};
     const data=this.data;
     this.pending=this.pending.filter(p=>!data.command_acks.includes(p.id));
     this.serverOffset=(data.now || Date.now()/1000)*1000-Date.now();
@@ -53,6 +61,10 @@ class BrainUI {
     }
     const view=this.view();
     const game=data.game,room=data.room;
+    const questionKey=game?`${game.id}:${game.level}:${game.qindex}`:'';
+    if(this.answerLock?.key!==questionKey || !['QUIZ','REVEAL'].includes(view))this.answerLock=null;
+    if(data.message && data.message!==this.handledError && !this.pending.length){this.signature='';this.answerLock=null;}
+    this.handledError=data.message;
     const signature=[view,game?.id,game?.level,game?.qindex,
       ['QUIZ','REVEAL'].includes(view)?game?.answered:'',
       view==='LOBBY'?JSON.stringify(room?.players):'',data.player?.id||''].join(':');
@@ -133,7 +145,8 @@ class BrainUI {
       <h1>Irene <span class="wedding-and">&</span><br><em>Daniele</em></h1><h2>Oggi si festeggia. Insieme a voi!</h2>
       <p>Un pensiero da custodire, una corsa da condividere.<br>Lascia un augurio agli sposi e unisciti alla festa!</p>
       <div class="hero-tags"><span>♥ Dediche</span><span>✿ Amici</span><span>★ Una corsa insieme</span></div>
-      ${welcome?`<form class="register" data-form="register"><label for="nickname">METTI IL TUO NICK E LASCIA UNA DEDICA AGLI SPOSI</label><div class="input-row"><input id="nickname" name="nickname" placeholder="Il tuo nickname" minlength="3" maxlength="16" required autocomplete="nickname"><button type="submit" class="btn primary">Lascia una dedica ♥</button></div><small>Oppure scegli una gara qui sotto. 3–16 caratteri · lettere, numeri, _ e -</small></form>`:
+      ${welcome?`<form class="register" data-form="register"><label for="nickname">METTI IL TUO NICK</label><div class="input-row"><input id="nickname" name="nickname" placeholder="Il tuo nickname" minlength="3" maxlength="16" required autocomplete="nickname"><button type="submit" name="intent" value="play" class="btn primary">Gioca</button></div><button type="submit" name="intent" value="dedicate" class="btn secondary">Lascia una dedica ♥</button><small>3–16 caratteri · lettere, numeri, _ e -</small></form>`:
+      `${button('Gioca '+icons.arrow,'START_SINGLE','primary play-now')}`+
       `<div class="welcome-back"><span class="avatar small">${esc(d.player.nickname.slice(0,2).toUpperCase())}</span><span>Bentornato, <strong>${esc(d.player.nickname)}.</strong> La festa ti aspetta!</span></div><div class="dedication-invite"><span class="dedication-heart">♥</span><div><h3>Un pensiero per gli sposi</h3><p>Il tuo augurio diventa un ricordo da conservare.</p></div>${button("Lascia una dedica", "NAV", "primary", 'data-page="DEDICATIONS"')}</div>`}</div>${heroArt()}</section>
       <section class="mode-section"><div class="section-heading"><h2><span class="section-number">01</span> Scegli la tua sfida</h2><span>IL PROSSIMO TRAGUARDO INIZIA QUI</span></div>
       <div class="mode-grid"><button class="mode-card single" data-action="${welcome?'FOCUS_NAME':'START_SINGLE'}"><div class="mode-top"><span class="feature-icon">${icons.car}</span><span class="pill">1 GIOCATORE</span></div><div class="mode-bottom"><div><h3>Partita singola</h3><p>Accompagna gli sposi verso il prossimo traguardo.</p></div><span class="circle-arrow">${icons.arrow}</span></div><div class="mode-track"></div></button>
@@ -173,7 +186,7 @@ class BrainUI {
   }
   help() {
     return this.intro('POCHE REGOLE. TANTA VOGLIA DI RIPROVARCI.','Prima il volante. Poi il cervello.')+
-      `<div class="help-grid">${[['01','Guida e sopravvivi.','Muoviti con ← → oppure A e D. Tieni premuto ↑, W o Shift per accelerare fino a 1,6 volte la velocità; rilascia per rallentare. Su smartphone usa i pulsanti o trascina il dito sulla pista e tieni premuto ACCELERA per aumentare la velocità. Parti con 3 vite: ogni urto ne costa una, poi hai 1,3 secondi di protezione.'],['02','Attraversa il traguardo.','Premi F o tocca ✿ BOUQUET per lanciare fiori: mira ai palloncini a cuore, ogni colpo riuscito vale +2 punti. Puoi tenere premuto. Supera i gruppi di ostacoli fino al termine del percorso. Le stelle valgono +1, lo scudo assorbe un urto e il bonus tempo rallenta la strada per 4 secondi.'],['03','Pensa veloce.','Rispondi a 3 domande, con 15 secondi per ognuna. Risposta corretta: +1. Sbagliata o tempo scaduto: −2. I punteggi negativi sono possibili, ma gli errori al quiz non tolgono vite.']].map(([n,h,p])=>`<section class="panel"><span class="step-number">${n}</span><h2>${h}</h2><p>${p}</p></section>`).join('')}</div>
+      `<div class="help-grid">${[['01','Guida e sopravvivi.','Muoviti con ← → oppure A e D. Tieni premuto ↑, W o Shift per accelerare fino a 1,6 volte la velocità; rilascia per rallentare. Su smartphone usa i pulsanti o trascina il dito sulla pista e tieni premuto ACCELERA per aumentare la velocità. Parti con 3 vite: ogni urto ne costa una, poi hai 1,3 secondi di protezione.'],['02','Attraversa il traguardo.','Tocca la pista, premi F o tocca ✿ BOUQUET per lanciare fiori: mira ai palloncini a cuore, ogni colpo riuscito vale +2 punti. Puoi tenere premuto. Supera i gruppi di ostacoli fino al termine del percorso. Le stelle valgono +1, lo scudo assorbe un urto e il bonus tempo rallenta la strada per 4 secondi.'],['03','Pensa veloce.','Rispondi a 3 domande, con 15 secondi per ognuna. Risposta corretta: +1. Sbagliata o tempo scaduto: −2. I punteggi negativi sono possibili, ma gli errori al quiz non tolgono vite.']].map(([n,h,p])=>`<section class="panel"><span class="step-number">${n}</span><h2>${h}</h2><p>${p}</p></section>`).join('')}</div>
       <section class="panel help-multi"><span class="feature-icon lavender">${icons.people}</span><div><h2>Una griglia, fino a sei rivali.</h2><p>Create una stanza, segnatevi pronti e lasciate partire l'host. Avrete la stessa pista e le stesse domande per 5 livelli. I risultati delle risposte restano nascosti fino alla chiusura della domanda. Chi non arriva entro 85 secondi perde una vita e salta il quiz. Chi esaurisce le vite può restare a guardare.</p><p>In singolo puoi mettere in pausa con Spazio. In multiplayer il tempo condiviso continua anche se cambi scheda. Una disconnessione oltre 40 secondi elimina il pilota. Se l'host lascia la lobby, il comando passa a un altro giocatore.</p></div></section>`+this.back();
   }
   lobby() {
@@ -210,7 +223,7 @@ class BrainUI {
     const title=reveal?(eligible?(answer?.correct?'Risposta corretta!':'Risposta sbagliata.'):'Ecco la risposta.'):'Adesso, pensa veloce.';
     return `${coupleArt('quiz',reveal?'Un passo in più verso la festa!':'Facciamo il tifo per te!',reveal?'jump':'dance')}<div class="quiz-top"><span class="eyebrow">LIVELLO ${String(g.level).padStart(2,'0')} · SFIDA DI CONOSCENZA</span><span class="score-chip">${g.score} <small>PT</small></span></div>
       <section class="quiz-panel ${reveal?'revealed':''}"><div class="quiz-meta"><span class="pill">${esc(q.category)}</span><div class="question-steps">${[0,1,2].map(i=>`<i class="${i===g.qindex?'current':i<g.qindex?'complete':''}"></i>`).join('')}<span>${g.qindex+1} / 3</span></div></div>
-      <div class="quiz-timing"><span>${reveal?'PROSSIMA TAPPA TRA':'TEMPO A DISPOSIZIONE'}</span><b data-countdown data-end="${g.deadline}"></b></div><div class="quiz-timer"><i data-timer-bar data-end="${g.deadline}" data-duration="${reveal?3:15}"></i></div>
+      <div class="quiz-timing"><span>${reveal?'PROSSIMA TAPPA TRA':'TEMPO A DISPOSIZIONE'}</span><b data-countdown data-end="${g.deadline}"></b></div><div class="quiz-timer"><i data-timer-bar data-end="${g.deadline}" data-duration="${reveal?.6:15}"></i></div>
       <span class="quiz-kicker">${title}</span><h1>${esc(q.question)}</h1>
       <div class="answer-grid">${q.answers.map((a,i)=>`<button class="answer ${reveal&&i===q.correct_index?'correct':''} ${reveal&&answer?.choice===i&&!answer.correct?'wrong':''}" data-action="ANSWER" data-choice="${i}" ${reveal||g.answered||!eligible?'disabled':''}><span class="answer-letter">${'ABCD'[i]}</span><span>${esc(a)}</span>${reveal&&i===q.correct_index?'<b>✓</b>':''}</button>`).join('')}</div>
       ${reveal?`<div class="quiz-feedback ${answer?.correct?'positive':''}" role="status"><strong>${eligible?(answer?.correct?'✓ +1 punto':answer?.choice===null?'◷ Tempo scaduto · −2 punti':'× −2 punti'):'Risultati della domanda'}</strong><p>Risposta corretta: <b>${esc(q.answers[q.correct_index])}</b>${q.explanation?'<br>'+esc(q.explanation):''}</p>${r?`<small>${g.correct_count} / ${g.eligible_count} risposte corrette</small>`:''}</div>`:
@@ -226,8 +239,8 @@ class BrainUI {
   }
   gameOver() {
     const g=this.data.game,rank=this.data.leaderboard.find(p=>p.player_id===this.data.player.id);
-    return `${coupleArt("celebration","Questo traguardo è anche vostro!","jump")}<section class="result-hero"><span class="eyebrow">LA CORSA FINISCE. LA SFIDA CONTINUA.</span><h1>GAME <em>OVER.</em></h1><p>${g.score>=this.data.stats.best?'Il tuo record personale è qui.':'Un’altra corsa. Un nuovo traguardo.'}</p><div class="total-score">${g.score}<small>PUNTEGGIO FINALE</small></div><div class="result-chips"><span>Livello ${g.level}</span><span>Record ${this.data.stats.best} PT</span>${rank?`<span>#${rank.rank} in classifica personale</span>`:''}</div></section>
-      <div class="center-actions">${button('Gioca ancora '+icons.arrow,'REPLAY')}${button('Torna al garage','HOME','secondary')}</div><div class="save-note">✓ Risultato salvato. Il prossimo record ti aspetta.</div>`;
+    return `<section class="result-hero"><span class="eyebrow">LA CORSA FINISCE. LA SFIDA CONTINUA.</span><h1>GAME <em>OVER.</em></h1>${button("Gioca ancora", "REPLAY", "primary play-now")}<p>${g.score>=this.data.stats.best?'Il tuo record personale è qui.':'Un’altra corsa. Un nuovo traguardo.'}</p><div class="total-score">${g.score}<small>PUNTEGGIO FINALE</small></div><div class="result-chips"><span>Livello ${g.level}</span><span>Record ${this.data.stats.best} PT</span>${rank?`<span>#${rank.rank} in classifica personale</span>`:''}</div></section>
+      <div class="center-actions">${button('Torna al garage','HOME','secondary')}</div>${coupleArt("celebration","Questo traguardo è anche vostro!","jump")}<div class="save-note">✓ Risultato salvato. Il prossimo record ti aspetta.</div>`;
   }
   pit() {
     const g=this.data.game,eliminated=g?.phase==='ELIMINATED';
@@ -242,7 +255,15 @@ class BrainUI {
   }
   tick() {
     if(!this.data)return;
-    const now=(Date.now()+(this.serverOffset||0))/1000;
+    const liveNow=(Date.now()+(this.serverOffset||0))/1000;
+    const now=this.view()==='QUIZ' && this.answerLock ? this.answerLock.at : liveNow;
+    if(this.view()==='QUIZ' && this.data.game.answered && !this.answerLock)
+      this.answerLock={key:`${this.data.game.id}:${this.data.game.level}:${this.data.game.qindex}`,at:now};
+    if(this.engine?.state.done && this.engine.state.lives<=0 && this.data.game.mode==='single' && !this.root.querySelector('.quick-replay')){
+      const panel=document.createElement('section');panel.className='quick-replay';
+      panel.innerHTML='<h1>Game Over</h1>'+button('Gioca ancora','REPLAY');
+      this.root.querySelector('.screen-driving').append(panel);
+    }
     this.root.querySelectorAll('[data-countdown]').forEach(el=>{el.textContent=`${Math.max(0,Math.ceil(Number(el.dataset.end)-now))}s`;});
     this.root.querySelectorAll('[data-timer-bar]').forEach(el=>{
       const fraction=Math.max(0,Math.min(1,(Number(el.dataset.end)-now)/Number(el.dataset.duration)));
@@ -270,6 +291,8 @@ class BrainUI {
     if(action==='CANCEL'){this.root.querySelector('.modal-backdrop')?.remove();if(this.engine)this.engine.paused=false;return;}
     if(action==='ANSWER'){
       const g=this.data.game;
+      if(this.answerLock || g.answered || g.screen_phase!=='QUIZ')return;
+      this.answerLock={key:`${g.id}:${g.level}:${g.qindex}`,at:(Date.now()+(this.serverOffset||0))/1000};
       this.root.querySelectorAll('.answer').forEach(a=>a.disabled=true);el.classList.add('picked');
       this.send('ANSWER',{game_id:g.id,level:g.level,index:g.qindex,choice:Number(el.dataset.choice)});return;
     }
@@ -277,7 +300,7 @@ class BrainUI {
   }
   submit(event) {
     event.preventDefault();this.audio.unlock();const form=event.target;
-    if(form.dataset.form==='register')this.send('REGISTER',{nickname:form.elements.nickname.value});
+    if(form.dataset.form==='register')this.send('REGISTER',{nickname:form.elements.nickname.value,play:event.submitter?.value==='play'});
     if(form.dataset.form==='join')this.send('JOIN_ROOM',{code:form.elements.code.value});
     if(form.dataset.form==='dedication'){
       this.send('DEDICATE',{message:form.elements.message.value});

@@ -7,10 +7,10 @@ from pathlib import Path
 import secrets
 import shutil
 import subprocess
-from urllib.parse import urlparse
 from zipfile import ZipFile, ZIP_DEFLATED
 
 ROOT = Path(__file__).resolve().parent.parent
+APP_URL = 'https://irenedaniele.streamlit.app/'
 
 
 def run(*args, env=None):
@@ -22,13 +22,10 @@ def run(*args, env=None):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--url', default='', help='Public HTTPS app URL; otherwise configured on first launch')
     parser.add_argument('--sdk', type=Path, default=Path(os.environ.get('ANDROID_HOME',
                         str(Path(os.environ['LOCALAPPDATA'])/'Android/Sdk'))))
     args = parser.parse_args()
     keytool = shutil.which('keytool') or str(Path(r'C:\Program Files\Java\jdk-20\bin\keytool.exe'))
-    if args.url and (urlparse(args.url).scheme != 'https' or not urlparse(args.url).hostname):
-        parser.error('--url must be an HTTPS public address')
     sdk = args.sdk
     tools = sdk/'build-tools/35.0.0'
     android_jar = sdk/'platforms/android-36/android.jar'
@@ -38,10 +35,10 @@ def main():
     gen = build/'gen/it/irenedaniele/brainracer'
     gen.mkdir(parents=True, exist_ok=True)
     (gen/'BuildConfig.java').write_text('package it.irenedaniele.brainracer; public final class BuildConfig {'
-          'public static final String APP_URL = '+json.dumps(args.url)+';}', encoding='utf-8')
+          'public static final String APP_URL = '+json.dumps(APP_URL)+';}', encoding='utf-8')
     run(tools/'aapt2.exe', 'compile', '--dir', ROOT/'android/res', '-o', build/'resources.zip')
     run(tools/'aapt2.exe', 'link', '-I', android_jar, '--manifest', ROOT/'android/AndroidManifest.xml',
-        '--java', build/'gen', '--version-code', '1', '--version-name', '1.0',
+        '--java', build/'gen', '--version-code', '2', '--version-name', '1.1',
         '-o', build/'base.apk', build/'resources.zip')
     sources = list((ROOT/'android/src').rglob('*.java'))+list((build/'gen').rglob('*.java'))
     run('javac', '-encoding', 'UTF-8', '-source', '8', '-target', '8', '-classpath', android_jar,
@@ -74,7 +71,7 @@ def main():
     sha = hashlib.sha256(out.read_bytes()).hexdigest()
     out.with_suffix('.apk.sha256').write_text(sha+'  '+out.name+'\n', encoding='ascii')
     print('APK:', out)
-    print('App URL:', args.url or 'Configured on first launch')
+    print('App URL:', APP_URL)
     print('SHA256:', sha)
 
 
