@@ -11,8 +11,8 @@ def lose_life(lives: int) -> int:
 
 
 def leaderboard_key(game):
-    return (-game.final_score, -game.max_level, -game.lives_remaining, game.duration_ms,
-            game.ended_at or 0, game.id)
+    return (-( game.final_score or 0), -(game.max_level or 0), -(game.lives_remaining or 0),
+            game.duration_ms or 0, game.ended_at or 0, game.id or "")
 
 
 def winner_key(player):

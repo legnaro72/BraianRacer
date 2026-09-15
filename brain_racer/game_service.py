@@ -529,7 +529,7 @@ class GameService:
             result = {"now": now, "player": {"id": p.id, "nickname": p.nickname, "tag": p.player_tag}}
             if room_id:
                 room, member = self._member(s, room_id, player_id)
-                if now - member.last_seen_at >= 3:
+                if now - (member.last_seen_at or 0) >= 3:
                     member.last_seen_at = now
                 self._tick_room(s, room, now)
                 s.flush()
@@ -545,7 +545,7 @@ class GameService:
                     g = by_player.get(m.player_id)
                     gs = g.state if g else initial_state(0, now)
                     rows.append({"player_id": mp.id, "nickname": mp.nickname, "tag": mp.player_tag,
-                                 "ready": m.ready, "online": now - m.last_seen_at < 10,
+                                 "ready": m.ready, "online": now - (m.last_seen_at or 0) < 10,
                                  **{k: gs.get(k) for k in ("score", "lives", "level", "progress", "phase",
                                      "finished_levels", "driving_ms", "finish_time", "round_correct", "round_wrong")}})
                 result["room"]["players"] = sorted(rows, key=winner_key)

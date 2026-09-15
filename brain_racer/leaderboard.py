@@ -20,12 +20,12 @@ def top_players(session, limit=10):
 
 def statistics(session, player_id):
     games = session.find(GameSession, player_id=player_id, status="finished")
-    correct = sum(g.correct_answers for g in games)
-    wrong = sum(g.wrong_answers for g in games)
-    return {"games": len(games), "best": max((g.final_score for g in games), default=0),
-            "level": max((g.max_level for g in games), default=0),
-            "stars": sum(g.stars_collected for g in games), "correct": correct, "wrong": wrong,
+    correct = sum((g.correct_answers or 0) for g in games)
+    wrong = sum((g.wrong_answers or 0) for g in games)
+    return {"games": len(games), "best": max(((g.final_score or 0) for g in games), default=0),
+            "level": max(((g.max_level or 0) for g in games), default=0),
+            "stars": sum((g.stars_collected or 0) for g in games), "correct": correct, "wrong": wrong,
             "accuracy": round(100 * correct / (correct + wrong)) if correct + wrong else 0,
             "multiplayer": sum(g.mode == "multi" for g in games),
-            "wins": sum(g.victory for g in games),
-            "recent": [g.final_score for g in sorted(games, key=lambda g: g.ended_at)[-12:]]}
+            "wins": sum(bool(g.victory) for g in games),
+            "recent": [(g.final_score or 0) for g in sorted(games, key=lambda g: g.ended_at or 0)[-12:]]}
