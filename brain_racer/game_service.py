@@ -220,7 +220,10 @@ class GameService:
     def next_level(self, game_id, player_id):
         with self.db.transaction() as s:
             g = self._owned(s, game_id, player_id)
-            if g.mode == "single" and g.state["phase"] == "LEVEL_SUMMARY":
+            ready = g.state["phase"] == "LEVEL_SUMMARY" or (
+                g.state["phase"] == "REVEAL" and g.state.get("qindex") == QUESTIONS_PER_LEVEL - 1
+                and s.get(QuizAnswer, (g.id, g.state["level"], g.state["qindex"])))
+            if g.mode == "single" and ready:
                 self._reset_round(g, g.state["level"] + 1, self.clock())
 
     def _reset_round(self, g, level, start_at):
@@ -260,6 +263,8 @@ class GameService:
             if g.status != "active" or st["level"] != level:
                 return
             if g.mode == "single":
+                if st["phase"] == "REVEAL" and index == st["qindex"] + 1:
+                    st.update(phase="QUIZ", qindex=index, deadline=now + QUIZ_SECONDS)
                 if st["phase"] != "QUIZ" or st["qindex"] != index:
                     return
                 self._score_answer(s, g, index,
@@ -701,6 +706,8 @@ class GameService:
         elif room and room.status in ("DRIVING", "QUIZ"):
             state["eligible"] = False
         state["difficulty"] = difficulty(state["level"])
+        if g.mode == "single":
+            state["next_difficulty"] = difficulty(state["level"] + 1)
         if state.get("screen_phase") == "LEVEL_SUMMARY":
             state["next_difficulty"] = difficulty(state["level"] + 1)
         return state

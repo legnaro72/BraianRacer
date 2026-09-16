@@ -65,9 +65,9 @@ class BrainUI {
       if(component.data.game?.seed===this.optimisticStart)this.optimisticStart=null;
       else if(previous?.game?.seed===this.optimisticStart)this.data.game=previous.game;
     }
-    if(this.optimisticQuiz){
-      if(['QUIZ','REVEAL','LEVEL_SUMMARY'].includes(component.data.game?.screen_phase))this.optimisticQuiz=null;
-      else if(['QUIZ','REVEAL'].includes(previous?.game?.screen_phase))this.data.game=previous.game;
+    if(this.localQuizActive){
+      if(component.data.game?.screen_phase==='LEVEL_SUMMARY')this.localQuizActive=false;
+      else if(['QUIZ','LEVEL_SUMMARY'].includes(previous?.game?.screen_phase))this.data.game=previous.game;
     }
     this.serverOffset=(data.now || Date.now()/1000)*1000-Date.now();
     if(!data.booted&&!this.identitySent){this.identitySent=true;
@@ -123,12 +123,32 @@ class BrainUI {
     }
   }
   openLocalQuiz(game) {
-    if(this.optimisticQuiz||!game?.quiz_preview?.length)return;
+    if(this.localQuizActive||!game?.quiz_preview?.length)return;
     const now=(Date.now()+(this.serverOffset||0))/1000;
-    this.optimisticQuiz=true;
+    this.localQuizActive=game.mode==='single';
     this.data.game={...game,phase:'QUIZ',screen_phase:'QUIZ',qindex:0,
       question:game.quiz_preview[0],deadline:now+15,answered:false,eligible:true};
     this.signature='';this.mountView('QUIZ');
+  }
+  advanceLocalQuiz(choice) {
+    const g=this.data.game,correct=choice===g.question.correct_index,delta=correct?1:-2;
+    this.data.game={...g,score:g.score+delta,correct:g.correct+(correct?1:0),wrong:g.wrong+(correct?0:1),
+      round_correct:g.round_correct+(correct?1:0),round_wrong:g.round_wrong+(correct?0:1)};
+    const level=g.level,index=g.qindex;
+    setTimeout(()=>{
+      const current=this.data.game;
+      if(!this.localQuizActive||current.level!==level||current.qindex!==index)return;
+      this.answerLock=null;
+      if(index+1<current.quiz_preview.length){
+        const now=(Date.now()+(this.serverOffset||0))/1000;
+        this.data.game={...current,phase:'QUIZ',screen_phase:'QUIZ',qindex:index+1,
+          question:current.quiz_preview[index+1],deadline:now+15,answered:false,answer:null};
+        this.signature='';this.mountView('QUIZ');
+      }else{
+        this.data.game={...current,phase:'LEVEL_SUMMARY',screen_phase:'LEVEL_SUMMARY',answered:false,answer:null};
+        this.signature='';this.mountView('LEVEL_SUMMARY');
+      }
+    },700);
   }
   startLocalGame(template, action) {
     const now=(Date.now()+(this.serverOffset||0))/1000;
@@ -388,7 +408,9 @@ class BrainUI {
             `<strong>× Risposta sbagliata. −2 punti</strong><p>Risposta corretta: <b>${esc(g.question.answers[correctIndex])}</b></p>`;}
         this.audio.play(correct?'correct':'wrong');
       }
-      this.send('ANSWER',{game_id:g.id,level:g.level,index:g.qindex,choice});return;
+      this.send('ANSWER',{game_id:g.id,level:g.level,index:g.qindex,choice});
+      if(this.localQuizActive)this.advanceLocalQuiz(choice);
+      return;
     }
     this.send(action);
   }
