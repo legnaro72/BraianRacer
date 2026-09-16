@@ -658,6 +658,7 @@ class GameService:
         state = _game_state(g.state, now,
                             room_state.get("seed", 0) if room_state else 0,
                             room_state.get("level", 1) if room_state else 1)
+        used_ids = list(state.get("used", []))
         question_ids = state.pop("questions", [])
         state.pop("used", None)
         state.update(id=g.id, mode=g.mode, status=g.status)
@@ -682,6 +683,12 @@ class GameService:
         if phase == "DRIVING" and question_ids:
             state["quiz_preview"] = [self.bank.public(question_id, reveal=True)
                                      for question_id in question_ids if question_id in self.bank.by_id]
+        if g.mode == "single" and g.status == "active":
+            next_used = list(used_ids)
+            next_ids = self.bank.select(state["level"] + 1, next_used,
+                                        state["seed"] + state["level"] + 1)
+            state["next_quiz_preview"] = [self.bank.public(question_id, reveal=True)
+                                          for question_id in next_ids if question_id in self.bank.by_id]
         if phase in ("QUIZ", "REVEAL") and question_ids:
             index = _integer(state.get("qindex") if room else rs.get("qindex"), 0, 0)
             if index >= len(question_ids) or question_ids[index] not in self.bank.by_id:

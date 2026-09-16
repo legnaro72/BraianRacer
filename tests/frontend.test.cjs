@@ -177,12 +177,27 @@ test('rapid play/replay clicks produce a single start command',()=>{
 });
 test('play paints the driving screen before the cloud acknowledges the command',()=>{
   const {ui}=uiHost();let mounted='',sent=null;
-  ui.data={...ui.data,game:null,start_template:{seed:42,difficulty:{groups:20}}};
+  ui.data={...ui.data,game:null,start_template:{seed:42,difficulty:{groups:20},quiz_preview:[{id:'q1'}]}};
   ui.mountView=view=>{mounted=view;};ui.send=(action,payload)=>{sent={action,payload};};
   const play={disabled:false,dataset:{action:'START_SINGLE'}};
   ui.click({target:{closest:()=>play}});
   assert.equal(mounted,'DRIVING');assert.equal(ui.data.game.seed,42);
+  assert.equal(ui.data.game.quiz_preview[0].id,'q1');
   assert.equal(sent.action,'START_SINGLE');assert.equal(sent.payload.seed,42);
+});
+test('next level keeps preloaded quiz questions and abort reacts locally',()=>{
+  const {ui}=uiHost();let mounted='',sent=[];
+  ui.data={...ui.data,game:{...ui.data.game,mode:'single',screen_phase:'LEVEL_SUMMARY',phase:'LEVEL_SUMMARY',
+    level:1,lives:3,score:5,progress:20,next_difficulty:{groups:22},next_quiz_preview:[{id:'q2'}]}};
+  ui.mountView=view=>{mounted=view;};ui.send=action=>{sent.push(action);};
+  ui.click({target:{closest:()=>({disabled:false,dataset:{action:'NEXT_LEVEL'}})}});
+  assert.equal(mounted,'DRIVING');assert.equal(ui.data.game.level,2);
+  assert.equal(ui.data.game.quiz_preview[0].id,'q2');
+  ui.root.querySelector=()=>({remove(){}});
+  ui.engine={destroy(){this.destroyed=true;}};
+  ui.click({target:{closest:()=>({disabled:false,dataset:{action:'ABORT'}})}});
+  assert.equal(mounted,'GAME_OVER');assert.equal(ui.data.game.screen_phase,'GAME_OVER');
+  assert.deepEqual(sent,['NEXT_LEVEL','ABORT']);
 });
 test('top navigation paints the selected page before the cloud acknowledges it',()=>{
   const {ui}=uiHost();let mounted='',sent=null;

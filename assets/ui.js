@@ -141,7 +141,8 @@ class BrainUI {
   advanceLocalQuiz(choice) {
     const g=this.data.game,correct=choice===g.question.correct_index,delta=correct?1:-2;
     this.data.game={...g,score:g.score+delta,correct:g.correct+(correct?1:0),wrong:g.wrong+(correct?0:1),
-      round_correct:g.round_correct+(correct?1:0),round_wrong:g.round_wrong+(correct?0:1)};
+      round_correct:g.round_correct+(correct?1:0),round_wrong:g.round_wrong+(correct?0:1),
+      answered:true,answer:{choice,correct,delta},screen_phase:'REVEAL',phase:'REVEAL',deadline:null};
     const level=g.level,index=g.qindex;
     setTimeout(()=>{
       const current=this.data.game;
@@ -164,7 +165,7 @@ class BrainUI {
       level:1,seed:template.seed,score:0,lives:3,stars:0,hearts:0,correct:0,wrong:0,progress:0,
       collected:[],hit:[],balloon_hit:[],shield:false,start_at:now,deadline:null,acks:[],
       difficulty:template.difficulty,round_score:0,round_stars:0,round_correct:0,round_wrong:0,
-      round_hearts:0,qindex:0,answered:false,quiz_preview:[]};
+      round_hearts:0,qindex:0,answered:false,quiz_preview:template.quiz_preview||[]};
     this.optimisticStart=template.seed;
     this.signature=['DRIVING',template.seed,1,0,'','',this.data.player?.id||''].join(':');
     this.mountView('DRIVING');this.send(action,{seed:template.seed});
@@ -381,7 +382,7 @@ class BrainUI {
       const nextDifficulty=g.next_difficulty||levelDifficulty(g.level+1);
       this.data.game={...g,screen_phase:'DRIVING',phase:'DRIVING',level:g.level+1,start_at:now,
         progress:0,collected:[],hit:[],balloon_hit:[],shield:false,qindex:0,answered:false,
-        difficulty:nextDifficulty,next_difficulty:null,acks:[]};
+        difficulty:nextDifficulty,next_difficulty:null,quiz_preview:g.next_quiz_preview||[],acks:[]};
       this.optimisticNextLevel=g.level+1;
       this.signature='';this.mountView('DRIVING');this.send('NEXT_LEVEL');return;
     }
@@ -399,6 +400,13 @@ class BrainUI {
       modal.querySelector('button').focus();return;
     }
     if(action==='CANCEL'){this.root.querySelector('.modal-backdrop')?.remove();if(this.engine)this.engine.paused=false;return;}
+    if(action==='ABORT'&&this.data.game?.mode==='single'){
+      this.root.querySelector('.modal-backdrop')?.remove();
+      if(this.engine){this.engine.destroy();this.engine=null;}
+      this.localQuizActive=false;this.optimisticNextLevel=null;this.optimisticStart=null;
+      this.data.game={...this.data.game,status:'finished',phase:'GAME_OVER',screen_phase:'GAME_OVER',lives:this.data.game.lives??0};
+      this.signature='';this.mountView('GAME_OVER');this.send('ABORT');return;
+    }
     if(action==='ANSWER'){
       const g=this.data.game;
       if(this.answerLock || g.answered || g.screen_phase!=='QUIZ')return;

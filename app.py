@@ -134,6 +134,12 @@ def dispatch(svc, command):
         st.session_state.pop("next_replay_seed", None)
 
 
+def quiz_preview(svc, level, seed):
+    used = []
+    return [svc.bank.public(question_id, reveal=True)
+            for question_id in svc.bank.select(level, used, seed + level)]
+
+
 @st.fragment(run_every=0.5)
 def arcade():
     ss = st.session_state
@@ -197,10 +203,12 @@ def arcade():
                 payload["message"] = str(exc)
         if ss.get("player_id") and not (ss.get("game_id") or ss.get("room_id")):
             ss.setdefault("next_game_seed", secrets.randbelow(2**31))
-            payload["start_template"] = {"seed": ss.next_game_seed, "difficulty": difficulty(1)}
+            payload["start_template"] = {"seed": ss.next_game_seed, "difficulty": difficulty(1),
+                                         "quiz_preview": quiz_preview(svc, 1, ss.next_game_seed)}
         elif payload.get("game", {}).get("screen_phase") == "GAME_OVER" and not ss.get("room_id"):
             ss.setdefault("next_replay_seed", secrets.randbelow(2**31))
-            payload["replay_template"] = {"seed": ss.next_replay_seed, "difficulty": difficulty(1)}
+            payload["replay_template"] = {"seed": ss.next_replay_seed, "difficulty": difficulty(1),
+                                          "quiz_preview": quiz_preview(svc, 1, ss.next_replay_seed)}
         asset_revision = tuple((ROOT / "assets" / f).stat().st_mtime_ns
                                for f in ("game.css", "course.js", "game.js", "ui.js")) + tuple(
                                    p.stat().st_mtime_ns for p in sorted((ROOT / "static").glob("couple-*.png")))

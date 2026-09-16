@@ -80,6 +80,8 @@ def test_full_single_player_loop_and_timeout(svc, player):
     next_game = svc.snapshot(player, game_id=gid)["game"]
     assert next_game["level"] == 2 and next_game["score"] == -3
     assert next_game["difficulty"]["speed"] > quiz["difficulty"]["speed"]
+    assert len(next_game["next_quiz_preview"]) == 3
+    assert all("correct_index" in q for q in next_game["next_quiz_preview"])
 
 
 def test_elimination_saves_and_stale_events_do_nothing(svc, player):
