@@ -112,11 +112,13 @@ class BrainUI {
     this.root.scrollIntoView({block:'start',behavior:'instant'});
     if(view==='DRIVING'){
       this.engine=new DrivingEngine(this.root.querySelector('canvas'),{...game,serverNow:data.now},events=>{
-        if(this.pending.some(p=>p.action==='EVENTS'))return;
         const current=this.data.game;
-        this.send('EVENTS',{game_id:current.id,level:current.level,events});
-        if(events.some(event=>event.event_type==='LEVEL_COMPLETED'))
+        const completed=events.some(event=>event.event_type==='LEVEL_COMPLETED');
+        if(completed){
+          this.send('EVENTS',{game_id:current.id,level:current.level,events});
           queueMicrotask(()=>this.openLocalQuiz(current));
+        }else if(!this.pending.some(p=>p.action==='EVENTS'))
+          this.send('EVENTS',{game_id:current.id,level:current.level,events});
       },this.audio);
     }
   }
@@ -143,6 +145,11 @@ class BrainUI {
     const d=this.data,g=d.game,r=d.room;
     if(!d.booted)return 'LOADING';
     if(!d.player)return 'WELCOME';
+    if(this.menuOverlay)return this.menuOverlay;
+    return this.gameView();
+  }
+  gameView() {
+    const d=this.data,g=d.game,r=d.room;
     if(r){
       if(r.phase==='CLOSED')return 'CLOSED';
       if(r.phase==='LOBBY')return 'LOBBY';
@@ -154,13 +161,13 @@ class BrainUI {
   }
   header() {
     const d=this.data,active=d.game||d.room;
-    return `<header class="nav"><button class="brand" data-action="NAV" data-page="HOME" ${active?'disabled':''}>
+    return `<header class="nav"><button class="brand" data-action="NAV" data-page="HOME">
       <span class="brand-symbol">${icons.flag}</span><span>BRAIN<span class="brand-light">RACER</span><small>GUIDA. PENSA. VINCI.</small></span></button>
       <nav aria-label="Navigazione principale">${[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥']].map(([page,label])=>
-        `<button data-action="NAV" data-page="${page}" class="nav-link ${d.page===page&&!active?'selected':''}" ${active||!d.player?'disabled':''}>${label}</button>`).join('')}</nav>
+        `<button data-action="NAV" data-page="${page}" class="nav-link ${(this.menuOverlay||d.page)===page?'selected':''}" ${!d.player?'disabled':''}>${label}</button>`).join('')}</nav>
       <div class="nav-right"><div class="audio-controls" aria-label="Controlli audio"><button class="sound" data-action="MUSIC" title="Musica di sottofondo" aria-label="${this.audio.musicMuted?'Attiva musica di sottofondo':'Disattiva musica di sottofondo'}">${this.audio.musicMuted?'♪̸':'♫'}</button><button class="sound" data-action="EFFECTS" title="Effetti sonori" aria-label="${this.audio.effectsMuted?'Attiva effetti sonori':'Disattiva effetti sonori'}">${this.audio.effectsMuted?'🔇':'🔊'}</button></div>
-      ${d.player?`<button class="profile" data-action="NAV" data-page="STATS" ${active?'disabled':''}><span class="avatar">${esc(d.player.nickname.slice(0,2).toUpperCase())}</span><span>${esc(d.player.nickname)}<small>#${esc(d.player.tag)}</small></span></button>`:
-      '<span class="edition">ARCADE / VOL. 01</span>'}</div></header>${d.player&&!active?`<nav class="mobile-nav" aria-label="Menu smartphone">${[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥']].map(([page,label])=>`<button data-action="NAV" data-page="${page}" class="${d.page===page?'selected':''}">${label}</button>`).join('')}</nav>`:''}`;
+      ${d.player?`<button class="profile" data-action="NAV" data-page="STATS"><span class="avatar">${esc(d.player.nickname.slice(0,2).toUpperCase())}</span><span>${esc(d.player.nickname)}<small>#${esc(d.player.tag)}</small></span></button>`:
+      '<span class="edition">ARCADE / VOL. 01</span>'}</div></header>${d.player?`<nav class="mobile-nav" aria-label="Menu smartphone">${[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥']].map(([page,label])=>`<button data-action="NAV" data-page="${page}" class="${(this.menuOverlay||d.page)===page?'selected':''}">${label}</button>`).join('')}</nav>`:''}${active&&this.menuOverlay?`<div class="active-game-banner"><span>Partita in corso</span>${button('Riprendi subito','RESUME','primary')}</div>`:''}`;
   }
   footer() {return `<footer><span>${icons.flag} BRAIN RACER <i>·</i> Riflessi veloci. Mente accesa.</span><span>Fatto per giocare. Ancora una volta. <span class="tiny-dot"></span></span></footer>`;}
   intro(eyebrow,title,description='') {return `<div class="page-intro with-couple"><div class="intro-copy"><span class="eyebrow">${eyebrow}</span><h1>${title}</h1>${description?`<p>${description}</p>`:''}</div>${coupleArt('page')}</div>`;}
@@ -324,10 +331,16 @@ class BrainUI {
     this.audio.unlock();
     if(action==='NAV'){
       const page=el.dataset.page;
+      if((this.data.game||this.data.room)&&['HOME','LEADERBOARD','STATS','HELP','DEDICATIONS'].includes(page)){
+        this.menuOverlay=page;this.signature='';this.mountView(page);return;
+      }
       if(!this.data.game&&!this.data.room&&['HOME','LEADERBOARD','STATS','HELP','MULTIPLAYER','DEDICATIONS'].includes(page)){
         this.optimisticPage=page;this.data.page=page;this.signature='';this.mountView(this.view());
       }
       this.send('NAV',{page});return;
+    }
+    if(action==='RESUME'||(action==='START_SINGLE'&&this.menuOverlay&&(this.data.game||this.data.room))){
+      this.menuOverlay=null;this.signature='';this.mountView(this.gameView());return;
     }
     if(action==='START_SINGLE'&&this.data.start_template){
       this.startLocalGame(this.data.start_template,'START_SINGLE');return;

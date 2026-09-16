@@ -3134,5 +3134,3141 @@
     ],
     "correct_index": 2,
     "explanation": ""
+  },
+  {
+    "id": "brx_001",
+    "category": "Geografia",
+    "difficulty": 1,
+    "question": "Qual è la capitale di Irlanda?",
+    "answers": [
+      "Dublino",
+      "Reykjavík",
+      "Rabat",
+      "Lima"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Dublino."
+  },
+  {
+    "id": "brx_002",
+    "category": "Geografia",
+    "difficulty": 1,
+    "question": "Qual è la capitale di Norvegia?",
+    "answers": [
+      "Ottawa",
+      "Il Cairo",
+      "Bangkok",
+      "Oslo"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Oslo."
+  },
+  {
+    "id": "brx_003",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "Qual è la capitale di Finlandia?",
+    "answers": [
+      "Buenos Aires",
+      "Hanoi",
+      "Helsinki",
+      "Canberra"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Helsinki."
+  },
+  {
+    "id": "brx_004",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "Qual è la capitale di Islanda?",
+    "answers": [
+      "Dublino",
+      "Reykjavík",
+      "Wellington",
+      "Santiago"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Reykjavík."
+  },
+  {
+    "id": "brx_005",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "Qual è la capitale di Canada?",
+    "answers": [
+      "Ottawa",
+      "Rabat",
+      "Lima",
+      "Oslo"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Ottawa."
+  },
+  {
+    "id": "brx_006",
+    "category": "Geografia",
+    "difficulty": 3,
+    "question": "Qual è la capitale di Australia?",
+    "answers": [
+      "Il Cairo",
+      "Bangkok",
+      "Helsinki",
+      "Canberra"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Canberra."
+  },
+  {
+    "id": "brx_007",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "Qual è la capitale di Nuova Zelanda?",
+    "answers": [
+      "Hanoi",
+      "Reykjavík",
+      "Wellington",
+      "Buenos Aires"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Wellington."
+  },
+  {
+    "id": "brx_008",
+    "category": "Geografia",
+    "difficulty": 1,
+    "question": "Qual è la capitale di Marocco?",
+    "answers": [
+      "Ottawa",
+      "Rabat",
+      "Santiago",
+      "Dublino"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Rabat."
+  },
+  {
+    "id": "brx_009",
+    "category": "Geografia",
+    "difficulty": 1,
+    "question": "Qual è la capitale di Egitto?",
+    "answers": [
+      "Il Cairo",
+      "Lima",
+      "Oslo",
+      "Canberra"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Il Cairo."
+  },
+  {
+    "id": "brx_010",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "Qual è la capitale di Argentina?",
+    "answers": [
+      "Bangkok",
+      "Helsinki",
+      "Wellington",
+      "Buenos Aires"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Buenos Aires."
+  },
+  {
+    "id": "brx_011",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "Qual è la capitale di Cile?",
+    "answers": [
+      "Reykjavík",
+      "Rabat",
+      "Santiago",
+      "Hanoi"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Santiago."
+  },
+  {
+    "id": "brx_012",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "Qual è la capitale di Perù?",
+    "answers": [
+      "Il Cairo",
+      "Lima",
+      "Dublino",
+      "Ottawa"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Lima."
+  },
+  {
+    "id": "brx_013",
+    "category": "Geografia",
+    "difficulty": 3,
+    "question": "Qual è la capitale di Thailandia?",
+    "answers": [
+      "Bangkok",
+      "Oslo",
+      "Canberra",
+      "Buenos Aires"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Bangkok."
+  },
+  {
+    "id": "brx_014",
+    "category": "Geografia",
+    "difficulty": 2,
+    "question": "Qual è la capitale di Vietnam?",
+    "answers": [
+      "Helsinki",
+      "Wellington",
+      "Santiago",
+      "Hanoi"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Hanoi."
+  },
+  {
+    "id": "brx_015",
+    "category": "Storia",
+    "difficulty": 1,
+    "question": "In quale anno avvenne questo evento: caduta dell'Impero romano d'Occidente?",
+    "answers": [
+      "476",
+      "1215",
+      "1789",
+      "1914"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: 476."
+  },
+  {
+    "id": "brx_016",
+    "category": "Storia",
+    "difficulty": 1,
+    "question": "In quale anno avvenne questo evento: incoronazione di Carlo Magno?",
+    "answers": [
+      "1453",
+      "1815",
+      "1945",
+      "800"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: 800."
+  },
+  {
+    "id": "brx_017",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "In quale anno avvenne questo evento: battaglia di Hastings?",
+    "answers": [
+      "1861",
+      "1989",
+      "1066",
+      "1492"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: 1066."
+  },
+  {
+    "id": "brx_018",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "In quale anno avvenne questo evento: firma della Magna Carta?",
+    "answers": [
+      "476",
+      "1215",
+      "1517",
+      "1870"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: 1215."
+  },
+  {
+    "id": "brx_019",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "In quale anno avvenne questo evento: caduta di Costantinopoli?",
+    "answers": [
+      "1453",
+      "1789",
+      "1914",
+      "800"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: 1453."
+  },
+  {
+    "id": "brx_020",
+    "category": "Storia",
+    "difficulty": 3,
+    "question": "In quale anno avvenne questo evento: scoperta dell'America da parte di Colombo?",
+    "answers": [
+      "1815",
+      "1945",
+      "1066",
+      "1492"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: 1492."
+  },
+  {
+    "id": "brx_021",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "In quale anno avvenne questo evento: inizio della Riforma protestante?",
+    "answers": [
+      "1989",
+      "1215",
+      "1517",
+      "1861"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: 1517."
+  },
+  {
+    "id": "brx_022",
+    "category": "Storia",
+    "difficulty": 1,
+    "question": "In quale anno avvenne questo evento: Rivoluzione francese?",
+    "answers": [
+      "1453",
+      "1789",
+      "1870",
+      "476"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: 1789."
+  },
+  {
+    "id": "brx_023",
+    "category": "Storia",
+    "difficulty": 1,
+    "question": "In quale anno avvenne questo evento: Congresso di Vienna?",
+    "answers": [
+      "1815",
+      "1914",
+      "800",
+      "1492"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: 1815."
+  },
+  {
+    "id": "brx_024",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "In quale anno avvenne questo evento: Unità d'Italia?",
+    "answers": [
+      "1945",
+      "1066",
+      "1517",
+      "1861"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: 1861."
+  },
+  {
+    "id": "brx_025",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "In quale anno avvenne questo evento: presa di Roma?",
+    "answers": [
+      "1215",
+      "1789",
+      "1870",
+      "1989"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: 1870."
+  },
+  {
+    "id": "brx_026",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "In quale anno avvenne questo evento: inizio della Prima guerra mondiale?",
+    "answers": [
+      "1815",
+      "1914",
+      "476",
+      "1453"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: 1914."
+  },
+  {
+    "id": "brx_027",
+    "category": "Storia",
+    "difficulty": 3,
+    "question": "In quale anno avvenne questo evento: fine della Seconda guerra mondiale in Europa?",
+    "answers": [
+      "1945",
+      "800",
+      "1492",
+      "1861"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: 1945."
+  },
+  {
+    "id": "brx_028",
+    "category": "Storia",
+    "difficulty": 2,
+    "question": "In quale anno avvenne questo evento: caduta del Muro di Berlino?",
+    "answers": [
+      "1066",
+      "1517",
+      "1870",
+      "1989"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: 1989."
+  },
+  {
+    "id": "brx_029",
+    "category": "Scienza",
+    "difficulty": 1,
+    "question": "Qual è il simbolo chimico di sodio?",
+    "answers": [
+      "Na",
+      "Cu",
+      "Pb",
+      "Si"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Na."
+  },
+  {
+    "id": "brx_030",
+    "category": "Scienza",
+    "difficulty": 1,
+    "question": "Qual è il simbolo chimico di potassio?",
+    "answers": [
+      "Ag",
+      "Hg",
+      "Ca",
+      "K"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: K."
+  },
+  {
+    "id": "brx_031",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Qual è il simbolo chimico di ferro?",
+    "answers": [
+      "He",
+      "Cl",
+      "Fe",
+      "Au"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Fe."
+  },
+  {
+    "id": "brx_032",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Qual è il simbolo chimico di rame?",
+    "answers": [
+      "Na",
+      "Cu",
+      "Sn",
+      "Ne"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Cu."
+  },
+  {
+    "id": "brx_033",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Qual è il simbolo chimico di argento?",
+    "answers": [
+      "Ag",
+      "Pb",
+      "Si",
+      "K"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Ag."
+  },
+  {
+    "id": "brx_034",
+    "category": "Scienza",
+    "difficulty": 3,
+    "question": "Qual è il simbolo chimico di oro?",
+    "answers": [
+      "Hg",
+      "Ca",
+      "Fe",
+      "Au"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Au."
+  },
+  {
+    "id": "brx_035",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Qual è il simbolo chimico di stagno?",
+    "answers": [
+      "Cl",
+      "Cu",
+      "Sn",
+      "He"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Sn."
+  },
+  {
+    "id": "brx_036",
+    "category": "Scienza",
+    "difficulty": 1,
+    "question": "Qual è il simbolo chimico di piombo?",
+    "answers": [
+      "Ag",
+      "Pb",
+      "Ne",
+      "Na"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Pb."
+  },
+  {
+    "id": "brx_037",
+    "category": "Scienza",
+    "difficulty": 1,
+    "question": "Qual è il simbolo chimico di mercurio?",
+    "answers": [
+      "Hg",
+      "Si",
+      "K",
+      "Au"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Hg."
+  },
+  {
+    "id": "brx_038",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Qual è il simbolo chimico di elio?",
+    "answers": [
+      "Ca",
+      "Fe",
+      "Sn",
+      "He"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: He."
+  },
+  {
+    "id": "brx_039",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Qual è il simbolo chimico di neon?",
+    "answers": [
+      "Cu",
+      "Pb",
+      "Ne",
+      "Cl"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Ne."
+  },
+  {
+    "id": "brx_040",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Qual è il simbolo chimico di silicio?",
+    "answers": [
+      "Hg",
+      "Si",
+      "Na",
+      "Ag"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Si."
+  },
+  {
+    "id": "brx_041",
+    "category": "Scienza",
+    "difficulty": 3,
+    "question": "Qual è il simbolo chimico di calcio?",
+    "answers": [
+      "Ca",
+      "K",
+      "Au",
+      "He"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Ca."
+  },
+  {
+    "id": "brx_042",
+    "category": "Scienza",
+    "difficulty": 2,
+    "question": "Qual è il simbolo chimico di cloro?",
+    "answers": [
+      "Fe",
+      "Sn",
+      "Ne",
+      "Cl"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Cl."
+  },
+  {
+    "id": "brx_043",
+    "category": "Natura",
+    "difficulty": 1,
+    "question": "Quale animale corrisponde alla descrizione: il più grande animale vivente?",
+    "answers": [
+      "Balenottera azzurra",
+      "Pipistrello",
+      "Canguro",
+      "Gorilla"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Balenottera azzurra."
+  },
+  {
+    "id": "brx_044",
+    "category": "Natura",
+    "difficulty": 1,
+    "question": "Quale animale corrisponde alla descrizione: il mammifero terrestre più veloce?",
+    "answers": [
+      "Coccodrillo marino",
+      "Ornitorinco",
+      "Pesce palla",
+      "Ghepardo"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Ghepardo."
+  },
+  {
+    "id": "brx_045",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "Quale animale corrisponde alla descrizione: il più grande uccello vivente?",
+    "answers": [
+      "Tigre",
+      "Narvalo",
+      "Struzzo",
+      "Rana"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Struzzo."
+  },
+  {
+    "id": "brx_046",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "Quale animale corrisponde alla descrizione: un mammifero capace di volo attivo?",
+    "answers": [
+      "Balenottera azzurra",
+      "Pipistrello",
+      "Camaleonte",
+      "Kiwi"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Pipistrello."
+  },
+  {
+    "id": "brx_047",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "Quale animale corrisponde alla descrizione: il più grande rettile vivente?",
+    "answers": [
+      "Coccodrillo marino",
+      "Canguro",
+      "Gorilla",
+      "Ghepardo"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Coccodrillo marino."
+  },
+  {
+    "id": "brx_048",
+    "category": "Natura",
+    "difficulty": 3,
+    "question": "Quale animale corrisponde alla descrizione: un anfibio che da giovane è un girino?",
+    "answers": [
+      "Ornitorinco",
+      "Pesce palla",
+      "Struzzo",
+      "Rana"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Rana."
+  },
+  {
+    "id": "brx_049",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "Quale animale corrisponde alla descrizione: l'animale noto per cambiare colore rapidamente?",
+    "answers": [
+      "Narvalo",
+      "Pipistrello",
+      "Camaleonte",
+      "Tigre"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Camaleonte."
+  },
+  {
+    "id": "brx_050",
+    "category": "Natura",
+    "difficulty": 1,
+    "question": "Quale animale corrisponde alla descrizione: il marsupiale simbolo dell'Australia?",
+    "answers": [
+      "Coccodrillo marino",
+      "Canguro",
+      "Kiwi",
+      "Balenottera azzurra"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Canguro."
+  },
+  {
+    "id": "brx_051",
+    "category": "Natura",
+    "difficulty": 1,
+    "question": "Quale animale corrisponde alla descrizione: il mammifero che depone uova e ha un becco?",
+    "answers": [
+      "Ornitorinco",
+      "Gorilla",
+      "Ghepardo",
+      "Rana"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Ornitorinco."
+  },
+  {
+    "id": "brx_052",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "Quale animale corrisponde alla descrizione: il felino più grande del mondo?",
+    "answers": [
+      "Pesce palla",
+      "Struzzo",
+      "Camaleonte",
+      "Tigre"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Tigre."
+  },
+  {
+    "id": "brx_053",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "Quale animale corrisponde alla descrizione: l'uccello incapace di volare simbolo della Nuova Zelanda?",
+    "answers": [
+      "Pipistrello",
+      "Canguro",
+      "Kiwi",
+      "Narvalo"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Kiwi."
+  },
+  {
+    "id": "brx_054",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "Quale animale corrisponde alla descrizione: il primate più grande?",
+    "answers": [
+      "Ornitorinco",
+      "Gorilla",
+      "Balenottera azzurra",
+      "Coccodrillo marino"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Gorilla."
+  },
+  {
+    "id": "brx_055",
+    "category": "Natura",
+    "difficulty": 3,
+    "question": "Quale animale corrisponde alla descrizione: il pesce noto per gonfiarsi come difesa?",
+    "answers": [
+      "Pesce palla",
+      "Ghepardo",
+      "Rana",
+      "Tigre"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Pesce palla."
+  },
+  {
+    "id": "brx_056",
+    "category": "Natura",
+    "difficulty": 2,
+    "question": "Quale animale corrisponde alla descrizione: il mammifero marino con una lunga zanna?",
+    "answers": [
+      "Struzzo",
+      "Camaleonte",
+      "Kiwi",
+      "Narvalo"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Narvalo."
+  },
+  {
+    "id": "brx_057",
+    "category": "Astronomia",
+    "difficulty": 1,
+    "question": "Quale corpo celeste corrisponde alla descrizione: il pianeta più vicino al Sole?",
+    "answers": [
+      "Mercurio",
+      "Giove",
+      "Luna",
+      "Ganimede"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Mercurio."
+  },
+  {
+    "id": "brx_058",
+    "category": "Astronomia",
+    "difficulty": 1,
+    "question": "Quale corpo celeste corrisponde alla descrizione: il pianeta più caldo del Sistema solare?",
+    "answers": [
+      "Saturno",
+      "Sole",
+      "Via Lattea",
+      "Venere"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Venere."
+  },
+  {
+    "id": "brx_059",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "Quale corpo celeste corrisponde alla descrizione: il pianeta rosso?",
+    "answers": [
+      "Plutone",
+      "Andromeda",
+      "Marte",
+      "Urano"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Marte."
+  },
+  {
+    "id": "brx_060",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "Quale corpo celeste corrisponde alla descrizione: il pianeta più grande?",
+    "answers": [
+      "Mercurio",
+      "Giove",
+      "Nettuno",
+      "Titano"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Giove."
+  },
+  {
+    "id": "brx_061",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "Quale corpo celeste corrisponde alla descrizione: il pianeta con gli anelli più evidenti?",
+    "answers": [
+      "Saturno",
+      "Luna",
+      "Ganimede",
+      "Venere"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Saturno."
+  },
+  {
+    "id": "brx_062",
+    "category": "Astronomia",
+    "difficulty": 3,
+    "question": "Quale corpo celeste corrisponde alla descrizione: il gigante ghiacciato che ruota quasi sdraiato?",
+    "answers": [
+      "Sole",
+      "Via Lattea",
+      "Marte",
+      "Urano"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Urano."
+  },
+  {
+    "id": "brx_063",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "Quale corpo celeste corrisponde alla descrizione: il pianeta più lontano dal Sole?",
+    "answers": [
+      "Andromeda",
+      "Giove",
+      "Nettuno",
+      "Plutone"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Nettuno."
+  },
+  {
+    "id": "brx_064",
+    "category": "Astronomia",
+    "difficulty": 1,
+    "question": "Quale corpo celeste corrisponde alla descrizione: il satellite naturale della Terra?",
+    "answers": [
+      "Saturno",
+      "Luna",
+      "Titano",
+      "Mercurio"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Luna."
+  },
+  {
+    "id": "brx_065",
+    "category": "Astronomia",
+    "difficulty": 1,
+    "question": "Quale corpo celeste corrisponde alla descrizione: la stella al centro del Sistema solare?",
+    "answers": [
+      "Sole",
+      "Ganimede",
+      "Venere",
+      "Urano"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Sole."
+  },
+  {
+    "id": "brx_066",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "Quale corpo celeste corrisponde alla descrizione: il pianeta nano nella fascia di Kuiper?",
+    "answers": [
+      "Via Lattea",
+      "Marte",
+      "Nettuno",
+      "Plutone"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Plutone."
+  },
+  {
+    "id": "brx_067",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "Quale corpo celeste corrisponde alla descrizione: il maggiore satellite di Saturno?",
+    "answers": [
+      "Giove",
+      "Luna",
+      "Titano",
+      "Andromeda"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Titano."
+  },
+  {
+    "id": "brx_068",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "Quale corpo celeste corrisponde alla descrizione: il maggiore satellite di Giove?",
+    "answers": [
+      "Sole",
+      "Ganimede",
+      "Mercurio",
+      "Saturno"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Ganimede."
+  },
+  {
+    "id": "brx_069",
+    "category": "Astronomia",
+    "difficulty": 3,
+    "question": "Quale corpo celeste corrisponde alla descrizione: la galassia che contiene il Sistema solare?",
+    "answers": [
+      "Via Lattea",
+      "Venere",
+      "Urano",
+      "Plutone"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Via Lattea."
+  },
+  {
+    "id": "brx_070",
+    "category": "Astronomia",
+    "difficulty": 2,
+    "question": "Quale corpo celeste corrisponde alla descrizione: la galassia grande più vicina alla nostra?",
+    "answers": [
+      "Marte",
+      "Nettuno",
+      "Titano",
+      "Andromeda"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Andromeda."
+  },
+  {
+    "id": "brx_071",
+    "category": "Letteratura",
+    "difficulty": 1,
+    "question": "Chi ha scritto «Il nome della rosa»?",
+    "answers": [
+      "Umberto Eco",
+      "Italo Svevo",
+      "Franz Kafka",
+      "Michail Bulgakov"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Umberto Eco."
+  },
+  {
+    "id": "brx_072",
+    "category": "Letteratura",
+    "difficulty": 1,
+    "question": "Chi ha scritto «Se questo è un uomo»?",
+    "answers": [
+      "Giuseppe Tomasi di Lampedusa",
+      "Gabriel García Márquez",
+      "Oscar Wilde",
+      "Primo Levi"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Primo Levi."
+  },
+  {
+    "id": "brx_073",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Chi ha scritto «Il barone rampante»?",
+    "answers": [
+      "Ernest Hemingway",
+      "Herman Melville",
+      "Italo Calvino",
+      "Jane Austen"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Italo Calvino."
+  },
+  {
+    "id": "brx_074",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Chi ha scritto «La coscienza di Zeno»?",
+    "answers": [
+      "Umberto Eco",
+      "Italo Svevo",
+      "Victor Hugo",
+      "Ray Bradbury"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Italo Svevo."
+  },
+  {
+    "id": "brx_075",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Chi ha scritto «Il Gattopardo»?",
+    "answers": [
+      "Giuseppe Tomasi di Lampedusa",
+      "Franz Kafka",
+      "Michail Bulgakov",
+      "Primo Levi"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Giuseppe Tomasi di Lampedusa."
+  },
+  {
+    "id": "brx_076",
+    "category": "Letteratura",
+    "difficulty": 3,
+    "question": "Chi ha scritto «Orgoglio e pregiudizio»?",
+    "answers": [
+      "Gabriel García Márquez",
+      "Oscar Wilde",
+      "Italo Calvino",
+      "Jane Austen"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Jane Austen."
+  },
+  {
+    "id": "brx_077",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Chi ha scritto «I miserabili»?",
+    "answers": [
+      "Herman Melville",
+      "Italo Svevo",
+      "Victor Hugo",
+      "Ernest Hemingway"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Victor Hugo."
+  },
+  {
+    "id": "brx_078",
+    "category": "Letteratura",
+    "difficulty": 1,
+    "question": "Chi ha scritto «Il processo»?",
+    "answers": [
+      "Giuseppe Tomasi di Lampedusa",
+      "Franz Kafka",
+      "Ray Bradbury",
+      "Umberto Eco"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Franz Kafka."
+  },
+  {
+    "id": "brx_079",
+    "category": "Letteratura",
+    "difficulty": 1,
+    "question": "Chi ha scritto «Cent'anni di solitudine»?",
+    "answers": [
+      "Gabriel García Márquez",
+      "Michail Bulgakov",
+      "Primo Levi",
+      "Jane Austen"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Gabriel García Márquez."
+  },
+  {
+    "id": "brx_080",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Chi ha scritto «Il vecchio e il mare»?",
+    "answers": [
+      "Oscar Wilde",
+      "Italo Calvino",
+      "Victor Hugo",
+      "Ernest Hemingway"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Ernest Hemingway."
+  },
+  {
+    "id": "brx_081",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Chi ha scritto «Fahrenheit 451»?",
+    "answers": [
+      "Italo Svevo",
+      "Franz Kafka",
+      "Ray Bradbury",
+      "Herman Melville"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Ray Bradbury."
+  },
+  {
+    "id": "brx_082",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Chi ha scritto «Il maestro e Margherita»?",
+    "answers": [
+      "Gabriel García Márquez",
+      "Michail Bulgakov",
+      "Umberto Eco",
+      "Giuseppe Tomasi di Lampedusa"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Michail Bulgakov."
+  },
+  {
+    "id": "brx_083",
+    "category": "Letteratura",
+    "difficulty": 3,
+    "question": "Chi ha scritto «Il ritratto di Dorian Gray»?",
+    "answers": [
+      "Oscar Wilde",
+      "Primo Levi",
+      "Jane Austen",
+      "Ernest Hemingway"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Oscar Wilde."
+  },
+  {
+    "id": "brx_084",
+    "category": "Letteratura",
+    "difficulty": 2,
+    "question": "Chi ha scritto «Moby Dick»?",
+    "answers": [
+      "Italo Calvino",
+      "Victor Hugo",
+      "Ray Bradbury",
+      "Herman Melville"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Herman Melville."
+  },
+  {
+    "id": "brx_085",
+    "category": "Arte",
+    "difficulty": 1,
+    "question": "Chi ha realizzato «La persistenza della memoria»?",
+    "answers": [
+      "Salvador Dalí",
+      "Johannes Vermeer",
+      "Auguste Rodin",
+      "Katsushika Hokusai"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Salvador Dalí."
+  },
+  {
+    "id": "brx_086",
+    "category": "Arte",
+    "difficulty": 1,
+    "question": "Chi ha realizzato «Guernica»?",
+    "answers": [
+      "Edvard Munch",
+      "Grant Wood",
+      "René Magritte",
+      "Pablo Picasso"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Pablo Picasso."
+  },
+  {
+    "id": "brx_087",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "Chi ha realizzato «Il bacio»?",
+    "answers": [
+      "Rembrandt",
+      "Edward Hopper",
+      "Gustav Klimt",
+      "Sandro Botticelli"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Gustav Klimt."
+  },
+  {
+    "id": "brx_088",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "Chi ha realizzato «La ragazza con l'orecchino di perla»?",
+    "answers": [
+      "Salvador Dalí",
+      "Johannes Vermeer",
+      "Diego Velázquez",
+      "Claude Monet"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Johannes Vermeer."
+  },
+  {
+    "id": "brx_089",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "Chi ha realizzato «L'urlo»?",
+    "answers": [
+      "Edvard Munch",
+      "Auguste Rodin",
+      "Katsushika Hokusai",
+      "Pablo Picasso"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Edvard Munch."
+  },
+  {
+    "id": "brx_090",
+    "category": "Arte",
+    "difficulty": 3,
+    "question": "Chi ha realizzato «La nascita di Venere»?",
+    "answers": [
+      "Grant Wood",
+      "René Magritte",
+      "Gustav Klimt",
+      "Sandro Botticelli"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Sandro Botticelli."
+  },
+  {
+    "id": "brx_091",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "Chi ha realizzato «Las Meninas»?",
+    "answers": [
+      "Edward Hopper",
+      "Johannes Vermeer",
+      "Diego Velázquez",
+      "Rembrandt"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Diego Velázquez."
+  },
+  {
+    "id": "brx_092",
+    "category": "Arte",
+    "difficulty": 1,
+    "question": "Chi ha realizzato «Il pensatore»?",
+    "answers": [
+      "Edvard Munch",
+      "Auguste Rodin",
+      "Claude Monet",
+      "Salvador Dalí"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Auguste Rodin."
+  },
+  {
+    "id": "brx_093",
+    "category": "Arte",
+    "difficulty": 1,
+    "question": "Chi ha realizzato «American Gothic»?",
+    "answers": [
+      "Grant Wood",
+      "Katsushika Hokusai",
+      "Pablo Picasso",
+      "Sandro Botticelli"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Grant Wood."
+  },
+  {
+    "id": "brx_094",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "Chi ha realizzato «La ronda di notte»?",
+    "answers": [
+      "René Magritte",
+      "Gustav Klimt",
+      "Diego Velázquez",
+      "Rembrandt"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Rembrandt."
+  },
+  {
+    "id": "brx_095",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "Chi ha realizzato «Impressione, levar del sole»?",
+    "answers": [
+      "Johannes Vermeer",
+      "Auguste Rodin",
+      "Claude Monet",
+      "Edward Hopper"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Claude Monet."
+  },
+  {
+    "id": "brx_096",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "Chi ha realizzato «La grande onda di Kanagawa»?",
+    "answers": [
+      "Grant Wood",
+      "Katsushika Hokusai",
+      "Salvador Dalí",
+      "Edvard Munch"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Katsushika Hokusai."
+  },
+  {
+    "id": "brx_097",
+    "category": "Arte",
+    "difficulty": 3,
+    "question": "Chi ha realizzato «Il figlio dell'uomo»?",
+    "answers": [
+      "René Magritte",
+      "Pablo Picasso",
+      "Sandro Botticelli",
+      "Rembrandt"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: René Magritte."
+  },
+  {
+    "id": "brx_098",
+    "category": "Arte",
+    "difficulty": 2,
+    "question": "Chi ha realizzato «Nighthawks»?",
+    "answers": [
+      "Gustav Klimt",
+      "Diego Velázquez",
+      "Claude Monet",
+      "Edward Hopper"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Edward Hopper."
+  },
+  {
+    "id": "brx_099",
+    "category": "Musica",
+    "difficulty": 1,
+    "question": "Chi ha composto «Le quattro stagioni»?",
+    "answers": [
+      "Antonio Vivaldi",
+      "Gioachino Rossini",
+      "Georges Bizet",
+      "Edvard Grieg"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Antonio Vivaldi."
+  },
+  {
+    "id": "brx_100",
+    "category": "Musica",
+    "difficulty": 1,
+    "question": "Chi ha composto «Il flauto magico»?",
+    "answers": [
+      "Giuseppe Verdi",
+      "Johann Sebastian Bach",
+      "Carl Orff",
+      "Wolfgang Amadeus Mozart"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Wolfgang Amadeus Mozart."
+  },
+  {
+    "id": "brx_101",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Chi ha composto «Nona sinfonia»?",
+    "answers": [
+      "Fryderyk Chopin",
+      "Giacomo Puccini",
+      "Ludwig van Beethoven",
+      "Pëtr Il'ič Čajkovskij"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Ludwig van Beethoven."
+  },
+  {
+    "id": "brx_102",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Chi ha composto «Il barbiere di Siviglia»?",
+    "answers": [
+      "Antonio Vivaldi",
+      "Gioachino Rossini",
+      "Maurice Ravel",
+      "George Gershwin"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Gioachino Rossini."
+  },
+  {
+    "id": "brx_103",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Chi ha composto «La traviata»?",
+    "answers": [
+      "Giuseppe Verdi",
+      "Georges Bizet",
+      "Edvard Grieg",
+      "Wolfgang Amadeus Mozart"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Giuseppe Verdi."
+  },
+  {
+    "id": "brx_104",
+    "category": "Musica",
+    "difficulty": 3,
+    "question": "Chi ha composto «Il lago dei cigni»?",
+    "answers": [
+      "Johann Sebastian Bach",
+      "Carl Orff",
+      "Ludwig van Beethoven",
+      "Pëtr Il'ič Čajkovskij"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Pëtr Il'ič Čajkovskij."
+  },
+  {
+    "id": "brx_105",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Chi ha composto «Boléro»?",
+    "answers": [
+      "Giacomo Puccini",
+      "Gioachino Rossini",
+      "Maurice Ravel",
+      "Fryderyk Chopin"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Maurice Ravel."
+  },
+  {
+    "id": "brx_106",
+    "category": "Musica",
+    "difficulty": 1,
+    "question": "Chi ha composto «Carmen»?",
+    "answers": [
+      "Giuseppe Verdi",
+      "Georges Bizet",
+      "George Gershwin",
+      "Antonio Vivaldi"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Georges Bizet."
+  },
+  {
+    "id": "brx_107",
+    "category": "Musica",
+    "difficulty": 1,
+    "question": "Chi ha composto «Toccata e fuga in re minore»?",
+    "answers": [
+      "Johann Sebastian Bach",
+      "Edvard Grieg",
+      "Wolfgang Amadeus Mozart",
+      "Pëtr Il'ič Čajkovskij"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Johann Sebastian Bach."
+  },
+  {
+    "id": "brx_108",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Chi ha composto «Notturno op. 9 n. 2»?",
+    "answers": [
+      "Carl Orff",
+      "Ludwig van Beethoven",
+      "Maurice Ravel",
+      "Fryderyk Chopin"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Fryderyk Chopin."
+  },
+  {
+    "id": "brx_109",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Chi ha composto «Rhapsody in Blue»?",
+    "answers": [
+      "Gioachino Rossini",
+      "Georges Bizet",
+      "George Gershwin",
+      "Giacomo Puccini"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: George Gershwin."
+  },
+  {
+    "id": "brx_110",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Chi ha composto «Peer Gynt»?",
+    "answers": [
+      "Johann Sebastian Bach",
+      "Edvard Grieg",
+      "Antonio Vivaldi",
+      "Giuseppe Verdi"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Edvard Grieg."
+  },
+  {
+    "id": "brx_111",
+    "category": "Musica",
+    "difficulty": 3,
+    "question": "Chi ha composto «Carmina Burana»?",
+    "answers": [
+      "Carl Orff",
+      "Wolfgang Amadeus Mozart",
+      "Pëtr Il'ič Čajkovskij",
+      "Fryderyk Chopin"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Carl Orff."
+  },
+  {
+    "id": "brx_112",
+    "category": "Musica",
+    "difficulty": 2,
+    "question": "Chi ha composto «La bohème»?",
+    "answers": [
+      "Ludwig van Beethoven",
+      "Maurice Ravel",
+      "George Gershwin",
+      "Giacomo Puccini"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Giacomo Puccini."
+  },
+  {
+    "id": "brx_113",
+    "category": "Cinema",
+    "difficulty": 1,
+    "question": "Chi ha diretto il film «Nuovo Cinema Paradiso»?",
+    "answers": [
+      "Giuseppe Tornatore",
+      "Steven Spielberg",
+      "James Cameron",
+      "Hayao Miyazaki"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Giuseppe Tornatore."
+  },
+  {
+    "id": "brx_114",
+    "category": "Cinema",
+    "difficulty": 1,
+    "question": "Chi ha diretto il film «La vita è bella»?",
+    "answers": [
+      "Stanley Kubrick",
+      "Peter Jackson",
+      "Wes Anderson",
+      "Roberto Benigni"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Roberto Benigni."
+  },
+  {
+    "id": "brx_115",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "Chi ha diretto il film «Pulp Fiction»?",
+    "answers": [
+      "Bong Joon-ho",
+      "Ridley Scott",
+      "Quentin Tarantino",
+      "Federico Fellini"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Quentin Tarantino."
+  },
+  {
+    "id": "brx_116",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "Chi ha diretto il film «E.T. l'extra-terrestre»?",
+    "answers": [
+      "Giuseppe Tornatore",
+      "Steven Spielberg",
+      "Alfred Hitchcock",
+      "Guillermo del Toro"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Steven Spielberg."
+  },
+  {
+    "id": "brx_117",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "Chi ha diretto il film «2001: Odissea nello spazio»?",
+    "answers": [
+      "Stanley Kubrick",
+      "James Cameron",
+      "Hayao Miyazaki",
+      "Roberto Benigni"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Stanley Kubrick."
+  },
+  {
+    "id": "brx_118",
+    "category": "Cinema",
+    "difficulty": 3,
+    "question": "Chi ha diretto il film «La dolce vita»?",
+    "answers": [
+      "Peter Jackson",
+      "Wes Anderson",
+      "Quentin Tarantino",
+      "Federico Fellini"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Federico Fellini."
+  },
+  {
+    "id": "brx_119",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "Chi ha diretto il film «Psycho»?",
+    "answers": [
+      "Ridley Scott",
+      "Steven Spielberg",
+      "Alfred Hitchcock",
+      "Bong Joon-ho"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Alfred Hitchcock."
+  },
+  {
+    "id": "brx_120",
+    "category": "Cinema",
+    "difficulty": 1,
+    "question": "Chi ha diretto il film «Titanic»?",
+    "answers": [
+      "Stanley Kubrick",
+      "James Cameron",
+      "Guillermo del Toro",
+      "Giuseppe Tornatore"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: James Cameron."
+  },
+  {
+    "id": "brx_121",
+    "category": "Cinema",
+    "difficulty": 1,
+    "question": "Chi ha diretto il film «Il Signore degli Anelli: La Compagnia dell'Anello»?",
+    "answers": [
+      "Peter Jackson",
+      "Hayao Miyazaki",
+      "Roberto Benigni",
+      "Federico Fellini"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Peter Jackson."
+  },
+  {
+    "id": "brx_122",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "Chi ha diretto il film «Parasite»?",
+    "answers": [
+      "Wes Anderson",
+      "Quentin Tarantino",
+      "Alfred Hitchcock",
+      "Bong Joon-ho"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Bong Joon-ho."
+  },
+  {
+    "id": "brx_123",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "Chi ha diretto il film «Il labirinto del fauno»?",
+    "answers": [
+      "Steven Spielberg",
+      "James Cameron",
+      "Guillermo del Toro",
+      "Ridley Scott"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Guillermo del Toro."
+  },
+  {
+    "id": "brx_124",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "Chi ha diretto il film «Spirited Away»?",
+    "answers": [
+      "Peter Jackson",
+      "Hayao Miyazaki",
+      "Giuseppe Tornatore",
+      "Stanley Kubrick"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Hayao Miyazaki."
+  },
+  {
+    "id": "brx_125",
+    "category": "Cinema",
+    "difficulty": 3,
+    "question": "Chi ha diretto il film «The Grand Budapest Hotel»?",
+    "answers": [
+      "Wes Anderson",
+      "Roberto Benigni",
+      "Federico Fellini",
+      "Bong Joon-ho"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Wes Anderson."
+  },
+  {
+    "id": "brx_126",
+    "category": "Cinema",
+    "difficulty": 2,
+    "question": "Chi ha diretto il film «Blade Runner»?",
+    "answers": [
+      "Quentin Tarantino",
+      "Alfred Hitchcock",
+      "Guillermo del Toro",
+      "Ridley Scott"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Ridley Scott."
+  },
+  {
+    "id": "brx_127",
+    "category": "Tecnologia",
+    "difficulty": 1,
+    "question": "Quale sigla indica la memoria ad accesso casuale?",
+    "answers": [
+      "RAM",
+      "VPN",
+      "API",
+      "DNS"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: RAM."
+  },
+  {
+    "id": "brx_128",
+    "category": "Tecnologia",
+    "difficulty": 1,
+    "question": "Quale sigla indica l'unità centrale di elaborazione?",
+    "answers": [
+      "HTML",
+      "SSD",
+      "PDF",
+      "CPU"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: CPU."
+  },
+  {
+    "id": "brx_129",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "Quale sigla indica un sistema di posizionamento globale?",
+    "answers": [
+      "NFC",
+      "2FA",
+      "GPS",
+      "CSS"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: GPS."
+  },
+  {
+    "id": "brx_130",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "Quale sigla indica una rete privata virtuale?",
+    "answers": [
+      "RAM",
+      "VPN",
+      "URL",
+      "QR"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: VPN."
+  },
+  {
+    "id": "brx_131",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "Quale sigla indica il linguaggio di marcatura delle pagine web?",
+    "answers": [
+      "HTML",
+      "API",
+      "DNS",
+      "CPU"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: HTML."
+  },
+  {
+    "id": "brx_132",
+    "category": "Tecnologia",
+    "difficulty": 3,
+    "question": "Quale sigla indica i fogli di stile a cascata?",
+    "answers": [
+      "SSD",
+      "PDF",
+      "GPS",
+      "CSS"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: CSS."
+  },
+  {
+    "id": "brx_133",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "Quale sigla indica un indirizzo uniforme di una risorsa web?",
+    "answers": [
+      "2FA",
+      "VPN",
+      "URL",
+      "NFC"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: URL."
+  },
+  {
+    "id": "brx_134",
+    "category": "Tecnologia",
+    "difficulty": 1,
+    "question": "Quale sigla indica l'interfaccia di programmazione di un'applicazione?",
+    "answers": [
+      "HTML",
+      "API",
+      "QR",
+      "RAM"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: API."
+  },
+  {
+    "id": "brx_135",
+    "category": "Tecnologia",
+    "difficulty": 1,
+    "question": "Quale sigla indica un disco a stato solido?",
+    "answers": [
+      "SSD",
+      "DNS",
+      "CPU",
+      "CSS"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: SSD."
+  },
+  {
+    "id": "brx_136",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "Quale sigla indica la comunicazione a corto raggio per pagamenti contactless?",
+    "answers": [
+      "PDF",
+      "GPS",
+      "URL",
+      "NFC"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: NFC."
+  },
+  {
+    "id": "brx_137",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "Quale sigla indica un codice di risposta rapida quadrato?",
+    "answers": [
+      "VPN",
+      "API",
+      "QR",
+      "2FA"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: QR."
+  },
+  {
+    "id": "brx_138",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "Quale sigla indica il sistema dei nomi di dominio?",
+    "answers": [
+      "SSD",
+      "DNS",
+      "RAM",
+      "HTML"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: DNS."
+  },
+  {
+    "id": "brx_139",
+    "category": "Tecnologia",
+    "difficulty": 3,
+    "question": "Quale sigla indica un formato portatile per documenti?",
+    "answers": [
+      "PDF",
+      "CPU",
+      "CSS",
+      "NFC"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: PDF."
+  },
+  {
+    "id": "brx_140",
+    "category": "Tecnologia",
+    "difficulty": 2,
+    "question": "Quale sigla indica l'autenticazione a due fattori?",
+    "answers": [
+      "GPS",
+      "URL",
+      "QR",
+      "2FA"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: 2FA."
+  },
+  {
+    "id": "brx_141",
+    "category": "Sport",
+    "difficulty": 1,
+    "question": "Quale atleta è associato a questa impresa: nove ori olimpici nei 100, 200 e staffetta veloce?",
+    "answers": [
+      "Usain Bolt",
+      "Lewis Hamilton",
+      "Michael Phelps",
+      "Steffi Graf"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Usain Bolt."
+  },
+  {
+    "id": "brx_142",
+    "category": "Sport",
+    "difficulty": 1,
+    "question": "Quale atleta è associato a questa impresa: ventitré titoli del Grande Slam in singolare nell'era Open?",
+    "answers": [
+      "Diego Maradona",
+      "Miguel Indurain",
+      "Muhammad Ali",
+      "Serena Williams"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Serena Williams."
+  },
+  {
+    "id": "brx_143",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Quale atleta è associato a questa impresa: primo 10 perfetto nella ginnastica olimpica?",
+    "answers": [
+      "Nedo Nadi",
+      "Alex Zanardi",
+      "Nadia Comăneci",
+      "Carl Lewis"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Nadia Comăneci."
+  },
+  {
+    "id": "brx_144",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Quale atleta è associato a questa impresa: record di titoli mondiali di Formula 1 condiviso con Schumacher?",
+    "answers": [
+      "Usain Bolt",
+      "Lewis Hamilton",
+      "Armand Duplantis",
+      "Marcell Jacobs"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Lewis Hamilton."
+  },
+  {
+    "id": "brx_145",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Quale atleta è associato a questa impresa: campione del mondo di calcio con l'Argentina nel 1986?",
+    "answers": [
+      "Diego Maradona",
+      "Michael Phelps",
+      "Steffi Graf",
+      "Serena Williams"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Diego Maradona."
+  },
+  {
+    "id": "brx_146",
+    "category": "Sport",
+    "difficulty": 3,
+    "question": "Quale atleta è associato a questa impresa: quattro ori olimpici nel salto in lungo?",
+    "answers": [
+      "Miguel Indurain",
+      "Muhammad Ali",
+      "Nadia Comăneci",
+      "Carl Lewis"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Carl Lewis."
+  },
+  {
+    "id": "brx_147",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Quale atleta è associato a questa impresa: recordman mondiale del salto con l'asta oltre sei metri?",
+    "answers": [
+      "Alex Zanardi",
+      "Lewis Hamilton",
+      "Armand Duplantis",
+      "Nedo Nadi"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Armand Duplantis."
+  },
+  {
+    "id": "brx_148",
+    "category": "Sport",
+    "difficulty": 1,
+    "question": "Quale atleta è associato a questa impresa: otto ori olimpici nel nuoto a Pechino 2008?",
+    "answers": [
+      "Diego Maradona",
+      "Michael Phelps",
+      "Marcell Jacobs",
+      "Usain Bolt"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Michael Phelps."
+  },
+  {
+    "id": "brx_149",
+    "category": "Sport",
+    "difficulty": 1,
+    "question": "Quale atleta è associato a questa impresa: vincitore di cinque Tour de France consecutivi dal 1991?",
+    "answers": [
+      "Miguel Indurain",
+      "Steffi Graf",
+      "Serena Williams",
+      "Carl Lewis"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Miguel Indurain."
+  },
+  {
+    "id": "brx_150",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Quale atleta è associato a questa impresa: cinque ori nella scherma ai Giochi di Anversa 1920?",
+    "answers": [
+      "Muhammad Ali",
+      "Nadia Comăneci",
+      "Armand Duplantis",
+      "Nedo Nadi"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Nedo Nadi."
+  },
+  {
+    "id": "brx_151",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Quale atleta è associato a questa impresa: oro olimpico nei 100 metri a Tokyo 2020?",
+    "answers": [
+      "Lewis Hamilton",
+      "Michael Phelps",
+      "Marcell Jacobs",
+      "Alex Zanardi"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Marcell Jacobs."
+  },
+  {
+    "id": "brx_152",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Quale atleta è associato a questa impresa: vincitrice del Golden Slam nel 1988?",
+    "answers": [
+      "Miguel Indurain",
+      "Steffi Graf",
+      "Usain Bolt",
+      "Diego Maradona"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Steffi Graf."
+  },
+  {
+    "id": "brx_153",
+    "category": "Sport",
+    "difficulty": 3,
+    "question": "Quale atleta è associato a questa impresa: campione dei pesi massimi noto come The Greatest?",
+    "answers": [
+      "Muhammad Ali",
+      "Serena Williams",
+      "Carl Lewis",
+      "Nedo Nadi"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Muhammad Ali."
+  },
+  {
+    "id": "brx_154",
+    "category": "Sport",
+    "difficulty": 2,
+    "question": "Quale atleta è associato a questa impresa: campione automobilistico e atleta paralimpico?",
+    "answers": [
+      "Nadia Comăneci",
+      "Armand Duplantis",
+      "Marcell Jacobs",
+      "Alex Zanardi"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Alex Zanardi."
+  },
+  {
+    "id": "brx_155",
+    "category": "Personaggi",
+    "difficulty": 1,
+    "question": "Quale personaggio corrisponde alla descrizione: fisica e chimica, due premi Nobel in discipline diverse?",
+    "answers": [
+      "Marie Curie",
+      "Florence Nightingale",
+      "Mahatma Gandhi",
+      "Howard Carter"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Marie Curie."
+  },
+  {
+    "id": "brx_156",
+    "category": "Personaggi",
+    "difficulty": 1,
+    "question": "Quale personaggio corrisponde alla descrizione: naturalista autore della teoria dell'evoluzione per selezione naturale?",
+    "answers": [
+      "Marco Polo",
+      "Amelia Earhart",
+      "Edward Jenner",
+      "Charles Darwin"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Charles Darwin."
+  },
+  {
+    "id": "brx_157",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Quale personaggio corrisponde alla descrizione: attivista sudafricano divenuto presidente dopo l'apartheid?",
+    "answers": [
+      "Rita Levi-Montalcini",
+      "Jacques Cousteau",
+      "Nelson Mandela",
+      "Neil Armstrong"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Nelson Mandela."
+  },
+  {
+    "id": "brx_158",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Quale personaggio corrisponde alla descrizione: infermiera britannica pioniera dell'assistenza moderna?",
+    "answers": [
+      "Marie Curie",
+      "Florence Nightingale",
+      "Ada Lovelace",
+      "Nikola Tesla"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Florence Nightingale."
+  },
+  {
+    "id": "brx_159",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Quale personaggio corrisponde alla descrizione: esploratore veneziano autore del Milione?",
+    "answers": [
+      "Marco Polo",
+      "Mahatma Gandhi",
+      "Howard Carter",
+      "Charles Darwin"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Marco Polo."
+  },
+  {
+    "id": "brx_160",
+    "category": "Personaggi",
+    "difficulty": 3,
+    "question": "Quale personaggio corrisponde alla descrizione: astronauta, primo essere umano sulla Luna?",
+    "answers": [
+      "Amelia Earhart",
+      "Edward Jenner",
+      "Nelson Mandela",
+      "Neil Armstrong"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Neil Armstrong."
+  },
+  {
+    "id": "brx_161",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Quale personaggio corrisponde alla descrizione: matematica autrice del primo algoritmo per una macchina?",
+    "answers": [
+      "Jacques Cousteau",
+      "Florence Nightingale",
+      "Ada Lovelace",
+      "Rita Levi-Montalcini"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Ada Lovelace."
+  },
+  {
+    "id": "brx_162",
+    "category": "Personaggi",
+    "difficulty": 1,
+    "question": "Quale personaggio corrisponde alla descrizione: leader indiano della nonviolenza?",
+    "answers": [
+      "Marco Polo",
+      "Mahatma Gandhi",
+      "Nikola Tesla",
+      "Marie Curie"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Mahatma Gandhi."
+  },
+  {
+    "id": "brx_163",
+    "category": "Personaggi",
+    "difficulty": 1,
+    "question": "Quale personaggio corrisponde alla descrizione: aviatrice prima donna a sorvolare in solitaria l'Atlantico?",
+    "answers": [
+      "Amelia Earhart",
+      "Howard Carter",
+      "Charles Darwin",
+      "Neil Armstrong"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Amelia Earhart."
+  },
+  {
+    "id": "brx_164",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Quale personaggio corrisponde alla descrizione: scienziata italiana premio Nobel per il fattore di crescita nervoso?",
+    "answers": [
+      "Edward Jenner",
+      "Nelson Mandela",
+      "Ada Lovelace",
+      "Rita Levi-Montalcini"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Rita Levi-Montalcini."
+  },
+  {
+    "id": "brx_165",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Quale personaggio corrisponde alla descrizione: inventore e imprenditore serbo-americano legato alla corrente alternata?",
+    "answers": [
+      "Florence Nightingale",
+      "Mahatma Gandhi",
+      "Nikola Tesla",
+      "Jacques Cousteau"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Nikola Tesla."
+  },
+  {
+    "id": "brx_166",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Quale personaggio corrisponde alla descrizione: archeologo che scoprì la tomba di Tutankhamon?",
+    "answers": [
+      "Amelia Earhart",
+      "Howard Carter",
+      "Marie Curie",
+      "Marco Polo"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Howard Carter."
+  },
+  {
+    "id": "brx_167",
+    "category": "Personaggi",
+    "difficulty": 3,
+    "question": "Quale personaggio corrisponde alla descrizione: medico che sviluppò il primo vaccino contro il vaiolo?",
+    "answers": [
+      "Edward Jenner",
+      "Charles Darwin",
+      "Neil Armstrong",
+      "Rita Levi-Montalcini"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Edward Jenner."
+  },
+  {
+    "id": "brx_168",
+    "category": "Personaggi",
+    "difficulty": 2,
+    "question": "Quale personaggio corrisponde alla descrizione: oceanografo ed esploratore co-inventore dell'Aqua-Lung?",
+    "answers": [
+      "Nelson Mandela",
+      "Ada Lovelace",
+      "Nikola Tesla",
+      "Jacques Cousteau"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Jacques Cousteau."
+  },
+  {
+    "id": "brx_169",
+    "category": "Invenzioni",
+    "difficulty": 1,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di telefono?",
+    "answers": [
+      "Alexander Graham Bell",
+      "Rudolf Diesel",
+      "Samuel Morse",
+      "Thomas Edison"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Alexander Graham Bell."
+  },
+  {
+    "id": "brx_170",
+    "category": "Invenzioni",
+    "difficulty": 1,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di radio?",
+    "answers": [
+      "Tim Berners-Lee",
+      "Alexander Fleming",
+      "Nikolaus Otto",
+      "Guglielmo Marconi"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Guglielmo Marconi."
+  },
+  {
+    "id": "brx_171",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di stampa a caratteri mobili in Europa?",
+    "answers": [
+      "Alessandro Volta",
+      "Joseph-Marie Jacquard",
+      "Johannes Gutenberg",
+      "Louis Pasteur"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Johannes Gutenberg."
+  },
+  {
+    "id": "brx_172",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di motore Diesel?",
+    "answers": [
+      "Alexander Graham Bell",
+      "Rudolf Diesel",
+      "Alfred Nobel",
+      "Evangelista Torricelli"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Rudolf Diesel."
+  },
+  {
+    "id": "brx_173",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di World Wide Web?",
+    "answers": [
+      "Tim Berners-Lee",
+      "Samuel Morse",
+      "Thomas Edison",
+      "Guglielmo Marconi"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Tim Berners-Lee."
+  },
+  {
+    "id": "brx_174",
+    "category": "Invenzioni",
+    "difficulty": 3,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di vaccino contro la rabbia?",
+    "answers": [
+      "Alexander Fleming",
+      "Nikolaus Otto",
+      "Johannes Gutenberg",
+      "Louis Pasteur"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Louis Pasteur."
+  },
+  {
+    "id": "brx_175",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di dinamite?",
+    "answers": [
+      "Joseph-Marie Jacquard",
+      "Rudolf Diesel",
+      "Alfred Nobel",
+      "Alessandro Volta"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Alfred Nobel."
+  },
+  {
+    "id": "brx_176",
+    "category": "Invenzioni",
+    "difficulty": 1,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di telegrafo e codice omonimo?",
+    "answers": [
+      "Tim Berners-Lee",
+      "Samuel Morse",
+      "Evangelista Torricelli",
+      "Alexander Graham Bell"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Samuel Morse."
+  },
+  {
+    "id": "brx_177",
+    "category": "Invenzioni",
+    "difficulty": 1,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di penicillina?",
+    "answers": [
+      "Alexander Fleming",
+      "Thomas Edison",
+      "Guglielmo Marconi",
+      "Louis Pasteur"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Alexander Fleming."
+  },
+  {
+    "id": "brx_178",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di batteria elettrica?",
+    "answers": [
+      "Nikolaus Otto",
+      "Johannes Gutenberg",
+      "Alfred Nobel",
+      "Alessandro Volta"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Alessandro Volta."
+  },
+  {
+    "id": "brx_179",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di barometro a mercurio?",
+    "answers": [
+      "Rudolf Diesel",
+      "Samuel Morse",
+      "Evangelista Torricelli",
+      "Joseph-Marie Jacquard"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Evangelista Torricelli."
+  },
+  {
+    "id": "brx_180",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di fonografo?",
+    "answers": [
+      "Alexander Fleming",
+      "Thomas Edison",
+      "Alexander Graham Bell",
+      "Tim Berners-Lee"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Thomas Edison."
+  },
+  {
+    "id": "brx_181",
+    "category": "Invenzioni",
+    "difficulty": 3,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di motore a quattro tempi?",
+    "answers": [
+      "Nikolaus Otto",
+      "Guglielmo Marconi",
+      "Louis Pasteur",
+      "Alessandro Volta"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Nikolaus Otto."
+  },
+  {
+    "id": "brx_182",
+    "category": "Invenzioni",
+    "difficulty": 2,
+    "question": "Chi è comunemente associato all'invenzione o allo sviluppo di primo telaio meccanico programmabile con schede perforate?",
+    "answers": [
+      "Johannes Gutenberg",
+      "Alfred Nobel",
+      "Evangelista Torricelli",
+      "Joseph-Marie Jacquard"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Joseph-Marie Jacquard."
+  },
+  {
+    "id": "brx_183",
+    "category": "Cultura del mondo",
+    "difficulty": 1,
+    "question": "A quale paese è tradizionalmente associato il piatto «paella»?",
+    "answers": [
+      "Spagna",
+      "Grecia",
+      "Brasile",
+      "Regno Unito"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Spagna."
+  },
+  {
+    "id": "brx_184",
+    "category": "Cultura del mondo",
+    "difficulty": 1,
+    "question": "A quale paese è tradizionalmente associato il piatto «sushi»?",
+    "answers": [
+      "Canada",
+      "Marocco",
+      "Messico",
+      "Giappone"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Giappone."
+  },
+  {
+    "id": "brx_185",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "A quale paese è tradizionalmente associato il piatto «pho»?",
+    "answers": [
+      "Corea del Sud",
+      "Thailandia",
+      "Vietnam",
+      "Perù"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Vietnam."
+  },
+  {
+    "id": "brx_186",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "A quale paese è tradizionalmente associato il piatto «moussaka»?",
+    "answers": [
+      "Spagna",
+      "Grecia",
+      "Ungheria",
+      "Svizzera"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Grecia."
+  },
+  {
+    "id": "brx_187",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "A quale paese è tradizionalmente associato il piatto «poutine»?",
+    "answers": [
+      "Canada",
+      "Brasile",
+      "Regno Unito",
+      "Giappone"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Canada."
+  },
+  {
+    "id": "brx_188",
+    "category": "Cultura del mondo",
+    "difficulty": 3,
+    "question": "A quale paese è tradizionalmente associato il piatto «ceviche»?",
+    "answers": [
+      "Marocco",
+      "Messico",
+      "Vietnam",
+      "Perù"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Perù."
+  },
+  {
+    "id": "brx_189",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "A quale paese è tradizionalmente associato il piatto «gulasch»?",
+    "answers": [
+      "Thailandia",
+      "Grecia",
+      "Ungheria",
+      "Corea del Sud"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Ungheria."
+  },
+  {
+    "id": "brx_190",
+    "category": "Cultura del mondo",
+    "difficulty": 1,
+    "question": "A quale paese è tradizionalmente associato il piatto «feijoada»?",
+    "answers": [
+      "Canada",
+      "Brasile",
+      "Svizzera",
+      "Spagna"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Brasile."
+  },
+  {
+    "id": "brx_191",
+    "category": "Cultura del mondo",
+    "difficulty": 1,
+    "question": "A quale paese è tradizionalmente associato il piatto «tagine»?",
+    "answers": [
+      "Marocco",
+      "Regno Unito",
+      "Giappone",
+      "Perù"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Marocco."
+  },
+  {
+    "id": "brx_192",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "A quale paese è tradizionalmente associato il piatto «kimchi»?",
+    "answers": [
+      "Messico",
+      "Vietnam",
+      "Ungheria",
+      "Corea del Sud"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Corea del Sud."
+  },
+  {
+    "id": "brx_193",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "A quale paese è tradizionalmente associato il piatto «fondue»?",
+    "answers": [
+      "Grecia",
+      "Brasile",
+      "Svizzera",
+      "Thailandia"
+    ],
+    "correct_index": 2,
+    "explanation": "Risposta corretta: Svizzera."
+  },
+  {
+    "id": "brx_194",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "A quale paese è tradizionalmente associato il piatto «fish and chips»?",
+    "answers": [
+      "Marocco",
+      "Regno Unito",
+      "Spagna",
+      "Canada"
+    ],
+    "correct_index": 1,
+    "explanation": "Risposta corretta: Regno Unito."
+  },
+  {
+    "id": "brx_195",
+    "category": "Cultura del mondo",
+    "difficulty": 3,
+    "question": "A quale paese è tradizionalmente associato il piatto «tacos»?",
+    "answers": [
+      "Messico",
+      "Giappone",
+      "Perù",
+      "Corea del Sud"
+    ],
+    "correct_index": 0,
+    "explanation": "Risposta corretta: Messico."
+  },
+  {
+    "id": "brx_196",
+    "category": "Cultura del mondo",
+    "difficulty": 2,
+    "question": "A quale paese è tradizionalmente associato il piatto «pad thai»?",
+    "answers": [
+      "Vietnam",
+      "Ungheria",
+      "Svizzera",
+      "Thailandia"
+    ],
+    "correct_index": 3,
+    "explanation": "Risposta corretta: Thailandia."
+  },
+  {
+    "id": "brx_197",
+    "category": "Matematica",
+    "difficulty": 1,
+    "question": "Quanto fa 7 × 4?",
+    "answers": [
+      "28",
+      "32",
+      "24",
+      "35"
+    ],
+    "correct_index": 0,
+    "explanation": "7 × 4 = 28."
+  },
+  {
+    "id": "brx_198",
+    "category": "Matematica",
+    "difficulty": 1,
+    "question": "Quanto fa 10 × 5?",
+    "answers": [
+      "55",
+      "45",
+      "60",
+      "50"
+    ],
+    "correct_index": 3,
+    "explanation": "10 × 5 = 50."
+  },
+  {
+    "id": "brx_199",
+    "category": "Matematica",
+    "difficulty": 1,
+    "question": "Quanto fa 13 × 6?",
+    "answers": [
+      "72",
+      "91",
+      "78",
+      "84"
+    ],
+    "correct_index": 2,
+    "explanation": "13 × 6 = 78."
+  },
+  {
+    "id": "brx_200",
+    "category": "Matematica",
+    "difficulty": 1,
+    "question": "Quanto fa 16 × 7?",
+    "answers": [
+      "128",
+      "112",
+      "119",
+      "105"
+    ],
+    "correct_index": 1,
+    "explanation": "16 × 7 = 112."
+  },
+  {
+    "id": "brx_201",
+    "category": "Matematica",
+    "difficulty": 1,
+    "question": "Quanto fa 19 × 8?",
+    "answers": [
+      "152",
+      "160",
+      "144",
+      "171"
+    ],
+    "correct_index": 0,
+    "explanation": "19 × 8 = 152."
+  },
+  {
+    "id": "brx_202",
+    "category": "Matematica",
+    "difficulty": 2,
+    "question": "Quanto fa 22 × 4?",
+    "answers": [
+      "92",
+      "84",
+      "110",
+      "88"
+    ],
+    "correct_index": 3,
+    "explanation": "22 × 4 = 88."
+  },
+  {
+    "id": "brx_203",
+    "category": "Matematica",
+    "difficulty": 2,
+    "question": "Quanto fa 25 × 5?",
+    "answers": [
+      "120",
+      "150",
+      "125",
+      "130"
+    ],
+    "correct_index": 2,
+    "explanation": "25 × 5 = 125."
+  },
+  {
+    "id": "brx_204",
+    "category": "Matematica",
+    "difficulty": 2,
+    "question": "Quanto fa 28 × 6?",
+    "answers": [
+      "196",
+      "168",
+      "174",
+      "162"
+    ],
+    "correct_index": 1,
+    "explanation": "28 × 6 = 168."
+  },
+  {
+    "id": "brx_205",
+    "category": "Matematica",
+    "difficulty": 2,
+    "question": "Quanto fa 31 × 7?",
+    "answers": [
+      "217",
+      "224",
+      "210",
+      "248"
+    ],
+    "correct_index": 0,
+    "explanation": "31 × 7 = 217."
+  },
+  {
+    "id": "brx_206",
+    "category": "Matematica",
+    "difficulty": 2,
+    "question": "Quanto fa 34 × 8?",
+    "answers": [
+      "280",
+      "264",
+      "306",
+      "272"
+    ],
+    "correct_index": 3,
+    "explanation": "34 × 8 = 272."
+  },
+  {
+    "id": "brx_207",
+    "category": "Matematica",
+    "difficulty": 3,
+    "question": "Quanto fa 37 × 4?",
+    "answers": [
+      "144",
+      "185",
+      "148",
+      "152"
+    ],
+    "correct_index": 2,
+    "explanation": "37 × 4 = 148."
+  },
+  {
+    "id": "brx_208",
+    "category": "Matematica",
+    "difficulty": 3,
+    "question": "Quanto fa 40 × 5?",
+    "answers": [
+      "240",
+      "200",
+      "205",
+      "195"
+    ],
+    "correct_index": 1,
+    "explanation": "40 × 5 = 200."
+  },
+  {
+    "id": "brx_209",
+    "category": "Matematica",
+    "difficulty": 3,
+    "question": "Quanto fa 43 × 6?",
+    "answers": [
+      "258",
+      "264",
+      "252",
+      "301"
+    ],
+    "correct_index": 0,
+    "explanation": "43 × 6 = 258."
+  },
+  {
+    "id": "brx_210",
+    "category": "Matematica",
+    "difficulty": 3,
+    "question": "Quanto fa 46 × 7?",
+    "answers": [
+      "329",
+      "315",
+      "368",
+      "322"
+    ],
+    "correct_index": 3,
+    "explanation": "46 × 7 = 322."
+  },
+  {
+    "id": "brx_211",
+    "category": "Logica",
+    "difficulty": 1,
+    "question": "Completa la sequenza: 2, 4, 6, 8, ...",
+    "answers": [
+      "11",
+      "12",
+      "9",
+      "10"
+    ],
+    "correct_index": 3,
+    "explanation": "La sequenza aumenta di 2: segue 10."
+  },
+  {
+    "id": "brx_212",
+    "category": "Logica",
+    "difficulty": 1,
+    "question": "Completa la sequenza: 3, 6, 9, 12, ...",
+    "answers": [
+      "18",
+      "14",
+      "15",
+      "16"
+    ],
+    "correct_index": 2,
+    "explanation": "La sequenza aumenta di 3: segue 15."
+  },
+  {
+    "id": "brx_213",
+    "category": "Logica",
+    "difficulty": 1,
+    "question": "Completa la sequenza: 4, 8, 12, 16, ...",
+    "answers": [
+      "19",
+      "20",
+      "21",
+      "24"
+    ],
+    "correct_index": 1,
+    "explanation": "La sequenza aumenta di 4: segue 20."
+  },
+  {
+    "id": "brx_214",
+    "category": "Logica",
+    "difficulty": 1,
+    "question": "Completa la sequenza: 5, 10, 15, 20, ...",
+    "answers": [
+      "25",
+      "26",
+      "30",
+      "24"
+    ],
+    "correct_index": 0,
+    "explanation": "La sequenza aumenta di 5: segue 25."
+  },
+  {
+    "id": "brx_215",
+    "category": "Logica",
+    "difficulty": 1,
+    "question": "Completa la sequenza: 6, 8, 10, 12, ...",
+    "answers": [
+      "15",
+      "16",
+      "13",
+      "14"
+    ],
+    "correct_index": 3,
+    "explanation": "La sequenza aumenta di 2: segue 14."
+  },
+  {
+    "id": "brx_216",
+    "category": "Logica",
+    "difficulty": 2,
+    "question": "Completa la sequenza: 7, 10, 13, 16, ...",
+    "answers": [
+      "22",
+      "18",
+      "19",
+      "20"
+    ],
+    "correct_index": 2,
+    "explanation": "La sequenza aumenta di 3: segue 19."
+  },
+  {
+    "id": "brx_217",
+    "category": "Logica",
+    "difficulty": 2,
+    "question": "Completa la sequenza: 8, 12, 16, 20, ...",
+    "answers": [
+      "23",
+      "24",
+      "25",
+      "28"
+    ],
+    "correct_index": 1,
+    "explanation": "La sequenza aumenta di 4: segue 24."
+  },
+  {
+    "id": "brx_218",
+    "category": "Logica",
+    "difficulty": 2,
+    "question": "Completa la sequenza: 9, 14, 19, 24, ...",
+    "answers": [
+      "29",
+      "30",
+      "34",
+      "28"
+    ],
+    "correct_index": 0,
+    "explanation": "La sequenza aumenta di 5: segue 29."
+  },
+  {
+    "id": "brx_219",
+    "category": "Logica",
+    "difficulty": 2,
+    "question": "Completa la sequenza: 10, 12, 14, 16, ...",
+    "answers": [
+      "19",
+      "20",
+      "17",
+      "18"
+    ],
+    "correct_index": 3,
+    "explanation": "La sequenza aumenta di 2: segue 18."
+  },
+  {
+    "id": "brx_220",
+    "category": "Logica",
+    "difficulty": 2,
+    "question": "Completa la sequenza: 11, 14, 17, 20, ...",
+    "answers": [
+      "26",
+      "22",
+      "23",
+      "24"
+    ],
+    "correct_index": 2,
+    "explanation": "La sequenza aumenta di 3: segue 23."
+  },
+  {
+    "id": "brx_221",
+    "category": "Logica",
+    "difficulty": 3,
+    "question": "Completa la sequenza: 12, 16, 20, 24, ...",
+    "answers": [
+      "27",
+      "28",
+      "29",
+      "32"
+    ],
+    "correct_index": 1,
+    "explanation": "La sequenza aumenta di 4: segue 28."
+  },
+  {
+    "id": "brx_222",
+    "category": "Logica",
+    "difficulty": 3,
+    "question": "Completa la sequenza: 13, 18, 23, 28, ...",
+    "answers": [
+      "33",
+      "34",
+      "38",
+      "32"
+    ],
+    "correct_index": 0,
+    "explanation": "La sequenza aumenta di 5: segue 33."
+  },
+  {
+    "id": "brx_223",
+    "category": "Logica",
+    "difficulty": 3,
+    "question": "Completa la sequenza: 14, 16, 18, 20, ...",
+    "answers": [
+      "23",
+      "24",
+      "21",
+      "22"
+    ],
+    "correct_index": 3,
+    "explanation": "La sequenza aumenta di 2: segue 22."
+  },
+  {
+    "id": "brx_224",
+    "category": "Logica",
+    "difficulty": 3,
+    "question": "Completa la sequenza: 15, 18, 21, 24, ...",
+    "answers": [
+      "30",
+      "26",
+      "27",
+      "28"
+    ],
+    "correct_index": 2,
+    "explanation": "La sequenza aumenta di 3: segue 27."
   }
 ]

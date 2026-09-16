@@ -12,7 +12,9 @@ from brain_racer.questions import QuestionBank
 
 def test_entire_bank_is_valid_and_diverse():
     bank = QuestionBank()
-    assert len(bank.by_id) >= 200
+    assert len(bank.by_id) == 448
+    assert all(sum(q["category"] == category for q in bank.by_id.values()) == 28
+               for category in {q["category"] for q in bank.by_id.values()})
     assert len({q["category"] for q in bank.by_id.values()}) == 16
     assert {q["difficulty"] for q in bank.by_id.values()} == {1, 2, 3}
 
@@ -30,10 +32,10 @@ def test_invalid_data_rejected(mutation):
 
 def test_no_repetition_until_pool_exhaustion():
     bank, used, selected = QuestionBank(), [], []
-    for level in range(1, 76):
+    for level in range(1, 151):
         selected.extend(bank.select(level, used, 831 + level))
-    assert len(set(selected[:224])) == 224
-    assert len(used) == 1  # The cycle resets only after the last unused question.
+    assert len(set(selected[:448])) == 448
+    assert len(used) == 2  # The cycle resets only after the last unused question.
 
 
 def test_deterministic_questions_and_courses():

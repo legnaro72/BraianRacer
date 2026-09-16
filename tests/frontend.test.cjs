@@ -193,6 +193,16 @@ test('top navigation paints the selected page before the cloud acknowledges it',
   assert.equal(ui.data.page,'HELP');assert.equal(mounted,'HELP');
   assert.equal(sent.action,'NAV');assert.equal(sent.payload.page,'HELP');
 });
+test('top navigation remains usable during a game and resumes without a server round trip',()=>{
+  const {ui}=uiHost();let mounted='';
+  ui.data={...ui.data,room:null,page:'HOME'};ui.mountView=view=>{mounted=view;};
+  const nav={disabled:false,dataset:{action:'NAV',page:'HELP'}};
+  ui.click({target:{closest:()=>nav}});
+  assert.equal(ui.menuOverlay,'HELP');assert.equal(mounted,'HELP');
+  const resume={disabled:false,dataset:{action:'RESUME'}};
+  ui.click({target:{closest:()=>resume}});
+  assert.equal(ui.menuOverlay,null);assert.equal(mounted,'QUIZ');
+});
 test('new game id never restores a finished engine session',()=>{
   const h=host(),old=h.make();old.state.done=true;old.state.score=99;old.state.lives=0;old.persist();
   h.data.id='fresh';const next=h.make();

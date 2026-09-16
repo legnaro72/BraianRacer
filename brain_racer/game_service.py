@@ -669,6 +669,12 @@ class GameService:
             question_ids = rs.get("questions", [])
             if not individual_quiz:
                 state.update(deadline=rs.get("deadline"), qindex=rs.get("qindex", 0))
+        # Older games created before question preloading still receive the exact
+        # deterministic set that the server will select at the finish line.
+        if phase == "DRIVING" and not question_ids:
+            preview_used = list(rs.get("used", []))
+            question_ids = self.bank.select(state["level"], preview_used,
+                                            rs["seed"] + state["level"])
         if phase == "DRIVING" and question_ids:
             state["quiz_preview"] = [self.bank.public(question_id, reveal=True)
                                      for question_id in question_ids if question_id in self.bank.by_id]
