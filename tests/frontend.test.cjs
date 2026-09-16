@@ -166,7 +166,7 @@ test('touching the track fires immediately, keeps steering and respects cooldown
   e.state.real+=1;e.state.done=true;e.down(touch);assert.equal(e.bouquets.length,2);
 });
 
-test('background music shares the toggle, resumes without duplicates and cleans up',async()=>{
+test('background music and sound effects have independent toggles',async()=>{
   const storage=new Map(),listeners=new Map(),tracks=[];
   class AudioMock {
     constructor(src){this.src=src;this.paused=true;this.plays=0;tracks.push(this);}
@@ -178,12 +178,15 @@ test('background music shares the toggle, resumes without duplicates and cleans 
     localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)}});
   vm.runInContext(fs.readFileSync(path.join(assets,'game.js'),'utf8')+'\nglobalThis.Sound=ArcadeAudio;',context);
   const sound=new context.Sound();sound.unlock();assert.equal(tracks.length,0);
-  sound.toggle();await Promise.resolve();await Promise.resolve();
+  assert.equal(sound.effectsMuted,false);
+  sound.toggleMusic();await Promise.resolve();await Promise.resolve();
   assert.equal(tracks.length,1);assert.equal(tracks[0].src,'app/static/main.mp3');
   assert.equal(tracks[0].paused,false);assert.equal(tracks[0].loop,true);
   sound.unlock();assert.equal(tracks[0].plays,1);
-  sound.toggle();assert.equal(tracks[0].paused,true);assert.equal(storage.get('br:mute'),'true');
-  sound.toggle();await Promise.resolve();await Promise.resolve();assert.equal(tracks.length,1);
+  sound.toggleEffects();assert.equal(sound.effectsMuted,true);assert.equal(tracks[0].paused,false);
+  assert.equal(storage.get('br:effects-muted'),'true');
+  sound.toggleMusic();assert.equal(tracks[0].paused,true);assert.equal(storage.get('br:music-muted'),'true');
+  sound.toggleMusic();await Promise.resolve();await Promise.resolve();assert.equal(tracks.length,1);
   doc.hidden=true;listeners.get('visibilitychange')();assert.equal(tracks[0].paused,true);
   doc.hidden=false;listeners.get('visibilitychange')();assert.equal(tracks[0].paused,false);
   sound.destroy();assert.equal(tracks[0].paused,true);assert.equal(tracks[0].removed,true);assert.equal(listeners.size,0);

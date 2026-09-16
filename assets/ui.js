@@ -103,6 +103,7 @@ class BrainUI {
       if(r.phase==='CLOSED')return 'CLOSED';
       if(r.phase==='LOBBY')return 'LOBBY';
       if(['COUNTDOWN','DRIVING'].includes(r.phase))return g?.phase==='DRIVING'?'DRIVING':'PIT';
+      if(r.phase==='QUIZ')return g?.screen_phase||'PIT';
       return r.phase;
     }
     return g?.screen_phase||d.page;
@@ -113,7 +114,7 @@ class BrainUI {
       <span class="brand-symbol">${icons.flag}</span><span>BRAIN<span class="brand-light">RACER</span><small>GUIDA. PENSA. VINCI.</small></span></button>
       <nav aria-label="Navigazione principale">${[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥']].map(([page,label])=>
         `<button data-action="NAV" data-page="${page}" class="nav-link ${d.page===page&&!active?'selected':''}" ${active||!d.player?'disabled':''}>${label}</button>`).join('')}</nav>
-      <div class="nav-right"><button class="sound" data-action="SOUND" title="Attiva o disattiva audio" aria-label="${this.audio.muted?'Attiva audio':'Disattiva audio'}">${this.audio.muted?'♪̸':'♫'}</button>
+      <div class="nav-right"><div class="audio-controls" aria-label="Controlli audio"><button class="sound" data-action="MUSIC" title="Musica di sottofondo" aria-label="${this.audio.musicMuted?'Attiva musica di sottofondo':'Disattiva musica di sottofondo'}">${this.audio.musicMuted?'♪̸':'♫'}</button><button class="sound" data-action="EFFECTS" title="Effetti sonori" aria-label="${this.audio.effectsMuted?'Attiva effetti sonori':'Disattiva effetti sonori'}">${this.audio.effectsMuted?'🔇':'🔊'}</button></div>
       ${d.player?`<button class="profile" data-action="NAV" data-page="STATS" ${active?'disabled':''}><span class="avatar">${esc(d.player.nickname.slice(0,2).toUpperCase())}</span><span>${esc(d.player.nickname)}<small>#${esc(d.player.tag)}</small></span></button>`:
       '<span class="edition">ARCADE / VOL. 01</span>'}</div></header>${d.player&&!active?`<nav class="mobile-nav" aria-label="Menu smartphone">${[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥']].map(([page,label])=>`<button data-action="NAV" data-page="${page}" class="${d.page===page?'selected':''}">${label}</button>`).join('')}</nav>`:''}`;
   }
@@ -223,12 +224,12 @@ class BrainUI {
     const title=reveal?(eligible?(answer?.correct?'Risposta corretta!':'Risposta sbagliata.'):'Ecco la risposta.'):'Adesso, pensa veloce.';
     return `${coupleArt('quiz',reveal?'Un passo in più verso la festa!':'Facciamo il tifo per te!',reveal?'jump':'dance')}<div class="quiz-top"><span class="eyebrow">LIVELLO ${String(g.level).padStart(2,'0')} · SFIDA DI CONOSCENZA</span><span class="score-chip">${g.score} <small>PT</small></span></div>
       <section class="quiz-panel ${reveal?'revealed':''}"><div class="quiz-meta"><span class="pill">${esc(q.category)}</span><div class="question-steps">${[0,1,2].map(i=>`<i class="${i===g.qindex?'current':i<g.qindex?'complete':''}"></i>`).join('')}<span>${g.qindex+1} / 3</span></div></div>
-      <div class="quiz-timing"><span>${reveal?'PROSSIMA TAPPA TRA':'TEMPO A DISPOSIZIONE'}</span><b data-countdown data-end="${g.deadline}"></b></div><div class="quiz-timer"><i data-timer-bar data-end="${g.deadline}" data-duration="${reveal?.6:15}"></i></div>
+      <div class="quiz-timing"><span>${reveal?'PROSSIMA TAPPA TRA':'TEMPO A DISPOSIZIONE'}</span><b data-countdown data-end="${g.deadline}"></b></div><div class="quiz-timer"><i data-timer-bar data-end="${g.deadline}" data-duration="${reveal?.45:15}"></i></div>
       <span class="quiz-kicker">${title}</span><h1>${esc(q.question)}</h1>
       <div class="answer-grid">${q.answers.map((a,i)=>`<button class="answer ${reveal&&i===q.correct_index?'correct':''} ${reveal&&answer?.choice===i&&!answer.correct?'wrong':''}" data-action="ANSWER" data-choice="${i}" ${reveal||g.answered||!eligible?'disabled':''}><span class="answer-letter">${'ABCD'[i]}</span><span>${esc(a)}</span>${reveal&&i===q.correct_index?'<b>✓</b>':''}</button>`).join('')}</div>
-      ${reveal?`<div class="quiz-feedback ${answer?.correct?'positive':''}" role="status"><strong>${eligible?(answer?.correct?'✓ +1 punto':answer?.choice===null?'◷ Tempo scaduto · −2 punti':'× −2 punti'):'Risultati della domanda'}</strong><p>Risposta corretta: <b>${esc(q.answers[q.correct_index])}</b>${q.explanation?'<br>'+esc(q.explanation):''}</p>${r?`<small>${g.correct_count} / ${g.eligible_count} risposte corrette</small>`:''}</div>`:
+      ${reveal?`<div class="quiz-feedback ${answer?.correct?'positive':''}" role="status"><strong>${eligible?(answer?.correct?'✓ +1 punto':answer?.choice===null?'◷ Tempo scaduto · −2 punti':'× −2 punti'):'Risultati della domanda'}</strong><p>Risposta corretta: <b>${esc(q.answers[q.correct_index])}</b>${q.explanation?'<br>'+esc(q.explanation):''}</p></div>`:
       `<div class="quiz-status" role="status">${!eligible?(g.phase==='DNF'?'DNF · Traguardo non raggiunto. Rientrerai al prossimo livello.':'Sei eliminato: segui la sfida come spettatore.'):
-         g.answered?'✓ Risposta bloccata. In attesa degli altri giocatori…':'Ogni risposta conta. Fidati della tua prima intuizione.'}${r?`<small>${g.answer_count} / ${g.eligible_count} giocatori hanno risposto</small>`:''}</div>`}
+         g.answered?'✓ Risposta registrata. Passiamo subito alla prossima.':'Ogni risposta conta. Fidati della tua prima intuizione.'}</div>`}
       <div class="quiz-scoring"><span>✓ Corretta <b>+1</b></span><span>× Sbagliata o scaduta <b>−2</b></span><span>♥ Le vite restano al sicuro</span></div></section>`;
   }
   summary() {
@@ -274,7 +275,8 @@ class BrainUI {
   click(event) {
     const el=event.target.closest('[data-action]');if(!el||el.disabled)return;
     const action=el.dataset.action;
-    if(action==='SOUND'){this.audio.toggle();el.textContent=this.audio.muted?'♪̸':'♫';el.setAttribute('aria-label',this.audio.muted?'Attiva audio':'Disattiva audio');return;}
+    if(action==='MUSIC'){this.audio.toggleMusic();el.textContent=this.audio.musicMuted?'♪̸':'♫';el.setAttribute('aria-label',this.audio.musicMuted?'Attiva musica di sottofondo':'Disattiva musica di sottofondo');return;}
+    if(action==='EFFECTS'){this.audio.toggleEffects();el.textContent=this.audio.effectsMuted?'🔇':'🔊';el.setAttribute('aria-label',this.audio.effectsMuted?'Attiva effetti sonori':'Disattiva effetti sonori');return;}
     this.audio.unlock();
     if(action==='FOCUS_NAME'){this.root.querySelector('#nickname')?.focus();return;}
     if(action==='PAUSE'){this.engine?.togglePause();el.textContent=this.engine?.paused?'▶ Riprendi':'Ⅱ Pausa';return;}

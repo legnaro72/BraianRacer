@@ -122,8 +122,7 @@ def dispatch(svc, command):
             st.session_state.pop("room_id", None)
         st.session_state.page = "HOME"
     elif action == "REPLAY" and gid:
-        svc.abort(gid, pid)
-        st.session_state.game_id = svc.new_game(pid)
+        st.session_state.game_id = svc.restart_game(gid, pid)
 
 
 @st.fragment(run_every=0.5)

@@ -7,14 +7,18 @@ const makeId = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.
 
 class ArcadeAudio {
   constructor() {
-    this.muted = safeStorage.get('br:mute') !== 'false';
+    const legacy=safeStorage.get('br:mute');
+    this.musicMuted = safeStorage.get('br:music-muted') ?? legacy ?? 'true';
+    this.effectsMuted = safeStorage.get('br:effects-muted') ?? 'false';
+    this.musicMuted = this.musicMuted === 'true';
+    this.effectsMuted = this.effectsMuted === 'true';
     this.onVisibility = () => {
       if(document.hidden)this.music?.pause();else this.startMusic();
     };
     document.addEventListener?.('visibilitychange',this.onVisibility);
   }
   startMusic() {
-    if(this.muted || this.disposed || document.hidden)return;
+    if(this.musicMuted || this.disposed || document.hidden)return;
     if(!this.music){
       this.music=new window.Audio('app/static/main.mp3');
       this.music.loop=true;this.music.volume=.22;this.music.preload='none';
@@ -33,9 +37,13 @@ class ArcadeAudio {
     this.context?.resume().catch(() => {});
     this.startMusic();
   }
-  toggle() {
-    this.muted = !this.muted; safeStorage.set('br:mute', String(this.muted));
-    if(this.muted)this.music?.pause();else this.unlock();
+  toggleMusic() {
+    this.musicMuted = !this.musicMuted; safeStorage.set('br:music-muted', String(this.musicMuted));
+    if(this.musicMuted)this.music?.pause();else this.unlock();
+  }
+  toggleEffects() {
+    this.effectsMuted = !this.effectsMuted; safeStorage.set('br:effects-muted', String(this.effectsMuted));
+    if(!this.effectsMuted)this.unlock();
   }
   destroy() {
     this.disposed=true;document.removeEventListener?.('visibilitychange',this.onVisibility);
@@ -43,7 +51,7 @@ class ArcadeAudio {
     this.context?.close().catch(()=>{});
   }
   play(kind) {
-    if (this.muted || !this.context || this.context.state !== 'running') return;
+    if (this.effectsMuted || !this.context || this.context.state !== 'running') return;
     const frequencies = {star:880, shield:600, slow:260, collision:90, finish:1046,
                          correct:784, wrong:150, countdown:440, start:880, victory:1174};
     const ctx = this.context, oscillator = ctx.createOscillator(), gain = ctx.createGain();
@@ -266,7 +274,7 @@ class DrivingEngine {
     if(s.progress>=this.cfg.groups && !s.done) {
       s.done=true; this.event('PROGRESS_UPDATE',{progress:s.progress});
       this.burst(.5,.5,'#eab447',90); this.audio.play('finish'); this.vibrate([30,30,60]);
-      this.pendingFinish=performance.now()+800;
+      this.pendingFinish=performance.now()+120;
     }
   }
   roundRect(x,y,w,h,r,color) {
@@ -388,7 +396,7 @@ class DrivingEngine {
           c.beginPath();c.moveTo(0,25);c.bezierCurveTo(-52,-4,-22,-42,0,-19);c.bezierCurveTo(22,-42,52,-4,0,25);c.fill();
           c.strokeStyle='#ffe6ed';c.lineWidth=3;c.beginPath();c.moveTo(-20,-9);c.quadraticCurveTo(-20,-22,-10,-19);c.stroke();
         }else{
-          c.rotate(-.35);c.strokeStyle='#629465';c.lineWidth=5;c.beginPath();c.moveTo(0,19);c.lineTo(-6,-5);c.moveTo(0,19);c.lineTo(7,-5);c.stroke();
+          c.scale(1.75,1.75);c.rotate(-.35);c.strokeStyle='#629465';c.lineWidth=5;c.beginPath();c.moveTo(0,19);c.lineTo(-6,-5);c.moveTo(0,19);c.lineTo(7,-5);c.stroke();
           for(const [xx,yy,col] of [[-8,-8,'#ff9e65'],[7,-10,'#ef759f'],[0,-19,'#ffc57b'],[0,-4,'#ffb1c7']]){c.fillStyle=col;c.beginPath();c.arc(xx,yy,8,0,Math.PI*2);c.fill();c.strokeStyle='#fff1db';c.lineWidth=1.5;c.stroke();}
           c.fillStyle='#fff2e4';c.fillRect(-6,9,12,5);
         }c.restore();continue;

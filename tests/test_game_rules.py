@@ -5,6 +5,20 @@ from brain_racer.models import GameSession
 from conftest import event, finish_drive
 
 
+def test_restart_finishes_previous_game_and_returns_a_clean_run(svc, player):
+    old_id = svc.new_game(player)
+    with svc.db.read() as session:
+        old_started = session.get(GameSession, old_id).started_at
+    svc.clock.advance(1)
+    new_id = svc.restart_game(old_id, player)
+    assert new_id != old_id
+    with svc.db.read() as session:
+        old = session.get(GameSession, old_id)
+        new = session.get(GameSession, new_id)
+        assert old.status == "finished" and old.ended_at >= old_started
+        assert new.status == "active" and new.state["score"] == 0
+
+
 def test_collisions_duplicate_shield_and_invulnerability(svc, player):
     gid = svc.new_game(player)
     svc.clock.advance(50)
