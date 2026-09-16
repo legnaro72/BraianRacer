@@ -23,6 +23,10 @@ class RuleError(ValueError):
     """Safe, Italian feedback for expected invalid actions."""
 
 
+def _number(value, default=0):
+    return default if value is None else value
+
+
 def save_state(obj):
     flag_modified(obj, "state")
 
@@ -378,7 +382,8 @@ class GameService:
                 raise RuleError("Solo l'host può avviare la gara.")
             members = self._members(s, room_id)
             now = self.clock()
-            if len(members) < 2 or not all(m.ready and now - m.last_seen_at < DISCONNECT_SECONDS for m in members):
+            if len(members) < 2 or not all(m.ready and now - _number(m.last_seen_at) < DISCONNECT_SECONDS
+                                           for m in members):
                 raise RuleError("Servono almeno 2 giocatori connessi e tutti pronti.")
             start = now + COUNTDOWN_SECONDS
             room.status = "COUNTDOWN"
@@ -427,11 +432,11 @@ class GameService:
     def _tick_room(self, s, room, now):
         members = self._members(s, room.id)
         if room.status == "LOBBY":
-            online = [m for m in members if now - m.last_seen_at < DISCONNECT_SECONDS]
+            online = [m for m in members if now - _number(m.last_seen_at) < DISCONNECT_SECONDS]
             if online and not any(m.player_id == room.host_player_id for m in online):
                 room.host_player_id = online[0].player_id
             for m in members:
-                if now - m.last_seen_at >= DISCONNECT_SECONDS:
+                if now - _number(m.last_seen_at) >= DISCONNECT_SECONDS:
                     s.delete(m)
             if not online:
                 room.status = "CLOSED"
@@ -439,7 +444,7 @@ class GameService:
         if room.status in ("MATCH_RESULTS", "CLOSED"):
             return
         games = self._games(s, room.id)
-        last_seen = {m.player_id: m.last_seen_at for m in members}
+        last_seen = {m.player_id: _number(m.last_seen_at) for m in members}
         for g in games:
             if now - last_seen.get(g.player_id, 0) > DISCONNECT_SECONDS and g.state["lives"] > 0:
                 g.state.update(lives=0, phase="ELIMINATED", disconnected=True)
@@ -524,12 +529,12 @@ class GameService:
             p = s.get(Player, player_id)
             if not p:
                 raise RuleError("Profilo non trovato.")
-            if now - (p.last_seen_at or 0) > 5:
+            if now - _number(p.last_seen_at) > 5:
                 p.last_seen_at = now
             result = {"now": now, "player": {"id": p.id, "nickname": p.nickname, "tag": p.player_tag}}
             if room_id:
                 room, member = self._member(s, room_id, player_id)
-                if now - (member.last_seen_at or 0) >= 3:
+                if now - _number(member.last_seen_at) >= 3:
                     member.last_seen_at = now
                 self._tick_room(s, room, now)
                 s.flush()
@@ -542,10 +547,12 @@ class GameService:
                 rows = []
                 for m in self._members(s, room_id):
                     mp = s.get(Player, m.player_id)
+                    if not mp:
+                        continue
                     g = by_player.get(m.player_id)
                     gs = g.state if g else initial_state(0, now)
                     rows.append({"player_id": mp.id, "nickname": mp.nickname, "tag": mp.player_tag,
-                                 "ready": m.ready, "online": now - (m.last_seen_at or 0) < 10,
+                                 "ready": m.ready, "online": now - _number(m.last_seen_at) < 10,
                                  **{k: gs.get(k) for k in ("score", "lives", "level", "progress", "phase",
                                      "finished_levels", "driving_ms", "finish_time", "round_correct", "round_wrong")}})
                 result["room"]["players"] = sorted(rows, key=winner_key)
@@ -565,6 +572,8 @@ class GameService:
                 result["dedications"] = []
                 for dedication in s.find(Dedication, order_by=("-created_at", "player_id")):
                     author = s.get(Player, dedication.player_id)
+                    if not author:
+                        continue
                     result["dedications"].append({"player_id": author.id, "nickname": author.nickname,
                         "tag": author.player_tag, "message": dedication.message})
             return result

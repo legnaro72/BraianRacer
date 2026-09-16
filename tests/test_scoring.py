@@ -1,6 +1,8 @@
+from types import SimpleNamespace
+
 import pytest
 
-from brain_racer.scoring import lose_life, quiz_delta, star_delta, winner_key
+from brain_racer.scoring import leaderboard_key, lose_life, quiz_delta, star_delta, winner_key
 
 
 @pytest.mark.parametrize("correct,expected", [(True, 1), (False, -2), (None, -2)])
@@ -20,3 +22,10 @@ def test_winner_tie_breaks():
               {**base, "finished_levels": 4}, {**base, "driving_ms": 14000}, {**base, "player_id": "a"}]
     for candidate in better:
         assert winner_key(candidate) < winner_key(base)
+
+
+def test_ranking_keys_tolerate_partial_records():
+    game = SimpleNamespace(final_score=None, max_level=None, lives_remaining=None,
+                           duration_ms=None, ended_at=None, id=None)
+    assert leaderboard_key(game) == (0, 0, 0, 0, 0, "")
+    assert winner_key({"player_id": None}) == (0, 0, 0, 0, "")

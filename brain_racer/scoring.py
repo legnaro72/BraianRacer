@@ -10,11 +10,16 @@ def lose_life(lives: int) -> int:
     return max(0, lives - 1)
 
 
+def _number(value, default=0):
+    return default if value is None else value
+
+
 def leaderboard_key(game):
-    return (-( game.final_score or 0), -(game.max_level or 0), -(game.lives_remaining or 0),
-            game.duration_ms or 0, game.ended_at or 0, game.id or "")
+    return (-_number(game.final_score), -_number(game.max_level), -_number(game.lives_remaining),
+            _number(game.duration_ms), _number(game.ended_at), game.id or "")
 
 
 def winner_key(player):
-    return (-player["score"], -player["lives"], -player["finished_levels"],
-            player["driving_ms"], player["player_id"])
+    return (-_number(player.get("score")), -_number(player.get("lives")),
+            -_number(player.get("finished_levels")), _number(player.get("driving_ms")),
+            player.get("player_id") or "")
