@@ -1,6 +1,7 @@
 """Launch with: streamlit run app.py"""
 import logging
 import os
+import secrets
 import time
 from pathlib import Path
 
@@ -9,7 +10,7 @@ import streamlit.components.v2 as components
 from sqlalchemy.exc import SQLAlchemyError
 from pymongo.errors import PyMongoError
 
-from brain_racer.config import ROOT
+from brain_racer.config import ROOT, difficulty
 from brain_racer.database import open_database
 from brain_racer.game_service import GameService, RuleError
 from brain_racer.questions import QuestionBank
@@ -88,7 +89,11 @@ def dispatch(svc, command):
     elif action == "DEDICATE":
         svc.dedicate(pid, command.get("message"))
     elif action == "START_SINGLE" and not rid:
-        st.session_state.game_id = svc.new_game(pid)
+        offered_seed = st.session_state.get("next_game_seed")
+        requested_seed = command.get("seed")
+        seed = requested_seed if type(requested_seed) is int and requested_seed == offered_seed else None
+        st.session_state.game_id = svc.new_game(pid, seed=seed)
+        st.session_state.pop("next_game_seed", None)
     elif action == "CREATE_ROOM" and not gid:
         st.session_state.room_id = svc.create_room(pid)
     elif action == "JOIN_ROOM" and not gid:
@@ -122,7 +127,11 @@ def dispatch(svc, command):
             st.session_state.pop("room_id", None)
         st.session_state.page = "HOME"
     elif action == "REPLAY" and gid:
-        st.session_state.game_id = svc.restart_game(gid, pid)
+        offered_seed = st.session_state.get("next_replay_seed")
+        requested_seed = command.get("seed")
+        seed = requested_seed if type(requested_seed) is int and requested_seed == offered_seed else None
+        st.session_state.game_id = svc.restart_game(gid, pid, seed=seed)
+        st.session_state.pop("next_replay_seed", None)
 
 
 @st.fragment(run_every=0.5)
@@ -156,7 +165,10 @@ def arcade():
                 cache_key = (ss.player_id, ss.get("game_id"), ss.get("room_id"), ss.page)
                 cached = ss.get("menu_snapshot")
                 active = bool(ss.get("game_id") or ss.get("room_id"))
-                if not active and not changed and cached and cached[0] == cache_key and time.monotonic()-cached[1] < 3:
+                cache_fresh = (isinstance(cached, (tuple, list)) and len(cached) == 3
+                               and cached[0] == cache_key and isinstance(cached[1], (int, float))
+                               and isinstance(cached[2], dict) and time.monotonic() - cached[1] < 3)
+                if not active and not changed and cache_fresh:
                     payload.update(cached[2])
                     payload["now"] = time.time()
                 else:
@@ -183,6 +195,12 @@ def arcade():
                 ss.pop("game_id", None)
                 payload.update(svc.snapshot(ss.player_id))
                 payload["message"] = str(exc)
+        if ss.get("player_id") and not (ss.get("game_id") or ss.get("room_id")):
+            ss.setdefault("next_game_seed", secrets.randbelow(2**31))
+            payload["start_template"] = {"seed": ss.next_game_seed, "difficulty": difficulty(1)}
+        elif payload.get("game", {}).get("screen_phase") == "GAME_OVER" and not ss.get("room_id"):
+            ss.setdefault("next_replay_seed", secrets.randbelow(2**31))
+            payload["replay_template"] = {"seed": ss.next_replay_seed, "difficulty": difficulty(1)}
         asset_revision = tuple((ROOT / "assets" / f).stat().st_mtime_ns
                                for f in ("game.css", "course.js", "game.js", "ui.js")) + tuple(
                                    p.stat().st_mtime_ns for p in sorted((ROOT / "static").glob("couple-*.png")))

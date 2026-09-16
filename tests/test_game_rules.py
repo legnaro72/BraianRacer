@@ -53,7 +53,8 @@ def test_full_single_player_loop_and_timeout(svc, player):
     finish_drive(svc, player, gid)
     quiz = svc.snapshot(player, game_id=gid)["game"]
     assert quiz["screen_phase"] == "QUIZ"
-    assert "correct_index" not in quiz["question"]
+    # The client paints green/red feedback before the next Streamlit round trip.
+    assert quiz["question"]["correct_index"] in range(4)
     correct = svc.bank.by_id[quiz["question"]["id"]]["correct_index"]
     svc.answer(gid, player, 1, 0, correct)
     svc.answer(gid, player, 1, 0, (correct + 1) % 4)

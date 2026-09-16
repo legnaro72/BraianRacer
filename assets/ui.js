@@ -61,6 +61,14 @@ class BrainUI {
       if((component.data.game?.level||0)>=this.optimisticNextLevel)this.optimisticNextLevel=null;
       else if(previous?.game?.level===this.optimisticNextLevel)this.data.game=previous.game;
     }
+    if(this.optimisticStart){
+      if(component.data.game?.seed===this.optimisticStart)this.optimisticStart=null;
+      else if(previous?.game?.seed===this.optimisticStart)this.data.game=previous.game;
+    }
+    if(this.optimisticQuiz){
+      if(['QUIZ','REVEAL','LEVEL_SUMMARY'].includes(component.data.game?.screen_phase))this.optimisticQuiz=null;
+      else if(['QUIZ','REVEAL'].includes(previous?.game?.screen_phase))this.data.game=previous.game;
+    }
     this.serverOffset=(data.now || Date.now()/1000)*1000-Date.now();
     if(!data.booted&&!this.identitySent){this.identitySent=true;
       queueMicrotask(()=>this.send('IDENTIFY',{token:safeStorage.get('br:identity')}));}
@@ -75,7 +83,7 @@ class BrainUI {
     if(this.answerLock?.key!==questionKey || !['QUIZ','REVEAL'].includes(view))this.answerLock=null;
     if(data.message && data.message!==this.handledError && !this.pending.length){this.signature='';this.answerLock=null;}
     this.handledError=data.message;
-    const signature=[view,game?.id,game?.level,game?.qindex,
+    const signature=[view,view==='DRIVING'?game?.seed:game?.id,game?.level,game?.qindex,
       ['QUIZ','REVEAL'].includes(view)?game?.answered:'',
       view==='LOBBY'?JSON.stringify(room?.players):'',data.player?.id||''].join(':');
     if(signature!==this.signature){
@@ -104,9 +112,32 @@ class BrainUI {
     this.root.scrollIntoView({block:'start',behavior:'instant'});
     if(view==='DRIVING'){
       this.engine=new DrivingEngine(this.root.querySelector('canvas'),{...game,serverNow:data.now},events=>{
-        if(!this.pending.some(p=>p.action==='EVENTS'))this.send('EVENTS',{game_id:game.id,level:game.level,events});
+        if(this.pending.some(p=>p.action==='EVENTS'))return;
+        const current=this.data.game;
+        this.send('EVENTS',{game_id:current.id,level:current.level,events});
+        if(events.some(event=>event.event_type==='LEVEL_COMPLETED'))
+          queueMicrotask(()=>this.openLocalQuiz(current));
       },this.audio);
     }
+  }
+  openLocalQuiz(game) {
+    if(this.optimisticQuiz||!game?.quiz_preview?.length)return;
+    const now=(Date.now()+(this.serverOffset||0))/1000;
+    this.optimisticQuiz=true;
+    this.data.game={...game,phase:'QUIZ',screen_phase:'QUIZ',qindex:0,
+      question:game.quiz_preview[0],deadline:now+15,answered:false,eligible:true};
+    this.signature='';this.mountView('QUIZ');
+  }
+  startLocalGame(template, action) {
+    const now=(Date.now()+(this.serverOffset||0))/1000;
+    this.data.game={id:`pending-${template.seed}`,mode:'single',status:'active',phase:'DRIVING',screen_phase:'DRIVING',
+      level:1,seed:template.seed,score:0,lives:3,stars:0,hearts:0,correct:0,wrong:0,progress:0,
+      collected:[],hit:[],balloon_hit:[],shield:false,start_at:now,deadline:null,acks:[],
+      difficulty:template.difficulty,round_score:0,round_stars:0,round_correct:0,round_wrong:0,
+      round_hearts:0,qindex:0,answered:false,quiz_preview:[]};
+    this.optimisticStart=template.seed;
+    this.signature=['DRIVING',template.seed,1,0,'','',this.data.player?.id||''].join(':');
+    this.mountView('DRIVING');this.send(action,{seed:template.seed});
   }
   view() {
     const d=this.data,g=d.game,r=d.room;
@@ -298,6 +329,12 @@ class BrainUI {
       }
       this.send('NAV',{page});return;
     }
+    if(action==='START_SINGLE'&&this.data.start_template){
+      this.startLocalGame(this.data.start_template,'START_SINGLE');return;
+    }
+    if(action==='REPLAY'&&this.data.replay_template){
+      this.startLocalGame(this.data.replay_template,'REPLAY');return;
+    }
     if(action==='NEXT_LEVEL'&&this.data.game?.next_difficulty){
       const g=this.data.game,now=(Date.now()+(this.serverOffset||0))/1000;
       this.data.game={...g,screen_phase:'DRIVING',phase:'DRIVING',level:g.level+1,start_at:now,
@@ -323,9 +360,22 @@ class BrainUI {
     if(action==='ANSWER'){
       const g=this.data.game;
       if(this.answerLock || g.answered || g.screen_phase!=='QUIZ')return;
+      const choice=Number(el.dataset.choice),correctIndex=Number(g.question?.correct_index);
       this.answerLock={key:`${g.id}:${g.level}:${g.qindex}`,at:(Date.now()+(this.serverOffset||0))/1000};
-      this.root.querySelectorAll('.answer').forEach(a=>a.disabled=true);el.classList.add('picked');
-      this.send('ANSWER',{game_id:g.id,level:g.level,index:g.qindex,choice:Number(el.dataset.choice)});return;
+      this.root.querySelectorAll('.answer').forEach((answer,index)=>{
+        answer.disabled=true;
+        if(Number.isInteger(correctIndex)&&index===correctIndex)answer.classList.add('correct');
+        if(Number.isInteger(correctIndex)&&index===choice&&choice!==correctIndex)answer.classList.add('wrong');
+      });
+      if(!Number.isInteger(correctIndex))el.classList.add('picked');
+      if(Number.isInteger(correctIndex)){
+        const correct=choice===correctIndex,status=this.root.querySelector('.quiz-status');
+        if(status){status.className=`quiz-feedback instant-feedback ${correct?'positive':'negative'}`;
+          status.innerHTML=correct?'<strong>✓ Risposta corretta! +1 punto</strong>':
+            `<strong>× Risposta sbagliata. −2 punti</strong><p>Risposta corretta: <b>${esc(g.question.answers[correctIndex])}</b></p>`;}
+        this.audio.play(correct?'correct':'wrong');
+      }
+      this.send('ANSWER',{game_id:g.id,level:g.level,index:g.qindex,choice});return;
     }
     this.send(action);
   }

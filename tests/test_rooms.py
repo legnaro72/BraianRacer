@@ -61,10 +61,11 @@ def test_shared_course_questions_private_answers_and_automatic_next_round(svc):
         svc.answer(games[0], players[0], 1, index, (correct+1)%4)
         reveal = svc.snapshot(players[0], room_id=rid)["game"]
         assert reveal["screen_phase"] == "REVEAL" and reveal["answer"]["correct"]
-        # The other player stays on the same private question and cannot see the answer.
+        # The other player stays on the same private question. The answer index is
+        # preloaded so its browser can paint immediate feedback without cloud latency.
         hidden = svc.snapshot(players[1], room_id=rid)["game"]
         assert hidden["qindex"] == index and hidden["screen_phase"] == "QUIZ"
-        assert "correct_index" not in hidden["question"] and "answer" not in hidden
+        assert hidden["question"]["correct_index"] in range(4) and "answer" not in hidden
         svc.answer(games[1], players[1], 1, index, (correct+1)%4)
         # Both feedback panels are presented before their reveal timers begin.
         svc.snapshot(players[0], room_id=rid)

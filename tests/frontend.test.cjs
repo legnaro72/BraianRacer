@@ -142,11 +142,15 @@ function uiHost(){
   vm.runInContext(uiSource+'\nglobalThis.UI=BrainUI;',context);
   const ui=Object.create(context.UI.prototype), timer={dataset:{end:115},textContent:''};
   const bar={dataset:{end:115,duration:15},style:{},classList:{toggle(){}}};
-  const answer={disabled:false,dataset:{action:'ANSWER',choice:'0'},classList:{add(){}}};
-  ui.data={booted:true,player:{id:'p'},game:{id:'g',level:1,qindex:0,screen_phase:'QUIZ',answered:false},command_acks:[]};
-  ui.pending=[];ui.audio={unlock(){}};ui.component={setStateValue(){}};ui.lastPacket=now;
-  ui.root={querySelectorAll:s=>s==='[data-countdown]'?[timer]:s==='[data-timer-bar]'?[bar]:s==='.answer'?[answer]:[]};
-  return {ui,timer,bar,answer,setTime:t=>now=t};
+  const answers=Array.from({length:4},(_,choice)=>({disabled:false,dataset:{action:'ANSWER',choice:String(choice)},
+    classes:new Set(),classList:{add(name){answers[choice].classes.add(name);}}}));
+  const status={className:'quiz-status',innerHTML:''};
+  ui.data={booted:true,player:{id:'p'},game:{id:'g',level:1,qindex:0,screen_phase:'QUIZ',answered:false,
+    question:{answers:['Uno','Due','Tre','Quattro'],correct_index:1}},command_acks:[]};
+  ui.pending=[];ui.audio={unlock(){},play(){}};ui.component={setStateValue(){}};ui.lastPacket=now;
+  ui.root={querySelector:s=>s==='.quiz-status'?status:null,
+    querySelectorAll:s=>s==='[data-countdown]'?[timer]:s==='[data-timer-bar]'?[bar]:s==='.answer'?answers:[]};
+  return {ui,timer,bar,answer:answers[0],answers,status,setTime:t=>now=t};
 }
 test('answer locks immediately, freezes timer, and sends only once before acknowledgement',()=>{
   const {ui,timer,bar,answer,setTime}=uiHost();
@@ -159,9 +163,26 @@ test('answer locks immediately, freezes timer, and sends only once before acknow
   assert.equal(ui.pending.length,1);
   ui.data.game.screen_phase='REVEAL';ui.tick();assert.notEqual(timer.textContent,frozen);
 });
+test('answer feedback paints the correct choice green and a wrong choice red immediately',()=>{
+  const {ui,answers,status}=uiHost();
+  ui.click({target:{closest:()=>answers[0]}});
+  assert.equal(answers[0].classes.has('wrong'),true);
+  assert.equal(answers[1].classes.has('correct'),true);
+  assert.match(status.innerHTML,/Risposta sbagliata/);
+  assert.match(status.innerHTML,/Due/);
+});
 test('rapid play/replay clicks produce a single start command',()=>{
   const {ui}=uiHost();ui.send('REPLAY');ui.send('REPLAY');ui.send('START_SINGLE');
   assert.equal(ui.pending.length,1);assert.equal(ui.pending[0].action,'REPLAY');
+});
+test('play paints the driving screen before the cloud acknowledges the command',()=>{
+  const {ui}=uiHost();let mounted='',sent=null;
+  ui.data={...ui.data,game:null,start_template:{seed:42,difficulty:{groups:20}}};
+  ui.mountView=view=>{mounted=view;};ui.send=(action,payload)=>{sent={action,payload};};
+  const play={disabled:false,dataset:{action:'START_SINGLE'}};
+  ui.click({target:{closest:()=>play}});
+  assert.equal(mounted,'DRIVING');assert.equal(ui.data.game.seed,42);
+  assert.equal(sent.action,'START_SINGLE');assert.equal(sent.payload.seed,42);
 });
 test('top navigation paints the selected page before the cloud acknowledges it',()=>{
   const {ui}=uiHost();let mounted='',sent=null;

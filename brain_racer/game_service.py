@@ -165,14 +165,17 @@ class GameService:
                         order_by=("-started_at",))
             return {"game_id": g.id} if g else {}
 
-    def new_game(self, player_id):
+    def new_game(self, player_id, seed=None):
         with self.db.transaction() as s:
             existing = s.first(GameSession, player_id=player_id, status="active", mode="single")
             if existing:
                 return existing.id
             now = self.clock()
+            seed = seed if type(seed) is int and 0 <= seed < 2**31 else secrets.randbelow(2**31)
+            state = initial_state(seed, now)
+            state["questions"] = self.bank.select(1, state["used"], seed + 1)
             g = GameSession(player_id=player_id, started_at=now,
-                            state=initial_state(secrets.randbelow(2**31), now))
+                            state=state)
             s.add(g)
             s.flush()
             log.info("Single game started: %s", g.id)
@@ -198,15 +201,17 @@ class GameService:
             if g.mode == "single":
                 self._finish(g, self.clock())
 
-    def restart_game(self, game_id, player_id):
+    def restart_game(self, game_id, player_id, seed=None):
         """Finish the previous run and create its replacement in one database round trip."""
         with self.db.transaction() as s:
             previous = self._owned(s, game_id, player_id)
             now = self.clock()
             if previous.mode == "single":
                 self._finish(previous, now)
-            game = GameSession(player_id=player_id, started_at=now,
-                               state=initial_state(secrets.randbelow(2**31), now))
+            seed = seed if type(seed) is int and 0 <= seed < 2**31 else secrets.randbelow(2**31)
+            state = initial_state(seed, now)
+            state["questions"] = self.bank.select(1, state["used"], seed + 1)
+            game = GameSession(player_id=player_id, started_at=now, state=state)
             s.add(game)
             s.flush()
             log.info("Single game restarted: %s", game.id)
@@ -227,6 +232,7 @@ class GameService:
                   balloon_hit=[], round_hearts=0, last_bouquet=-100,
                   last_collision=-100, round_score=st["score"], round_stars=0,
                   round_correct=0, round_wrong=0, questions=[], qindex=0, acks=[], finish_time=None)
+        st["questions"] = self.bank.select(level, st["used"], st["seed"] + level)
         save_state(g)
 
     def _score_answer(self, s, g, index, choice, question_ids):
@@ -366,7 +372,8 @@ class GameService:
                         st["driving_ms"] += round(max(0, elapsed) * 1000)
                         st["finish_time"] = round(elapsed, 1)
                         if g.mode == "single":
-                            st["questions"] = self.bank.select(level, st["used"], st["seed"] + level)
+                            if not st["questions"]:
+                                st["questions"] = self.bank.select(level, st["used"], st["seed"] + level)
                             st.update(phase="QUIZ", qindex=0, deadline=now + QUIZ_SECONDS)
                         else:
                             rs = room.state
@@ -493,6 +500,7 @@ class GameService:
                                            for m in members):
                 raise RuleError("Servono almeno 2 giocatori connessi e tutti pronti.")
             start = now + COUNTDOWN_SECONDS
+            room.state["questions"] = self.bank.select(1, room.state["used"], room.state["seed"] + 1)
             room.status = "COUNTDOWN"
             room.state.update(phase="COUNTDOWN", start_at=start,
                               deadline=start + difficulty(1)["deadline"])
@@ -632,7 +640,9 @@ class GameService:
             else:
                 rs["level"] += 1
                 rs["start_at"] = now + COUNTDOWN_SECONDS
-                rs.update(questions=[], qindex=0, answers={})
+                rs.update(questions=self.bank.select(rs["level"], rs["used"],
+                                                     rs["seed"] + rs["level"]),
+                          qindex=0, answers={})
                 for g in games:
                     self._reset_round(g, rs["level"], rs["start_at"])
                 self._set_phase(room, "COUNTDOWN", rs["start_at"] + difficulty(rs["level"])["deadline"])
@@ -659,6 +669,9 @@ class GameService:
             question_ids = rs.get("questions", [])
             if not individual_quiz:
                 state.update(deadline=rs.get("deadline"), qindex=rs.get("qindex", 0))
+        if phase == "DRIVING" and question_ids:
+            state["quiz_preview"] = [self.bank.public(question_id, reveal=True)
+                                     for question_id in question_ids if question_id in self.bank.by_id]
         if phase in ("QUIZ", "REVEAL") and question_ids:
             index = _integer(state.get("qindex") if room else rs.get("qindex"), 0, 0)
             if index >= len(question_ids) or question_ids[index] not in self.bank.by_id:
@@ -667,7 +680,8 @@ class GameService:
                 return state
             if state.get("deadline") is None:
                 state["deadline"] = self.clock() + (REVEAL_SECONDS if phase == "REVEAL" else QUIZ_SECONDS)
-            state["question"] = self.bank.public(question_ids[index], reveal=phase == "REVEAL")
+            # The browser needs the answer to paint immediate green/red feedback while Atlas saves.
+            state["question"] = self.bank.public(question_ids[index], reveal=True)
             answer = s.get(QuizAnswer, (g.id, state["level"], index))
             state["answered"] = answer is not None
             state["eligible"] = True
