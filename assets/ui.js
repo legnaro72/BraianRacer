@@ -1,4 +1,7 @@
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const levelDifficulty = level => ({groups:Math.min(20+(level-1)*2,36),speed:Math.min(.34+(level-1)*.018,.55),
+  interval:Math.max(1.2,1.85-(level-1)*.045),roadWidth:Math.max(.66,.84-Math.max(0,level-3)*.018),
+  moving:level>=3,double:level>=5,deadline:85,maxAcceleration:1.6});
 const icons = {
   flag:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 21V4m0 0c5-5 9 5 15 0v11c-6 5-10-5-15 0" stroke="currentColor" stroke-width="1.8"/><path d="M6 5h4v4H6zm4 4h4v4h-4zm4-4h4v4h-4z" fill="currentColor"/></svg>',
   arrow:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -59,7 +62,12 @@ class BrainUI {
     }
     if(this.optimisticNextLevel){
       if((component.data.game?.level||0)>=this.optimisticNextLevel)this.optimisticNextLevel=null;
-      else if(previous?.game?.level===this.optimisticNextLevel)this.data.game=previous.game;
+      else if(previous?.game?.level===this.optimisticNextLevel){
+        this.data.game=previous.game;
+        if(!this.pending.some(p=>p.action==='NEXT_LEVEL')&&Date.now()-(this.lastNextRetry||0)>900){
+          this.lastNextRetry=Date.now();queueMicrotask(()=>this.send('NEXT_LEVEL'));
+        }
+      }
     }
     if(this.optimisticStart){
       if(component.data.game?.seed===this.optimisticStart)this.optimisticStart=null;
@@ -368,11 +376,12 @@ class BrainUI {
     if(action==='REPLAY'&&this.data.replay_template){
       this.startLocalGame(this.data.replay_template,'REPLAY');return;
     }
-    if(action==='NEXT_LEVEL'&&this.data.game?.next_difficulty){
+    if(action==='NEXT_LEVEL'){
       const g=this.data.game,now=(Date.now()+(this.serverOffset||0))/1000;
+      const nextDifficulty=g.next_difficulty||levelDifficulty(g.level+1);
       this.data.game={...g,screen_phase:'DRIVING',phase:'DRIVING',level:g.level+1,start_at:now,
         progress:0,collected:[],hit:[],balloon_hit:[],shield:false,qindex:0,answered:false,
-        difficulty:g.next_difficulty,next_difficulty:null,acks:[]};
+        difficulty:nextDifficulty,next_difficulty:null,acks:[]};
       this.optimisticNextLevel=g.level+1;
       this.signature='';this.mountView('DRIVING');this.send('NEXT_LEVEL');return;
     }

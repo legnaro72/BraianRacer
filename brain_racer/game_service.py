@@ -221,8 +221,7 @@ class GameService:
         with self.db.transaction() as s:
             g = self._owned(s, game_id, player_id)
             ready = g.state["phase"] == "LEVEL_SUMMARY" or (
-                g.state["phase"] == "REVEAL" and g.state.get("qindex") == QUESTIONS_PER_LEVEL - 1
-                and s.get(QuizAnswer, (g.id, g.state["level"], g.state["qindex"])))
+                g.state["phase"] == "REVEAL" and g.state.get("qindex") == QUESTIONS_PER_LEVEL - 1)
             if g.mode == "single" and ready:
                 self._reset_round(g, g.state["level"] + 1, self.clock())
 
