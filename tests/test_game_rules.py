@@ -176,3 +176,25 @@ def test_active_compact_snapshot_avoids_aggregate_queries(svc, player, monkeypat
     svc.abort(gid, player)
     snapshot = svc.snapshot(player, game_id=gid, compact=True)
     assert snapshot["stats"]["games"] == 1 and "leaderboard" in snapshot
+
+
+def test_snapshots_normalize_partial_legacy_game_state(svc, player):
+    gid = svc.new_game(player)
+    with svc.db.transaction() as session:
+        game = session.get(GameSession, gid)
+        game.state = {**game.state, "level": None, "qindex": None, "score": None,
+                      "questions": None, "collected": None, "hit": None,
+                      "balloon_hit": None, "acks": None, "phase": None,
+                      "deadline": "invalid"}
+    for read_only in (True, False):
+        game = svc.snapshot(player, game_id=gid, compact=True, read_only=read_only)["game"]
+        assert game["level"] == 1 and game["qindex"] == 0 and game["score"] == 0
+        assert game["phase"] == "DRIVING" and game["hit"] == [] and game["acks"] == []
+
+    with svc.db.transaction() as session:
+        game = session.get(GameSession, gid)
+        game.state = {**game.state, "phase": "QUIZ", "questions": None,
+                      "deadline": None, "qindex": None}
+    recovered = svc.snapshot(player, game_id=gid, compact=True)["game"]
+    assert recovered["screen_phase"] == "QUIZ" and recovered["qindex"] == 0
+    assert recovered["question"]["id"] in svc.bank.by_id

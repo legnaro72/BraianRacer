@@ -166,7 +166,7 @@ def arcade():
                     time_sensitive = previous_phase in ("QUIZ", "REVEAL") or previous_room_phase in (
                         "COUNTDOWN", "QUIZ", "REVEAL", "ROUND_RESULTS")
                     write_interval = .45 if time_sensitive else (1.0 if ss.get("room_id") else 2.0)
-                    write_due = monotonic_now - ss.get("last_snapshot_write", 0) >= write_interval
+                    write_due = monotonic_now - float(ss.get("last_snapshot_write", 0) or 0) >= write_interval
                     fast_read = changed or (active and not write_due)
                     snapshot = svc.snapshot(ss.player_id, ss.get("game_id"), ss.get("room_id"),
                                             include_dedications=ss.page == "DEDICATIONS" and not (ss.get("game_id") or ss.get("room_id")),
@@ -188,7 +188,7 @@ def arcade():
                                    p.stat().st_mtime_ns for p in sorted((ROOT / "static").glob("couple-*.png")))
         renderer(asset_revision)(data=payload, key="arcade_component", on_packet_change=lambda: None,
                    default={"packet": []}, width="stretch")
-    except (SQLAlchemyError, PyMongoError, OSError, ValueError):
+    except (SQLAlchemyError, PyMongoError, OSError, ValueError, TypeError, KeyError, IndexError):
         log.exception("Unable to update arcade")
         st.error("Il box è momentaneamente occupato. La connessione sarà ritentata automaticamente: attendi qualche secondo.")
         if st.button("Riprova adesso"):

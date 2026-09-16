@@ -28,6 +28,55 @@ def _number(value, default=0):
     return default if value is None else value
 
 
+def _integer(value, default=0, minimum=None):
+    try:
+        result = int(value)
+    except (TypeError, ValueError, OverflowError):
+        result = default
+    return max(minimum, result) if minimum is not None else result
+
+
+def _game_state(raw, now, seed=0, level=1):
+    source = raw if isinstance(raw, dict) else {}
+    safe_seed = _integer(source.get("seed"), _integer(seed))
+    state = initial_state(safe_seed, now)
+    state.update({key: deepcopy(value) for key, value in source.items() if value is not None})
+    state["level"] = _integer(state.get("level"), _integer(level, 1, 1), 1)
+    state["qindex"] = _integer(state.get("qindex"), 0, 0)
+    for key in ("score", "lives", "stars", "correct", "wrong", "progress", "hearts", "round_score",
+                "round_hearts", "round_stars", "round_correct", "round_wrong",
+                "finished_levels", "driving_ms"):
+        state[key] = _integer(state.get(key), 0, 0 if key != "score" else None)
+    for key in ("used", "questions", "collected", "hit", "balloon_hit", "acks"):
+        if not isinstance(state.get(key), list):
+            state[key] = []
+    if not isinstance(state.get("phase"), str):
+        state["phase"] = "DRIVING"
+    for key in ("start_at", "deadline"):
+        if state.get(key) is not None and not isinstance(state[key], (int, float)):
+            state[key] = now if key == "start_at" else None
+    return state
+
+
+def _room_state(raw, now):
+    source = raw if isinstance(raw, dict) else {}
+    state = {"phase": "LOBBY", "level": 1, "seed": 0, "used": [], "questions": [],
+             "qindex": 0, "deadline": None, "start_at": None, "answers": {}}
+    state.update({key: deepcopy(value) for key, value in source.items() if value is not None})
+    state["level"] = _integer(state.get("level"), 1, 1)
+    state["seed"] = _integer(state.get("seed"), 0)
+    state["qindex"] = _integer(state.get("qindex"), 0, 0)
+    for key in ("used", "questions"):
+        if not isinstance(state.get(key), list):
+            state[key] = []
+    if not isinstance(state.get("answers"), dict):
+        state["answers"] = {}
+    for key in ("start_at", "deadline"):
+        if state.get(key) is not None and not isinstance(state[key], (int, float)):
+            state[key] = now if key == "start_at" else None
+    return state
+
+
 def save_state(obj):
     flag_modified(obj, "state")
 
@@ -200,6 +249,7 @@ class GameService:
         with self.db.transaction() as s:
             g = self._owned(s, game_id, player_id)
             now = self.clock()
+            g.state = _game_state(g.state, now)
             st = g.state
             if g.status != "active" or st["level"] != level:
                 return
@@ -231,6 +281,7 @@ class GameService:
         with self.db.transaction() as s:
             g = self._owned(s, game_id, player_id)
             now = self.clock()
+            g.state = _game_state(g.state, now)
             if g.mode == "multi":
                 room = s.get(Room, g.room_id)
                 if room.status not in ("COUNTDOWN", "DRIVING") or now > room.state["deadline"]:
@@ -340,12 +391,19 @@ class GameService:
             save_state(g)
 
     def _tick_single(self, s, g, now):
+        g.state = _game_state(g.state, now)
         st = g.state
         if g.status != "active":
             return
-        if st["phase"] == "QUIZ" and now >= st["deadline"]:
-            self._score_answer(s, g, st["qindex"], None, st["questions"])
-            st.update(phase="REVEAL", deadline=None)
+        if st["phase"] in ("QUIZ", "REVEAL") and not st["questions"]:
+            st["questions"] = self.bank.select(st["level"], st["used"], st["seed"] + st["level"])
+            st["qindex"] = 0
+        if st["phase"] == "QUIZ":
+            if st.get("deadline") is None:
+                st["deadline"] = now + QUIZ_SECONDS
+            elif now >= st["deadline"]:
+                self._score_answer(s, g, st["qindex"], None, st["questions"])
+                st.update(phase="REVEAL", deadline=None)
         elif st["phase"] == "REVEAL":
             if st.get("deadline") is None:
                 st["deadline"] = now + REVEAL_SECONDS
@@ -479,6 +537,7 @@ class GameService:
         log.info("Match finished: %s", room.room_code)
 
     def _tick_room(self, s, room, now):
+        room.state = _room_state(room.state, now)
         members = self._members(s, room.id)
         if room.status == "LOBBY":
             online = [m for m in members if now - _number(m.last_seen_at) < DISCONNECT_SECONDS]
@@ -493,17 +552,29 @@ class GameService:
         if room.status in ("MATCH_RESULTS", "CLOSED"):
             return
         games = self._games(s, room.id)
+        for g in games:
+            g.state = _game_state(g.state, now, room.state.get("seed", 0), room.state.get("level", 1))
         last_seen = {m.player_id: _number(m.last_seen_at) for m in members}
         for g in games:
             if now - last_seen.get(g.player_id, 0) > DISCONNECT_SECONDS and g.state["lives"] > 0:
                 g.state.update(lives=0, phase="ELIMINATED", disconnected=True)
                 save_state(g)
         rs = room.state
+        if ((room.status in ("QUIZ", "REVEAL")
+                or any(g.state.get("phase") in ("QUIZ", "REVEAL", "QUIZ_DONE") for g in games))
+                and not rs["questions"]):
+            rs["questions"] = self.bank.select(rs["level"], rs["used"], rs["seed"] + rs["level"])
+            rs.update(qindex=0, answers={})
+            save_state(room)
         active = [g for g in games if g.state["lives"] > 0]
         if len(active) <= 1:
             self._end_match(s, room, games, now)
             return
         if room.status == "COUNTDOWN":
+            if rs.get("start_at") is None:
+                rs["start_at"] = now
+            if rs.get("deadline") is None:
+                rs["deadline"] = rs["start_at"] + difficulty(rs["level"])["deadline"]
             if now >= rs["start_at"]:
                 self._set_phase(room, "DRIVING", rs["deadline"])
 
@@ -522,6 +593,8 @@ class GameService:
                 self._tick_quiz_game(s, g, rs["questions"], now)
 
         if room.status == "DRIVING":
+            if rs.get("deadline") is None:
+                rs["deadline"] = now + difficulty(rs["level"])["deadline"]
             if all(g.state["phase"] != "DRIVING" for g in active) or now >= rs["deadline"]:
                 for g in active:
                     if g.state["phase"] == "DRIVING":
@@ -566,12 +639,16 @@ class GameService:
         save_state(room)
 
     def _public_game(self, s, g, room=None):
-        state = deepcopy(g.state)
+        now = self.clock()
+        room_state = _room_state(room.state, now) if room else None
+        state = _game_state(g.state, now,
+                            room_state.get("seed", 0) if room_state else 0,
+                            room_state.get("level", 1) if room_state else 1)
         question_ids = state.pop("questions", [])
         state.pop("used", None)
         state.update(id=g.id, mode=g.mode, status=g.status)
-        rs = room.state if room else state
-        phase = room.status if room else state["phase"]
+        rs = room_state if room else state
+        phase = (room.status or rs.get("phase") or "LOBBY") if room else state["phase"]
         individual_quiz = room and state.get("phase") in ("QUIZ", "REVEAL", "QUIZ_DONE")
         if room and room.status in ("DRIVING", "QUIZ") and state.get("phase") != "DRIVING":
             phase = state.get("phase")
@@ -581,9 +658,13 @@ class GameService:
         if room:
             question_ids = rs.get("questions", [])
             if not individual_quiz:
-                state.update(deadline=rs["deadline"], qindex=rs["qindex"])
+                state.update(deadline=rs.get("deadline"), qindex=rs.get("qindex", 0))
         if phase in ("QUIZ", "REVEAL") and question_ids:
-            index = state["qindex"] if room else rs["qindex"]
+            index = _integer(state.get("qindex") if room else rs.get("qindex"), 0, 0)
+            if index >= len(question_ids) or question_ids[index] not in self.bank.by_id:
+                state.update(screen_phase="PIT", eligible=False)
+                state["difficulty"] = difficulty(state["level"])
+                return state
             if state.get("deadline") is None:
                 state["deadline"] = self.clock() + (REVEAL_SECONDS if phase == "REVEAL" else QUIZ_SECONDS)
             state["question"] = self.bank.public(question_ids[index], reveal=phase == "REVEAL")
@@ -622,7 +703,8 @@ class GameService:
                 if not read_only:
                     self._tick_room(s, room, now)
                     s.flush()
-                result["room"] = {k: deepcopy(v) for k, v in room.state.items()
+                visible_room_state = _room_state(room.state, now)
+                result["room"] = {k: deepcopy(v) for k, v in visible_room_state.items()
                                   if k not in ("questions", "answers", "used")}
                 result["room"].update(id=room.id, code=room.room_code,
                                       host=room.host_player_id, phase=room.status)
@@ -634,7 +716,8 @@ class GameService:
                     if not mp:
                         continue
                     g = by_player.get(m.player_id)
-                    gs = g.state if g else initial_state(0, now)
+                    gs = _game_state(g.state, now, visible_room_state["seed"], visible_room_state["level"]) \
+                        if g else initial_state(0, now)
                     rows.append({"player_id": mp.id, "nickname": mp.nickname, "tag": mp.player_tag,
                                  "ready": m.ready, "online": now - _number(m.last_seen_at) < 10,
                                  **{k: gs.get(k) for k in ("score", "lives", "level", "progress", "phase",

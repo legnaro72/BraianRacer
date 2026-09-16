@@ -146,3 +146,19 @@ def test_complete_five_round_match_persists_podium(svc):
     assert ranking(final[0]) == ranking(final[1])
     assert all(snap["game"]["score"] == 15 for snap in final)
     assert sum(svc.snapshot(p)["stats"]["wins"] for p in players) == 1
+
+
+def test_room_snapshot_normalizes_partial_legacy_atlas_records(svc):
+    rid, players = setup_room(svc)
+    with svc.db.transaction() as session:
+        room = session.get(Room, rid)
+        room.state = {**room.state, "level": None, "qindex": None, "questions": None,
+                      "answers": None, "start_at": None, "deadline": None}
+        game = svc._games(session, rid)[0]
+        game.state = {**game.state, "level": None, "score": None,
+                      "collected": None, "phase": None}
+    fast = svc.snapshot(players[0], room_id=rid, compact=True, read_only=True)
+    assert fast["room"]["level"] == 1 and fast["room"]["qindex"] == 0
+    assert isinstance(fast["room"]["players"], list)
+    normal = svc.snapshot(players[0], room_id=rid, compact=True)
+    assert normal["room"]["phase"] in ("COUNTDOWN", "DRIVING")
