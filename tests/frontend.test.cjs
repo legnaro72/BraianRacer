@@ -65,6 +65,11 @@ test('bouquet hits a heart once and respects the throw cooldown',()=>{
   assert.equal(e.state.score,2);assert.deepEqual([...e.state.balloon_hit],[g.id]);
   assert.equal(e.state.pending.filter(p=>p.event_type==='BALLOON_POPPED').length,1);
 });
+test('progress updates are sent only when the car reaches a new checkpoint',()=>{
+  const e=host().make();e.queueProgress();assert.equal(e.state.pending.length,0);
+  e.state.progress=1;e.queueProgress();e.queueProgress();
+  assert.equal(e.state.pending.filter(p=>p.event_type==='PROGRESS_UPDATE').length,1);
+});
 
 test('collision deducts one life, cannot repeat, and shields absorb one hit',()=>{
   const e=host().make(),g=e.course[0];
@@ -119,6 +124,16 @@ test('dedication markup escapes HTML supplied by a player',()=>{
   vm.runInContext(ui+'\nglobalThis.escapeText=esc;',context);
   assert.equal(context.escapeText('<img src=x onerror="alert(1)">'), '&lt;img src=x onerror=&quot;alert(1)&quot;&gt;');
 });
+test('guestbook renders dedications from every player',()=>{
+  const context=vm.createContext({});
+  vm.runInContext(uiSource+'\nglobalThis.UI=BrainUI;',context);
+  const ui=Object.create(context.UI.prototype);
+  ui.data={player:{id:'p1'},dedications:[
+    {player_id:'p1',nickname:'Anna',tag:'A1',message:'La mia dedica'},
+    {player_id:'p2',nickname:'Luca',tag:'B2',message:'Auguri da Luca'}]};
+  const html=ui.dedicationEntries();
+  assert.match(html,/La mia dedica/);assert.match(html,/Auguri da Luca/);assert.match(html,/Luca/);
+});
 const uiSource=fs.readFileSync(path.join(assets,'ui.js'),'utf8').replace('export default function(component)', 'function renderer(component)');
 function uiHost(){
   let now=100000;
@@ -147,6 +162,15 @@ test('answer locks immediately, freezes timer, and sends only once before acknow
 test('rapid play/replay clicks produce a single start command',()=>{
   const {ui}=uiHost();ui.send('REPLAY');ui.send('REPLAY');ui.send('START_SINGLE');
   assert.equal(ui.pending.length,1);assert.equal(ui.pending[0].action,'REPLAY');
+});
+test('top navigation paints the selected page before the cloud acknowledges it',()=>{
+  const {ui}=uiHost();let mounted='',sent=null;
+  ui.data={...ui.data,game:null,room:null,page:'HOME'};
+  ui.mountView=view=>{mounted=view;};ui.send=(action,payload)=>{sent={action,payload};};
+  const nav={disabled:false,dataset:{action:'NAV',page:'HELP'}};
+  ui.click({target:{closest:()=>nav}});
+  assert.equal(ui.data.page,'HELP');assert.equal(mounted,'HELP');
+  assert.equal(sent.action,'NAV');assert.equal(sent.payload.page,'HELP');
 });
 test('new game id never restores a finished engine session',()=>{
   const h=host(),old=h.make();old.state.done=true;old.state.score=99;old.state.lives=0;old.persist();

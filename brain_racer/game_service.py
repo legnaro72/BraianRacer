@@ -206,21 +206,24 @@ class GameService:
             if g.mode == "single":
                 if st["phase"] != "QUIZ" or st["qindex"] != index:
                     return
-                self._score_answer(s, g, index, choice if now < st["deadline"] else None, st["questions"])
-                st.update(phase="REVEAL", deadline=now + REVEAL_SECONDS)
+                self._score_answer(s, g, index,
+                                   choice if st.get("deadline") is None or now < st["deadline"] else None,
+                                   st["questions"])
+                # The reveal timer starts when a snapshot actually presents the feedback.
+                st.update(phase="REVEAL", deadline=None)
                 save_state(g)
             else:
                 room = s.get(Room, g.room_id)
                 rs = room.state
-                if (room.status != "QUIZ" or st.get("qindex") != index or st.get("phase") != "QUIZ"
-                        or now >= st.get("deadline", 0)):
+                deadline = st.get("deadline")
+                if (room.status not in ("DRIVING", "QUIZ") or st.get("qindex") != index
+                        or st.get("phase") != "QUIZ" or (deadline is not None and now >= deadline)):
                     return
                 # Every player advances immediately through the same question set. This avoids
                 # making a fast player wait for another browser or for the shared timeout.
                 self._score_answer(s, g, index, choice, rs["questions"])
-                st.update(phase="REVEAL", deadline=now + REVEAL_SECONDS)
+                st.update(phase="REVEAL", deadline=None)
                 save_state(g)
-                self._tick_room(s, room, now)
 
     def events(self, game_id, player_id, level, events):
         if not isinstance(events, list) or len(events) > 120:
@@ -315,7 +318,13 @@ class GameService:
                             st["questions"] = self.bank.select(level, st["used"], st["seed"] + level)
                             st.update(phase="QUIZ", qindex=0, deadline=now + QUIZ_SECONDS)
                         else:
-                            st["phase"] = "WAITING"
+                            rs = room.state
+                            if not rs.get("questions"):
+                                rs["questions"] = self.bank.select(level, rs["used"], rs["seed"] + level)
+                                rs.update(qindex=0, answers={})
+                                save_state(room)
+                            # A finisher starts thinking immediately while other cars may continue.
+                            st.update(phase="QUIZ", qindex=0, deadline=None)
                         accepted = True
                 if accepted:
                     s.add(GameEvent(game_id=g.id, event_id=eid, event_type=kind))
@@ -336,13 +345,37 @@ class GameService:
             return
         if st["phase"] == "QUIZ" and now >= st["deadline"]:
             self._score_answer(s, g, st["qindex"], None, st["questions"])
-            st.update(phase="REVEAL", deadline=now + REVEAL_SECONDS)
-        elif st["phase"] == "REVEAL" and now >= st["deadline"]:
-            if st["qindex"] >= QUESTIONS_PER_LEVEL - 1:
-                st["phase"] = "LEVEL_SUMMARY"
-            else:
-                st.update(phase="QUIZ", qindex=st["qindex"] + 1, deadline=now + QUIZ_SECONDS)
+            st.update(phase="REVEAL", deadline=None)
+        elif st["phase"] == "REVEAL":
+            if st.get("deadline") is None:
+                st["deadline"] = now + REVEAL_SECONDS
+            elif now >= st["deadline"]:
+                if st["qindex"] >= QUESTIONS_PER_LEVEL - 1:
+                    st["phase"] = "LEVEL_SUMMARY"
+                else:
+                    st.update(phase="QUIZ", qindex=st["qindex"] + 1, deadline=now + QUIZ_SECONDS)
         save_state(g)
+
+    def _tick_quiz_game(self, s, g, question_ids, now):
+        st = g.state
+        if st.get("phase") == "QUIZ":
+            if st.get("deadline") is None:
+                st["deadline"] = now + QUIZ_SECONDS
+                save_state(g)
+            elif now >= st["deadline"]:
+                self._score_answer(s, g, st["qindex"], None, question_ids)
+                st.update(phase="REVEAL", deadline=None)
+                save_state(g)
+        elif st.get("phase") == "REVEAL":
+            if st.get("deadline") is None:
+                st["deadline"] = now + REVEAL_SECONDS
+                save_state(g)
+            elif now >= st["deadline"]:
+                if st["qindex"] >= QUESTIONS_PER_LEVEL - 1:
+                    st.update(phase="QUIZ_DONE", deadline=None)
+                else:
+                    st.update(phase="QUIZ", qindex=st["qindex"] + 1, deadline=now + QUIZ_SECONDS)
+                save_state(g)
 
     def create_room(self, player_id):
         with self.db.transaction() as s:
@@ -473,6 +506,21 @@ class GameService:
         if room.status == "COUNTDOWN":
             if now >= rs["start_at"]:
                 self._set_phase(room, "DRIVING", rs["deadline"])
+
+        # Upgrade rooms that were already in the previous shared reveal flow.
+        if room.status == "REVEAL":
+            for g in games:
+                if g.state.get("phase") == "WAITING":
+                    g.state.update(phase="REVEAL", qindex=rs.get("qindex", 0), deadline=None)
+                    save_state(g)
+            room.status = "QUIZ"
+            save_state(room)
+
+        # Finished players run their quiz independently, even while other cars are still racing.
+        if rs.get("questions"):
+            for g in games:
+                self._tick_quiz_game(s, g, rs["questions"], now)
+
         if room.status == "DRIVING":
             if all(g.state["phase"] != "DRIVING" for g in active) or now >= rs["deadline"]:
                 for g in active:
@@ -480,24 +528,12 @@ class GameService:
                         g.state["lives"] = lose_life(g.state["lives"])
                         g.state["phase"] = "DNF" if g.state["lives"] else "ELIMINATED"
                         save_state(g)
-                eligible = [g for g in games if g.state["phase"] == "WAITING"]
-                rs["questions"] = self.bank.select(rs["level"], rs["used"], rs["seed"] + rs["level"])
-                rs.update(qindex=0, answers={})
-                for g in eligible:
-                    g.state.update(phase="QUIZ", qindex=0, deadline=now + QUIZ_SECONDS)
-                    save_state(g)
-                self._set_phase(room, "QUIZ" if eligible else "ROUND_RESULTS",
-                                now + (QUIZ_SECONDS if eligible else RESULT_SECONDS))
-        # Upgrade rooms that were already in the old shared quiz flow during deployment.
-        if room.status == "REVEAL":
-            for g in games:
-                if g.state.get("phase") == "WAITING":
-                    g.state.update(phase="REVEAL", qindex=rs.get("qindex", 0),
-                                   deadline=rs.get("deadline", now))
-                    save_state(g)
-            room.status = "QUIZ"
-            save_state(room)
-        elif room.status == "QUIZ":
+                quiz_players = [g for g in games if g.state.get("phase") in ("QUIZ", "REVEAL", "QUIZ_DONE")]
+                self._set_phase(room, "QUIZ" if quiz_players else "ROUND_RESULTS",
+                                now + (QUIZ_SECONDS if quiz_players else RESULT_SECONDS))
+
+        if room.status == "QUIZ":
+            # Migrate players from rooms created by an older deployed version.
             for g in games:
                 if g.state.get("phase") != "WAITING":
                     continue
@@ -505,29 +541,15 @@ class GameService:
                 old_answers = rs.get("answers", {})
                 if g.id in old_answers:
                     self._score_answer(s, g, index, old_answers[g.id], rs["questions"])
-                    g.state.update(phase="REVEAL", qindex=index,
-                                   deadline=min(rs.get("deadline") or now, now + REVEAL_SECONDS))
+                    g.state.update(phase="REVEAL", qindex=index, deadline=None)
                 else:
                     g.state.update(phase="QUIZ", qindex=index,
                                    deadline=rs.get("deadline") or now + QUIZ_SECONDS)
                 save_state(g)
-            for g in games:
-                gst = g.state
-                if gst.get("phase") == "QUIZ" and now >= gst.get("deadline", 0):
-                    self._score_answer(s, g, gst["qindex"], None, rs["questions"])
-                    gst.update(phase="REVEAL", deadline=now + REVEAL_SECONDS)
-                    save_state(g)
-                elif gst.get("phase") == "REVEAL" and now >= gst.get("deadline", 0):
-                    if gst["qindex"] >= QUESTIONS_PER_LEVEL - 1:
-                        gst.update(phase="QUIZ_DONE", deadline=None)
-                    else:
-                        gst.update(phase="QUIZ", qindex=gst["qindex"] + 1,
-                                   deadline=now + QUIZ_SECONDS)
-                    save_state(g)
             still_answering = [g for g in games if g.state.get("phase") in ("QUIZ", "REVEAL")]
             if still_answering:
                 deadlines = [g.state.get("deadline") for g in still_answering if g.state.get("deadline")]
-                rs["deadline"] = max(deadlines) if deadlines else now
+                rs["deadline"] = max(deadlines) if deadlines else now + REVEAL_SECONDS
                 save_state(room)
             else:
                 self._set_phase(room, "ROUND_RESULTS", now + RESULT_SECONDS)
@@ -537,6 +559,7 @@ class GameService:
             else:
                 rs["level"] += 1
                 rs["start_at"] = now + COUNTDOWN_SECONDS
+                rs.update(questions=[], qindex=0, answers={})
                 for g in games:
                     self._reset_round(g, rs["level"], rs["start_at"])
                 self._set_phase(room, "COUNTDOWN", rs["start_at"] + difficulty(rs["level"])["deadline"])
@@ -549,17 +572,20 @@ class GameService:
         state.update(id=g.id, mode=g.mode, status=g.status)
         rs = room.state if room else state
         phase = room.status if room else state["phase"]
-        if room and room.status == "QUIZ":
+        individual_quiz = room and state.get("phase") in ("QUIZ", "REVEAL", "QUIZ_DONE")
+        if room and room.status in ("DRIVING", "QUIZ") and state.get("phase") != "DRIVING":
             phase = state.get("phase")
             state["screen_phase"] = phase if phase in ("QUIZ", "REVEAL") else "PIT"
         else:
             state["screen_phase"] = phase
         if room:
             question_ids = rs.get("questions", [])
-            if room.status != "QUIZ":
+            if not individual_quiz:
                 state.update(deadline=rs["deadline"], qindex=rs["qindex"])
         if phase in ("QUIZ", "REVEAL") and question_ids:
             index = state["qindex"] if room else rs["qindex"]
+            if state.get("deadline") is None:
+                state["deadline"] = self.clock() + (REVEAL_SECONDS if phase == "REVEAL" else QUIZ_SECONDS)
             state["question"] = self.bank.public(question_ids[index], reveal=phase == "REVEAL")
             answer = s.get(QuizAnswer, (g.id, state["level"], index))
             state["answered"] = answer is not None
@@ -571,27 +597,31 @@ class GameService:
                     answers = [s.get(QuizAnswer, (x.id, state["level"], index)) for x in self._games(s, room.id)]
                     state["eligible_count"] = sum(a is not None for a in answers)
                     state["correct_count"] = sum(bool(a and a.correct) for a in answers)
-        elif room and room.status == "QUIZ":
+        elif room and room.status in ("DRIVING", "QUIZ"):
             state["eligible"] = False
         state["difficulty"] = difficulty(state["level"])
+        if state.get("screen_phase") == "LEVEL_SUMMARY":
+            state["next_difficulty"] = difficulty(state["level"] + 1)
         return state
 
     def snapshot(self, player_id, game_id=None, room_id=None, include_dedications=False,
-                 compact=False):
+                 compact=False, read_only=False):
         now = self.clock()
-        with self.db.transaction() as s:
+        context = self.db.read() if read_only else self.db.transaction()
+        with context as s:
             p = s.get(Player, player_id)
             if not p:
                 raise RuleError("Profilo non trovato.")
-            if now - _number(p.last_seen_at) > 5:
+            if not read_only and now - _number(p.last_seen_at) > 5:
                 p.last_seen_at = now
             result = {"now": now, "player": {"id": p.id, "nickname": p.nickname, "tag": p.player_tag}}
             if room_id:
                 room, member = self._member(s, room_id, player_id)
-                if now - _number(member.last_seen_at) >= 3:
+                if not read_only and now - _number(member.last_seen_at) >= 3:
                     member.last_seen_at = now
-                self._tick_room(s, room, now)
-                s.flush()
+                if not read_only:
+                    self._tick_room(s, room, now)
+                    s.flush()
                 result["room"] = {k: deepcopy(v) for k, v in room.state.items()
                                   if k not in ("questions", "answers", "used")}
                 result["room"].update(id=room.id, code=room.room_code,
@@ -614,9 +644,11 @@ class GameService:
                     result["game"] = self._public_game(s, by_player[player_id], room)
             elif game_id:
                 g = self._owned(s, game_id, player_id)
-                self._tick_single(s, g, now)
+                if not read_only:
+                    self._tick_single(s, g, now)
                 result["game"] = self._public_game(s, g)
-            s.flush()
+            if not read_only:
+                s.flush()
             # Compact data, also used by end screens. No client-submitted totals are trusted.
             phase = result.get("game", {}).get("screen_phase")
             room_active = bool(room_id and result.get("room", {}).get("phase") not in ("MATCH_RESULTS", "CLOSED"))

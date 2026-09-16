@@ -160,10 +160,22 @@ def arcade():
                     payload.update(cached[2])
                     payload["now"] = time.time()
                 else:
+                    monotonic_now = time.monotonic()
+                    previous_phase = ss.get("arcade_phase")
+                    previous_room_phase = ss.get("arcade_room_phase")
+                    time_sensitive = previous_phase in ("QUIZ", "REVEAL") or previous_room_phase in (
+                        "COUNTDOWN", "QUIZ", "REVEAL", "ROUND_RESULTS")
+                    write_interval = .45 if time_sensitive else (1.0 if ss.get("room_id") else 2.0)
+                    write_due = monotonic_now - ss.get("last_snapshot_write", 0) >= write_interval
+                    fast_read = changed or (active and not write_due)
                     snapshot = svc.snapshot(ss.player_id, ss.get("game_id"), ss.get("room_id"),
                                             include_dedications=ss.page == "DEDICATIONS" and not (ss.get("game_id") or ss.get("room_id")),
-                                            compact=True)
+                                            compact=True, read_only=fast_read)
                     payload.update(snapshot)
+                    ss.arcade_phase = snapshot.get("game", {}).get("screen_phase")
+                    ss.arcade_room_phase = snapshot.get("room", {}).get("phase")
+                    if not fast_read:
+                        ss.last_snapshot_write = monotonic_now
                     if not active:
                         ss.menu_snapshot = (cache_key, time.monotonic(), snapshot)
             except RuleError as exc:

@@ -62,12 +62,15 @@ def test_full_single_player_loop_and_timeout(svc, player):
     second = svc.snapshot(player, game_id=gid)["game"]
     wrong = (svc.bank.by_id[second["question"]["id"]]["correct_index"] + 1) % 4
     svc.answer(gid, player, 1, 1, wrong)
+    # The first snapshot presents feedback before its short display timer starts.
+    assert svc.snapshot(player, game_id=gid)["game"]["screen_phase"] == "REVEAL"
     svc.clock.advance(REVEAL_SECONDS)
     svc.snapshot(player, game_id=gid)
     svc.clock.advance(QUIZ_SECONDS)
     timeout = svc.snapshot(player, game_id=gid)["game"]
     assert timeout["answer"]["choice"] is None and timeout["score"] == -3
     assert timeout["lives"] == 3
+    svc.snapshot(player, game_id=gid)
     svc.clock.advance(REVEAL_SECONDS)
     summary = svc.snapshot(player, game_id=gid)["game"]
     assert summary["screen_phase"] == "LEVEL_SUMMARY"

@@ -46,11 +46,21 @@ class BrainUI {
   }
   flush() {this.lastPacket=Date.now();this.component.setStateValue('packet',[...this.pending]);}
   update(component) {
+    const previous=this.data;
     this.component=component;this.data={...component.data,
       stats:component.data.stats||this.data?.stats||{best:0},
-      leaderboard:component.data.leaderboard||this.data?.leaderboard||[]};
+      leaderboard:component.data.leaderboard||this.data?.leaderboard||[],
+      dedications:component.data.dedications||this.data?.dedications||[]};
     const data=this.data;
     this.pending=this.pending.filter(p=>!data.command_acks.includes(p.id));
+    if(this.optimisticPage){
+      if(component.data.page===this.optimisticPage)this.optimisticPage=null;
+      else this.data.page=this.optimisticPage;
+    }
+    if(this.optimisticNextLevel){
+      if((component.data.game?.level||0)>=this.optimisticNextLevel)this.optimisticNextLevel=null;
+      else if(previous?.game?.level===this.optimisticNextLevel)this.data.game=previous.game;
+    }
     this.serverOffset=(data.now || Date.now()/1000)*1000-Date.now();
     if(!data.booted&&!this.identitySent){this.identitySent=true;
       queueMicrotask(()=>this.send('IDENTIFY',{token:safeStorage.get('br:identity')}));}
@@ -70,16 +80,7 @@ class BrainUI {
       view==='LOBBY'?JSON.stringify(room?.players):'',data.player?.id||''].join(':');
     if(signature!==this.signature){
       this.signature=signature;
-      if(this.engine){this.engine.destroy();this.engine=null;}
-      this.root.innerHTML=this.header()+`<main class="screen screen-${view.toLowerCase()}">${this.render(view)}</main>`+this.footer()+
-      '<div class="toast" role="alert" hidden></div>';
-      this.root.scrollIntoView({block:'start',behavior:'instant'});
-      if(view==='DRIVING'){
-        this.engine=new DrivingEngine(this.root.querySelector('canvas'),{...game,serverNow:data.now},events=>{
-          // An outstanding transport packet is retried, never expanded indefinitely.
-          if(!this.pending.some(p=>p.action==='EVENTS'))this.send('EVENTS',{game_id:game.id,level:game.level,events});
-        },this.audio);
-      }
+      this.mountView(view);
     }else if(this.engine)this.engine.sync({...game,serverNow:data.now});
     if(this.root.querySelector('[data-opponents]'))this.root.querySelector('[data-opponents]').innerHTML=this.opponents();
     const guestbook=this.root.querySelector('[data-guestbook]');
@@ -95,6 +96,18 @@ class BrainUI {
     if(view==='MATCH_RESULTS'&&this.soundPhase!==signature){this.soundPhase=signature;this.audio.play('victory');}
     this.tick();
   }
+  mountView(view) {
+    const data=this.data,game=data.game;
+    if(this.engine){this.engine.destroy();this.engine=null;}
+    this.root.innerHTML=this.header()+`<main class="screen screen-${view.toLowerCase()}">${this.render(view)}</main>`+this.footer()+
+      '<div class="toast" role="alert" hidden></div>';
+    this.root.scrollIntoView({block:'start',behavior:'instant'});
+    if(view==='DRIVING'){
+      this.engine=new DrivingEngine(this.root.querySelector('canvas'),{...game,serverNow:data.now},events=>{
+        if(!this.pending.some(p=>p.action==='EVENTS'))this.send('EVENTS',{game_id:game.id,level:game.level,events});
+      },this.audio);
+    }
+  }
   view() {
     const d=this.data,g=d.game,r=d.room;
     if(!d.booted)return 'LOADING';
@@ -102,7 +115,7 @@ class BrainUI {
     if(r){
       if(r.phase==='CLOSED')return 'CLOSED';
       if(r.phase==='LOBBY')return 'LOBBY';
-      if(['COUNTDOWN','DRIVING'].includes(r.phase))return g?.phase==='DRIVING'?'DRIVING':'PIT';
+      if(['COUNTDOWN','DRIVING'].includes(r.phase))return ['QUIZ','REVEAL'].includes(g?.screen_phase)?g.screen_phase:g?.phase==='DRIVING'?'DRIVING':'PIT';
       if(r.phase==='QUIZ')return g?.screen_phase||'PIT';
       return r.phase;
     }
@@ -164,13 +177,13 @@ class BrainUI {
   }
   back() {return `<div class="back-row">${button('← Torna al garage','NAV','ghost','data-page="HOME"')}</div>`;}
   dedications() {
-    const mine=(this.data.dedications||[]).find(d=>d.player_id===this.data.player.id);
-    return this.intro('IL LIBRO DEGLI OSPITI','Per Irene e Daniele, con amore.','Una corsa insieme, un pensiero da conservare.')+
+    const entries=this.data.dedications||[],mine=entries.find(d=>d.player_id===this.data.player.id);
+    return this.intro('IL LIBRO DEGLI OSPITI','Per Irene e Daniele, con amore.','Qui puoi leggere tutte le dediche lasciate dagli invitati e aggiungere la tua.')+
       `<section class="panel dedication-form"><form data-form="dedication"><label for="dedication">La tua dedica agli sposi</label>
       <textarea id="dedication" name="message" maxlength="800" rows="5" required placeholder="Cari Irene e Daniele…">${esc(mine?.message||'')}</textarea>
       <p>Fino a 800 caratteri. Il messaggio sarà visibile agli altri giocatori in questo libro, firmato con il tuo nickname. Puoi modificarlo e salvarlo di nuovo.</p>
       <button class="btn primary" type="submit">♥ Salva la dedica</button><span data-dedication-feedback role="status"></span></form></section>
-      <h2 class="subheading">I vostri pensieri</h2><div data-guestbook class="guestbook">${this.dedicationEntries()}</div>`+this.back();
+      <h2 class="subheading">Tutte le dediche degli invitati <span class="pill">${entries.length}</span></h2><div data-guestbook class="guestbook">${this.dedicationEntries()}</div>`+this.back();
   }
   dedicationEntries() {
     const entries=this.data.dedications||[];
@@ -278,6 +291,21 @@ class BrainUI {
     if(action==='MUSIC'){this.audio.toggleMusic();el.textContent=this.audio.musicMuted?'♪̸':'♫';el.setAttribute('aria-label',this.audio.musicMuted?'Attiva musica di sottofondo':'Disattiva musica di sottofondo');return;}
     if(action==='EFFECTS'){this.audio.toggleEffects();el.textContent=this.audio.effectsMuted?'🔇':'🔊';el.setAttribute('aria-label',this.audio.effectsMuted?'Attiva effetti sonori':'Disattiva effetti sonori');return;}
     this.audio.unlock();
+    if(action==='NAV'){
+      const page=el.dataset.page;
+      if(!this.data.game&&!this.data.room&&['HOME','LEADERBOARD','STATS','HELP','MULTIPLAYER','DEDICATIONS'].includes(page)){
+        this.optimisticPage=page;this.data.page=page;this.signature='';this.mountView(this.view());
+      }
+      this.send('NAV',{page});return;
+    }
+    if(action==='NEXT_LEVEL'&&this.data.game?.next_difficulty){
+      const g=this.data.game,now=(Date.now()+(this.serverOffset||0))/1000;
+      this.data.game={...g,screen_phase:'DRIVING',phase:'DRIVING',level:g.level+1,start_at:now,
+        progress:0,collected:[],hit:[],balloon_hit:[],shield:false,qindex:0,answered:false,
+        difficulty:g.next_difficulty,next_difficulty:null,acks:[]};
+      this.optimisticNextLevel=g.level+1;
+      this.signature='';this.mountView('DRIVING');this.send('NEXT_LEVEL');return;
+    }
     if(action==='FOCUS_NAME'){this.root.querySelector('#nickname')?.focus();return;}
     if(action==='PAUSE'){this.engine?.togglePause();el.textContent=this.engine?.paused?'▶ Riprendi':'Ⅱ Pausa';return;}
     if(action==='BOUQUET'){if(this.engine?.state.started)this.engine.throwBouquet();return;}
@@ -299,7 +327,7 @@ class BrainUI {
       this.root.querySelectorAll('.answer').forEach(a=>a.disabled=true);el.classList.add('picked');
       this.send('ANSWER',{game_id:g.id,level:g.level,index:g.qindex,choice:Number(el.dataset.choice)});return;
     }
-    this.send(action,action==='NAV'?{page:el.dataset.page}:{});
+    this.send(action);
   }
   submit(event) {
     event.preventDefault();this.audio.unlock();const form=event.target;

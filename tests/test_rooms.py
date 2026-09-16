@@ -47,7 +47,9 @@ def test_shared_course_questions_private_answers_and_automatic_next_round(svc):
     heartbeat_all(svc, rid, players)
     games = [snap["game"]["id"] for snap in snapshots]
     finish_drive(svc, players[0], games[0])
-    assert svc.snapshot(players[0], room_id=rid)["game"]["phase"] == "WAITING"
+    first_finisher = svc.snapshot(players[0], room_id=rid)
+    assert first_finisher["room"]["phase"] == "DRIVING"
+    assert first_finisher["game"]["screen_phase"] == "QUIZ"
     finish_drive(svc, players[1], games[1])
     a, b = [svc.snapshot(p, room_id=rid) for p in players]
     assert a["room"]["phase"] == "QUIZ"
@@ -64,6 +66,8 @@ def test_shared_course_questions_private_answers_and_automatic_next_round(svc):
         assert hidden["qindex"] == index and hidden["screen_phase"] == "QUIZ"
         assert "correct_index" not in hidden["question"] and "answer" not in hidden
         svc.answer(games[1], players[1], 1, index, (correct+1)%4)
+        # Both feedback panels are presented before their reveal timers begin.
+        svc.snapshot(players[0], room_id=rid)
         svc.clock.advance(REVEAL_SECONDS)
         svc.snapshot(players[0], room_id=rid)
     results = svc.snapshot(players[0], room_id=rid)
@@ -129,6 +133,7 @@ def test_complete_five_round_match_persists_podium(svc):
             q = snap["game"]["question"]
             correct = svc.bank.by_id[q["id"]]["correct_index"]
             for p, gid in zip(players, games): svc.answer(gid, p, level, index, correct)
+            svc.snapshot(players[0], room_id=rid)
             svc.clock.advance(REVEAL_SECONDS)
             svc.snapshot(players[0], room_id=rid)
         svc.clock.advance(RESULT_SECONDS)

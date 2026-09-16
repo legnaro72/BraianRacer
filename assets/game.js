@@ -84,6 +84,7 @@ class DrivingEngine {
     this.keys = new Set(); this.particles = []; this.popups = []; this.lastFrame = 0;
     this.state.balloon_hit ||= [...(data.balloon_hit || [])];
     this.bouquets=[];this.lastBouquet=this.state.last_bouquet ?? -100;
+    this.lastProgressSent=data.progress||0;
     this.state.acceleration = Math.max(1, Math.min(this.cfg.maxAcceleration || 1.6, this.state.acceleration || 1));
     this.frame = 0; this.lastSend = 0; this.shake = 0; this.countdown = null;
     this.offset = data.serverNow * 1000 - Date.now(); this.paused = false;
@@ -155,6 +156,11 @@ class DrivingEngine {
     if (this.state.pending.length) this.emit(this.state.pending.slice(0,120));
     this.persist();
   }
+  queueProgress() {
+    if(this.state.progress<=this.lastProgressSent)return;
+    this.lastProgressSent=this.state.progress;
+    this.event('PROGRESS_UPDATE',{progress:this.state.progress});
+  }
   persist() { safeStorage.set(this.key, JSON.stringify(this.state)); }
   laneX(lane, t = this.state.t) {
     const curve = this.data.level >= 4 ? Math.sin(t * .12) * .025 : 0;
@@ -200,7 +206,7 @@ class DrivingEngine {
         if(!g.balloon||s.balloon_hit.includes(g.id)||b.life<=0)continue;
         const t=-.12+(s.t-g.spawn)*this.cfg.speed;
         if(t<0||t>.92)continue;
-        if(Math.abs(t-b.travel)<.07&&Math.abs(this.laneX(g.balloonLane)-b.x)<40/this.sceneWidth()){
+        if(Math.abs(t-b.travel)<.09&&Math.abs(this.laneX(g.balloonLane)-b.x)<80/this.sceneWidth()){
           b.life=0;s.balloon_hit.push(g.id);s.score+=2;
           this.event('BALLOON_POPPED',{group:g.id,shot_at:b.shot_at,at:s.real,course_t:s.t,aim:b.x});
           const p=this.project(this.laneX(g.balloonLane),t);
@@ -235,7 +241,7 @@ class DrivingEngine {
     this.draw(wait, hidden);
     if (timestamp - this.lastSend > 850) {
       this.lastSend=timestamp;
-      if (!this.state.done && this.state.started) this.event('PROGRESS_UPDATE',{progress:this.state.progress});
+      if (!this.state.done && this.state.started) this.queueProgress();
       this.send();
     }
     this.frame=requestAnimationFrame(t=>this.loop(t));
@@ -272,7 +278,7 @@ class DrivingEngine {
     const progress=this.course.filter(g=>-.12+(s.t-g.spawn)*this.cfg.speed>1.12).length;
     if(progress>s.progress) s.progress=progress;
     if(s.progress>=this.cfg.groups && !s.done) {
-      s.done=true; this.event('PROGRESS_UPDATE',{progress:s.progress});
+      s.done=true; this.queueProgress();
       this.burst(.5,.5,'#eab447',90); this.audio.play('finish'); this.vibrate([30,30,60]);
       this.pendingFinish=performance.now()+120;
     }
@@ -396,7 +402,7 @@ class DrivingEngine {
           c.beginPath();c.moveTo(0,25);c.bezierCurveTo(-52,-4,-22,-42,0,-19);c.bezierCurveTo(22,-42,52,-4,0,25);c.fill();
           c.strokeStyle='#ffe6ed';c.lineWidth=3;c.beginPath();c.moveTo(-20,-9);c.quadraticCurveTo(-20,-22,-10,-19);c.stroke();
         }else{
-          c.scale(1.75,1.75);c.rotate(-.35);c.strokeStyle='#629465';c.lineWidth=5;c.beginPath();c.moveTo(0,19);c.lineTo(-6,-5);c.moveTo(0,19);c.lineTo(7,-5);c.stroke();
+          c.scale(5.25,5.25);c.rotate(-.35);c.strokeStyle='#629465';c.lineWidth=5;c.beginPath();c.moveTo(0,19);c.lineTo(-6,-5);c.moveTo(0,19);c.lineTo(7,-5);c.stroke();
           for(const [xx,yy,col] of [[-8,-8,'#ff9e65'],[7,-10,'#ef759f'],[0,-19,'#ffc57b'],[0,-4,'#ffb1c7']]){c.fillStyle=col;c.beginPath();c.arc(xx,yy,8,0,Math.PI*2);c.fill();c.strokeStyle='#fff1db';c.lineWidth=1.5;c.stroke();}
           c.fillStyle='#fff2e4';c.fillRect(-6,9,12,5);
         }c.restore();continue;
