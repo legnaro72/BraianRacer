@@ -23,6 +23,18 @@ Puoi recuperare il valore di `MONGO_URI` dal file locale `C:\Progetti\torneo-Sub
 
 L'utente Atlas deve poter leggere e scrivere su `brain_racer`; l'accesso di rete Atlas deve consentire le connessioni dall'hosting. La connessione dal computer locale è stata verificata, ma questo non dimostra ancora che la rete di Streamlit Cloud abbia accesso.
 
+## Album fotografico condiviso
+
+Per attivare **Foto ♥**, crea un progetto Google Cloud, abilita Google Drive API e crea una service account. Crea sul tuo Drive una cartella dedicata alle foto del matrimonio e condividila con l'indirizzo email della service account come **Editor**. Aggiungi poi questi Secrets (senza pubblicarli su GitHub):
+
+```toml
+GOOGLE_DRIVE_FOLDER_ID = "ID_DELLA_CARTELLA"
+GOOGLE_SERVICE_ACCOUNT_JSON = '''INCOLLA_QUI_IL_JSON_COMPLETO_DELLA_SERVICE_ACCOUNT'''
+SUPERVISOR_PASSWORD = "Irene Daniele"
+```
+
+Le foto sono caricate nella cartella Drive e la loro lista, autore e stato Flipbook restano in Atlas. L'app rende ogni foto leggibile dagli invitati, come scelto per la galleria comune; la cartella Drive può restare privata. La password supervisore serve soltanto ad approvare o rimuovere gli scatti dal Flipbook.
+
 ## 4. Pubblicare e provare
 
 Premi **Deploy** e attendi il completamento. Se compare un errore, apri i log da **Manage app** e condividi il tipo di errore senza credenziali.

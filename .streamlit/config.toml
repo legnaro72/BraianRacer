@@ -13,3 +13,4 @@ showErrorDetails = false
 [server]
 headless = true
 enableStaticServing = true
+maxUploadSize = 12

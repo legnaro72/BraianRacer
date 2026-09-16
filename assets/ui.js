@@ -53,7 +53,8 @@ class BrainUI {
     this.component=component;this.data={...component.data,
       stats:component.data.stats||this.data?.stats||{best:0},
       leaderboard:component.data.leaderboard||this.data?.leaderboard||[],
-      dedications:component.data.dedications||this.data?.dedications||[]};
+      dedications:component.data.dedications||this.data?.dedications||[],
+      photos:component.data.photos||this.data?.photos||[]};
     const data=this.data;
     this.pending=this.pending.filter(p=>!data.command_acks.includes(p.id));
     if(this.optimisticPage){
@@ -192,11 +193,11 @@ class BrainUI {
     const d=this.data,active=d.game||d.room;
     return `<header class="nav"><button class="brand" data-action="NAV" data-page="HOME">
       <span class="brand-symbol">${icons.flag}</span><span>BRAIN<span class="brand-light">RACER</span><small>GUIDA. PENSA. VINCI.</small></span></button>
-      <nav aria-label="Navigazione principale">${[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥']].map(([page,label])=>
+      <nav aria-label="Navigazione principale">${[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥'],['PHOTOS','Foto ♥']].map(([page,label])=>
         `<button data-action="NAV" data-page="${page}" class="nav-link ${(this.menuOverlay||d.page)===page?'selected':''}" ${!d.player?'disabled':''}>${label}</button>`).join('')}</nav>
       <div class="nav-right"><div class="audio-controls" aria-label="Controlli audio"><button class="sound" data-action="MUSIC" title="Musica di sottofondo" aria-label="${this.audio.musicMuted?'Attiva musica di sottofondo':'Disattiva musica di sottofondo'}">${this.audio.musicMuted?'♪̸':'♫'}</button><button class="sound" data-action="EFFECTS" title="Effetti sonori" aria-label="${this.audio.effectsMuted?'Attiva effetti sonori':'Disattiva effetti sonori'}">${this.audio.effectsMuted?'🔇':'🔊'}</button></div>
       ${d.player?`<button class="profile" data-action="NAV" data-page="STATS"><span class="avatar">${esc(d.player.nickname.slice(0,2).toUpperCase())}</span><span>${esc(d.player.nickname)}<small>#${esc(d.player.tag)}</small></span></button>`:
-      '<span class="edition">ARCADE / VOL. 01</span>'}</div></header>${d.player?`<nav class="mobile-nav" aria-label="Menu smartphone">${[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥']].map(([page,label])=>`<button data-action="NAV" data-page="${page}" class="${(this.menuOverlay||d.page)===page?'selected':''}">${label}</button>`).join('')}</nav>`:''}${active&&this.menuOverlay?`<div class="active-game-banner"><span>Partita in corso</span>${button('Riprendi subito','RESUME','primary')}</div>`:''}`;
+      '<span class="edition">ARCADE / VOL. 01</span>'}</div></header>${d.player?`<nav class="mobile-nav" aria-label="Menu smartphone">${[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥'],['PHOTOS','Foto ♥']].map(([page,label])=>`<button data-action="NAV" data-page="${page}" class="${(this.menuOverlay||d.page)===page?'selected':''}">${label}</button>`).join('')}</nav>`:''}${active&&this.menuOverlay?`<div class="active-game-banner"><span>Partita in corso</span>${button('Riprendi subito','RESUME','primary')}</div>`:''}`;
   }
   footer() {return `<footer><span>${icons.flag} BRAIN RACER <i>·</i> Riflessi veloci. Mente accesa.</span><span>Fatto per giocare. Ancora una volta. <span class="tiny-dot"></span></span></footer>`;}
   intro(eyebrow,title,description='') {return `<div class="page-intro with-couple"><div class="intro-copy"><span class="eyebrow">${eyebrow}</span><h1>${title}</h1>${description?`<p>${description}</p>`:''}</div>${coupleArt('page')}</div>`;}
@@ -207,6 +208,7 @@ class BrainUI {
     if(view==='LEADERBOARD')return this.intro('LA GRIGLIA DEI MIGLIORI','Ogni punto conta.','I migliori 10 piloti. Un solo record per giocatore.')+this.leaderboard()+this.back();
     if(view==='STATS')return this.stats();
     if(view==='DEDICATIONS')return this.dedications();
+    if(view==='PHOTOS')return this.photos();
     if(view==='HELP')return this.help();
     if(view==='MULTIPLAYER')return this.intro('STESSA STRADA. STESSA SFIDA.','La gara è più bella insieme.','Da 2 a 6 piloti, cinque livelli. Invita i tuoi amici con il codice stanza.')+
       `<div class="two-col room-options"><section class="panel"><span class="feature-icon lime">${icons.flag}</span><h2>La tua griglia di partenza.</h2><p>Crea una stanza privata e condividi il codice. Quando tutti sono pronti, si parte.</p>${button('Crea stanza '+icons.arrow,'CREATE_ROOM')}</section>
@@ -256,6 +258,14 @@ class BrainUI {
     const entries=this.data.dedications||[];
     return entries.length?entries.map(d=>`<article class="panel dedication-entry"><span class="dedication-heart">♥</span><p>${esc(d.message)}</p><small>— ${esc(d.nickname)} #${esc(d.tag)}</small></article>`).join(''):
       '<div class="empty-board"><h3>Il primo pensiero potrebbe essere il tuo.</h3><p>Lascia un ricordo per gli sposi.</p></div>';
+  }
+  photos() {
+    const entries=this.data.photos||[],approved=entries.filter(photo=>photo.approved);
+    const card=photo=>`<article class="photo-card"><a href="${esc(photo.view_url)}" target="_blank" rel="noopener"><img src="${esc(photo.url)}" alt="${esc(photo.filename)}"></a><div><b>${esc(photo.filename)}</b><small>di ${esc(photo.nickname)} #${esc(photo.tag)}</small>${photo.approved?'<span class="photo-approved">♥ Nel Flipbook</span>':''}</div></article>`;
+    return this.intro('I RICORDI DELLA FESTA','Foto, sorrisi e momenti da rivivere.','Carica le tue foto qui sotto: appariranno nella galleria condivisa.')+
+      `<section class="photo-upload-note panel"><span class="feature-icon">📷</span><div><h2>Condividi i tuoi scatti</h2><p>Puoi scegliere fino a 20 foto alla volta dalla galleria del telefono. Il caricamento è qui sotto.</p></div></section>
+      <section class="flipbook"><div class="section-heading"><h2>♥ Flipbook di Irene e Daniele</h2><span>${approved.length} ricordi scelti dagli sposi</span></div>${approved.length?`<div class="flipbook-pages">${approved.map(card).join('')}</div>`:'<p class="flipbook-empty">Gli sposi stanno scegliendo le prime foto per il loro album.</p>'}</section>
+      <section class="photo-wall"><div class="section-heading"><h2>Tutte le foto della festa</h2><span>${entries.length} scatti condivisi</span></div>${entries.length?`<div class="photo-grid">${entries.map(card).join('')}</div>`:'<div class="empty-board"><h3>La galleria aspetta il primo scatto.</h3><p>Condividi un momento della festa con Irene e Daniele.</p></div>'}</section>`+this.back();
   }
   stats() {
     const s=this.data.stats;
@@ -360,10 +370,10 @@ class BrainUI {
     this.audio.unlock();
     if(action==='NAV'){
       const page=el.dataset.page;
-      if((this.data.game||this.data.room)&&['HOME','LEADERBOARD','STATS','HELP','DEDICATIONS'].includes(page)){
+      if((this.data.game||this.data.room)&&['HOME','LEADERBOARD','STATS','HELP','DEDICATIONS','PHOTOS'].includes(page)){
         this.menuOverlay=page;this.signature='';this.mountView(page);return;
       }
-      if(!this.data.game&&!this.data.room&&['HOME','LEADERBOARD','STATS','HELP','MULTIPLAYER','DEDICATIONS'].includes(page)){
+      if(!this.data.game&&!this.data.room&&['HOME','LEADERBOARD','STATS','HELP','MULTIPLAYER','DEDICATIONS','PHOTOS'].includes(page)){
         this.optimisticPage=page;this.data.page=page;this.signature='';this.mountView(this.view());
       }
       this.send('NAV',{page});return;

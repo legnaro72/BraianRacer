@@ -91,3 +91,21 @@ class Dedication(Base):
     message: Mapped[str] = mapped_column(String(800))
     created_at: Mapped[float] = mapped_column(Float, default=time.time)
     updated_at: Mapped[float] = mapped_column(Float, default=time.time)
+
+
+class EventPhoto(Base):
+    """Metadata for an event image stored in the configured media provider.
+
+    Image bytes deliberately stay out of Atlas/SQLite: that keeps game snapshots
+    small and lets Drive handle durable media storage and thumbnails.
+    """
+    __tablename__ = "event_photos"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    player_id: Mapped[str] = mapped_column(ForeignKey("players.id"), index=True)
+    storage_id: Mapped[str] = mapped_column(String(160), unique=True)
+    filename: Mapped[str] = mapped_column(String(255))
+    mime_type: Mapped[str] = mapped_column(String(100))
+    byte_size: Mapped[int] = mapped_column(Integer)
+    uploaded_at: Mapped[float] = mapped_column(Float, default=time.time, index=True)
+    approved: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    approved_at: Mapped[float | None] = mapped_column(Float, nullable=True)

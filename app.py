@@ -13,6 +13,7 @@ from pymongo.errors import PyMongoError
 from brain_racer.config import ROOT, difficulty
 from brain_racer.database import open_database
 from brain_racer.game_service import GameService, RuleError
+from brain_racer.photo_service import GoogleDriveStorage, PhotoError, PhotoService
 from brain_racer.questions import QuestionBank
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -28,20 +29,30 @@ body{background:#fff8ef} @media(max-width:640px){.stMainBlockContainer{padding:0
 </style>""")
 
 
+def setting(key, default=None):
+    value = os.environ.get(key)
+    if value:
+        return value
+    try:
+        return st.secrets.get(key, default)
+    except (FileNotFoundError, st.errors.StreamlitSecretNotFoundError):
+        return default
+
+
 @st.cache_resource
 def service():
-    def setting(key, default=None):
-        value = os.environ.get(key)
-        if value:
-            return value
-        try:
-            return st.secrets.get(key, default)
-        except (FileNotFoundError, st.errors.StreamlitSecretNotFoundError):
-            return default
     bank = QuestionBank()
     db = open_database(setting("DATABASE_URL"), setting("MONGO_URI"), setting("MONGO_DATABASE", "brain_racer"))
     log.info("Brain Racer started; %s questions validated", len(bank.by_id))
     return GameService(db, bank)
+
+
+@st.cache_resource
+def photo_album():
+    folder_id = setting("GOOGLE_DRIVE_FOLDER_ID")
+    service_account_json = setting("GOOGLE_SERVICE_ACCOUNT_JSON")
+    storage = GoogleDriveStorage(folder_id, service_account_json) if folder_id and service_account_json else None
+    return PhotoService(service().db, storage)
 
 
 @st.cache_resource
@@ -84,7 +95,7 @@ def dispatch(svc, command):
         st.session_state.pop("identity_token", None)
     elif action == "NAV":
         page = command.get("page")
-        if page in ("HOME", "LEADERBOARD", "STATS", "HELP", "MULTIPLAYER", "DEDICATIONS") and not (gid or rid):
+        if page in ("HOME", "LEADERBOARD", "STATS", "HELP", "MULTIPLAYER", "DEDICATIONS", "PHOTOS") and not (gid or rid):
             st.session_state.page = page
     elif action == "DEDICATE":
         svc.dedicate(pid, command.get("message"))
@@ -209,6 +220,18 @@ def arcade():
             ss.setdefault("next_replay_seed", secrets.randbelow(2**31))
             payload["replay_template"] = {"seed": ss.next_replay_seed, "difficulty": difficulty(1),
                                           "quiz_preview": quiz_preview(svc, 1, ss.next_replay_seed)}
+        if ss.get("player_id") and ss.page == "PHOTOS" and not (ss.get("game_id") or ss.get("room_id")):
+            cached_photos = ss.get("photo_snapshot")
+            photos_fresh = (isinstance(cached_photos, tuple) and len(cached_photos) == 2
+                            and time.monotonic() - cached_photos[0] < 10)
+            if photos_fresh:
+                payload["photos"] = cached_photos[1]
+            else:
+                try:
+                    payload["photos"] = photo_album().list_photos()
+                    ss.photo_snapshot = (time.monotonic(), payload["photos"])
+                except PhotoError as exc:
+                    payload.update(photos=[], photo_error=str(exc))
         asset_revision = tuple((ROOT / "assets" / f).stat().st_mtime_ns
                                for f in ("game.css", "course.js", "game.js", "ui.js")) + tuple(
                                    p.stat().st_mtime_ns for p in sorted((ROOT / "static").glob("couple-*.png")))
@@ -223,3 +246,62 @@ def arcade():
 
 
 arcade()
+
+
+def photo_upload_and_supervisor():
+    """Native Streamlit file transport; the component remains responsible for gallery UI."""
+    ss = st.session_state
+    if ss.get("page") != "PHOTOS" or not ss.get("player_id") or ss.get("game_id") or ss.get("room_id"):
+        return
+    try:
+        album = photo_album()
+    except PhotoError as exc:
+        st.error(str(exc))
+        return
+    st.subheader("Aggiungi le tue foto")
+    if not album.ready:
+        st.info("L'album sarà attivato dagli sposi a breve.")
+        return
+    with st.form("event-photo-upload", clear_on_submit=True):
+        files = st.file_uploader("Scegli fino a 20 foto", type=["jpg", "jpeg", "png", "webp", "heic", "heif"],
+                                 accept_multiple_files=True,
+                                 help="Massimo 12 MB per foto. Puoi selezionarne molte dalla galleria del telefono.")
+        submitted = st.form_submit_button("Carica le foto")
+    if submitted:
+        try:
+            items = [(uploaded.name, uploaded.type, uploaded.getvalue()) for uploaded in files]
+            with st.spinner("Carichiamo le foto una alla volta…"):
+                count = len(album.upload_many(ss.player_id, items))
+            ss.pop("photo_snapshot", None)
+            st.success(f"{count} foto caricate: grazie per aver condiviso questo ricordo!")
+            st.rerun()
+        except PhotoError as exc:
+            st.error(str(exc))
+
+    configured_password = setting("SUPERVISOR_PASSWORD")
+    st.divider()
+    with st.expander("Area riservata Irene e Daniele"):
+        if not configured_password:
+            st.caption("La password supervisore verrà configurata nei Secrets dell'app.")
+            return
+        entered = st.text_input("Password sposi", type="password", key="supervisor_password")
+        if entered and secrets.compare_digest(entered, str(configured_password)):
+            st.success("Area supervisore attiva")
+            photos = album.list_photos()
+            pending = [photo for photo in photos if not photo["approved"]]
+            st.caption(f"{len(photos)} foto ricevute · {len(pending)} da selezionare per il Flipbook")
+            for photo in photos:
+                left, right = st.columns([1, 2])
+                with left:
+                    st.image(photo["url"], use_container_width=True)
+                with right:
+                    st.write(f"**{photo['filename']}**")
+                    st.caption(f"Caricata da {photo['nickname']} #{photo['tag']}")
+                    label = "Rimuovi dal Flipbook" if photo["approved"] else "Pubblica nel Flipbook"
+                    if st.button(label, key=f"photo-approval-{photo['id']}"):
+                        album.set_approved(photo["id"], not photo["approved"])
+                        ss.pop("photo_snapshot", None)
+                        st.rerun()
+
+
+photo_upload_and_supervisor()
