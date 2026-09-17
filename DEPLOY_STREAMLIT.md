@@ -25,15 +25,15 @@ L'utente Atlas deve poter leggere e scrivere su `brain_racer`; l'accesso di rete
 
 ## Album fotografico condiviso
 
-Per attivare **Foto ♥**, crea un progetto Google Cloud, abilita Google Drive API e crea una service account. Crea sul tuo Drive una cartella dedicata alle foto del matrimonio e condividila con l'indirizzo email della service account come **Editor**. Aggiungi poi questi Secrets (senza pubblicarli su GitHub):
+Per attivare **Foto ♥**, aggiungi i Secrets del backend Google Apps Script già deployato (senza pubblicarli su GitHub):
 
 ```toml
-GOOGLE_DRIVE_FOLDER_ID = "ID_DELLA_CARTELLA"
-GOOGLE_SERVICE_ACCOUNT_JSON = '''INCOLLA_QUI_IL_JSON_COMPLETO_DELLA_SERVICE_ACCOUNT'''
-SUPERVISOR_PASSWORD = "Irene Daniele"
+GOOGLE_DRIVE_WEBAPP_URL = "https://SCRIPT.GOOGLE.COM/macros/s/.../exec"
+GOOGLE_DRIVE_API_TOKEN = "INSERISCI_IL_TOKEN_DEL_BACKEND"
+SUPERVISOR_PASSWORD = "INSERISCI_QUI_UNA_PASSWORD_FORTE"
 ```
 
-Le foto sono caricate nella cartella Drive e la loro lista, autore e stato Flipbook restano in Atlas. L'app rende ogni foto leggibile dagli invitati, come scelto per la galleria comune; la cartella Drive può restare privata. La password supervisore serve soltanto ad approvare o rimuovere gli scatti dal Flipbook.
+Le foto sono caricate e lette attraverso Apps Script, mentre lista, autore e stato Flipbook restano in Atlas. La cartella Drive rimane privata e non vengono esposti URL Drive agli invitati. La password supervisore serve soltanto ad approvare o rimuovere gli scatti dal Flipbook.
 
 ## 4. Pubblicare e provare
 

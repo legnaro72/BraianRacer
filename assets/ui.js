@@ -260,12 +260,9 @@ class BrainUI {
       '<div class="empty-board"><h3>Il primo pensiero potrebbe essere il tuo.</h3><p>Lascia un ricordo per gli sposi.</p></div>';
   }
   photos() {
-    const entries=this.data.photos||[],approved=entries.filter(photo=>photo.approved);
-    const card=photo=>`<article class="photo-card"><a href="${esc(photo.view_url)}" target="_blank" rel="noopener"><img src="${esc(photo.url)}" alt="${esc(photo.filename)}"></a><div><b>${esc(photo.filename)}</b><small>di ${esc(photo.nickname)} #${esc(photo.tag)}</small>${photo.approved?'<span class="photo-approved">♥ Nel Flipbook</span>':''}</div></article>`;
     return this.intro('I RICORDI DELLA FESTA','Foto, sorrisi e momenti da rivivere.','Carica le tue foto qui sotto: appariranno nella galleria condivisa.')+
-      `<section class="photo-upload-note panel"><span class="feature-icon">📷</span><div><h2>Condividi i tuoi scatti</h2><p>Puoi scegliere fino a 20 foto alla volta dalla galleria del telefono. Il caricamento è qui sotto.</p></div></section>
-      <section class="flipbook"><div class="section-heading"><h2>♥ Flipbook di Irene e Daniele</h2><span>${approved.length} ricordi scelti dagli sposi</span></div>${approved.length?`<div class="flipbook-pages">${approved.map(card).join('')}</div>`:'<p class="flipbook-empty">Gli sposi stanno scegliendo le prime foto per il loro album.</p>'}</section>
-      <section class="photo-wall"><div class="section-heading"><h2>Tutte le foto della festa</h2><span>${entries.length} scatti condivisi</span></div>${entries.length?`<div class="photo-grid">${entries.map(card).join('')}</div>`:'<div class="empty-board"><h3>La galleria aspetta il primo scatto.</h3><p>Condividi un momento della festa con Irene e Daniele.</p></div>'}</section>`+this.back();
+      `<section class="photo-upload-note panel"><span class="feature-icon">📷</span><div><h2>Condividi i tuoi scatti</h2><p>Puoi scegliere fino a 20 foto alla volta dalla galleria del telefono. Il caricamento e l'album sono qui sotto.</p></div></section>
+      <section class="flipbook"><div class="section-heading"><h2>♥ Flipbook di Irene e Daniele</h2><span>Gli scatti scelti dagli sposi</span></div><p class="flipbook-empty">Le foto restano private su Drive e sono mostrate qui dall'album.</p></section>`+this.back();
   }
   stats() {
     const s=this.data.stats;

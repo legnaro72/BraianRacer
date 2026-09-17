@@ -97,7 +97,7 @@ class EventPhoto(Base):
     """Metadata for an event image stored in the configured media provider.
 
     Image bytes deliberately stay out of Atlas/SQLite: that keeps game snapshots
-    small and lets Drive handle durable media storage and thumbnails.
+    small while the configured media backend handles durable storage.
     """
     __tablename__ = "event_photos"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
