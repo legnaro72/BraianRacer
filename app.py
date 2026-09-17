@@ -270,6 +270,28 @@ def photo_upload_and_supervisor():
     if not album.ready:
         st.info("L'album fotografico sarà attivato dagli sposi a breve.")
         return
+    try:
+        photos = cached_photo_records()
+        approved = [photo for photo in photos if photo["approved"]]
+    except PhotoError:
+        photos, approved = [], []
+    if not approved:
+        ss.photo_show_flipbook = False
+
+    flipbook_label = f"♥ Apri il Flipbook ({len(approved)} foto)" if approved else "♥ Flipbook in preparazione"
+    if st.button(flipbook_label, type="primary", disabled=not approved,
+                 width="stretch", key="open-wedding-flipbook"):
+        ss.photo_show_flipbook = True
+        st.rerun()
+    if ss.get("photo_show_flipbook"):
+        st.subheader("♥ Flipbook di Irene e Daniele")
+        st.caption("Gli scatti scelti dagli sposi")
+        photo_columns(approved, "Foto non disponibile")
+        if st.button("← Torna a tutte le foto", width="stretch"):
+            ss.photo_show_flipbook = False
+            st.rerun()
+        return
+
     feedback = ss.get("photo_feedback")
     if isinstance(feedback, dict) and time.monotonic() - feedback.get("at", 0) < 8:
         getattr(st, feedback.get("kind", "info"))(feedback.get("message", ""))
@@ -321,7 +343,6 @@ def photo_upload_and_supervisor():
             is_supervisor = entered and secrets.compare_digest(entered, str(configured_password))
         if configured_password and is_supervisor:
             st.success("Area supervisore attiva")
-            photos = cached_photo_records()
             pending = [photo for photo in photos if not photo["approved"]]
             st.caption(f"{len(photos)} foto ricevute · {len(pending)} da selezionare per il Flipbook")
             select_all, clear_selection = st.columns(2)
@@ -397,15 +418,6 @@ def photo_upload_and_supervisor():
                     ss.pop("photo_delete_confirm", None)
                     st.rerun()
 
-    try:
-        photos = cached_photo_records()
-    except PhotoError as exc:
-        st.info(str(exc))
-        return
-    approved = [photo for photo in photos if photo["approved"]]
-    if approved:
-        st.subheader("♥ Flipbook di Irene e Daniele")
-        photo_columns(approved, "Foto non disponibile")
     st.subheader("Tutte le foto della festa")
     if photos:
         photo_columns(photos, "Foto non disponibile")
