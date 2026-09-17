@@ -440,7 +440,7 @@ def render_flipbook(photos):
         st.caption("Il Flipbook aspetta il primo scatto scelto dagli sposi.")
         return
     ss = st.session_state
-    total_pages = len(photos) + 1
+    total_pages = len(photos) + 2
     page = max(0, min(int(ss.get("flipbook_page", 0)), total_pages - 1))
     previous, counter, following = st.columns([1, 1.4, 1])
     go_previous = previous.button("← Precedente", disabled=page == 0, width="stretch")
@@ -465,6 +465,14 @@ def render_flipbook(photos):
             unsafe_allow_html=True,
         )
         st.image(ROOT / "static" / "couple-cartoon.png", width="stretch")
+    elif page == total_pages - 1:
+        st.image(ROOT / "static" / "bouquet-finale.png", width="stretch")
+        st.markdown(
+            "<div style='text-align:center;padding:.8rem .5rem 1.4rem;"
+            "font-family:Georgia,serif;font-size:clamp(1.5rem,5vw,2.8rem);"
+            "color:#9b4165;font-weight:700'>Non FINE ma INIZIO</div>",
+            unsafe_allow_html=True,
+        )
     else:
         # Keep navigation safe if a browser session carries an index from an older release.
         photo_index = max(0, min(page - 1, len(photos) - 1))
