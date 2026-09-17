@@ -320,21 +320,12 @@ class PhotoService:
                 raise PhotoError("Foto non trovata nel Flipbook.")
             if moving.flipbook_locked:
                 raise PhotoError("Sblocca la foto prima di cambiarne la posizione.")
-            locked = {index: photo for index, photo in enumerate(photos)
-                      if photo.flipbook_locked and photo.id != photo_id}
-            if position in locked:
+            current = next(index for index, photo in enumerate(photos) if photo.id == photo_id)
+            target = photos[position]
+            if target.flipbook_locked and target.id != photo_id:
                 raise PhotoError("Questa posizione è bloccata da un'altra foto.")
-
-            result = [None] * len(photos)
-            for index, photo in locked.items():
-                result[index] = photo
-            result[position] = moving
-            remaining = [photo for photo in photos
-                         if photo.id != photo_id and not photo.flipbook_locked]
-            for index in range(len(result)):
-                if result[index] is None:
-                    result[index] = remaining.pop(0)
-            for order, photo in enumerate(result):
+            photos[current], photos[position] = photos[position], photos[current]
+            for order, photo in enumerate(photos):
                 photo.flipbook_order = order
             return position
 

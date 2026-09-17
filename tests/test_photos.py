@@ -140,6 +140,28 @@ def test_supervisor_can_choose_flipbook_order(svc, player):
     assert [photo["id"] for photo in album.list_photos(approved_only=True)] == list(reversed(before))
 
 
+def test_assigning_a_position_swaps_the_two_photos(svc, player):
+    class Storage:
+        next_id = 0
+
+        def drive_upload_photo(self, filename, mime_type, content):
+            self.next_id += 1
+            return type("Stored", (), {"storage_id": f"drive-swap-{self.next_id}",
+                                        "filename": filename, "mime_type": mime_type})()
+
+    album = PhotoService(svc.db, Storage(), svc.clock)
+    album.upload_many(player, [(f"{index}.jpg", "image/jpeg", str(index).encode())
+                               for index in range(1, 5)])
+    photo_ids = [photo["id"] for photo in album.list_photos()]
+    album.set_approved_many(photo_ids, True)
+    before = [photo["id"] for photo in album.list_photos(approved_only=True)]
+
+    album.set_flipbook_position(before[3], 0)
+
+    after = [photo["id"] for photo in album.list_photos(approved_only=True)]
+    assert after == [before[3], before[1], before[2], before[0]]
+
+
 def test_locked_flipbook_position_is_unavailable_until_unlocked(svc, player):
     class Storage:
         next_id = 0

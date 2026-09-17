@@ -405,49 +405,52 @@ def photo_upload_and_supervisor():
             )
             if ordered_flipbook:
                 st.markdown("#### Ordine del Flipbook")
-                st.caption("Scegli una posizione, premi Assegna e blocca la foto quando l'ordine è definitivo. Puoi sempre sbloccarla per cambiarlo.")
+                st.caption("Assegna un numero per scambiare due foto, usa le frecce per piccoli spostamenti e blocca le posizioni definitive.")
                 locked_positions = {
                     position for position, photo in enumerate(ordered_flipbook, start=1)
                     if photo.get("flipbook_locked")
                 }
-                for position, photo in enumerate(ordered_flipbook, start=1):
-                    preview, label = st.columns([1, 4])
-                    try:
-                        image, _ = cached_photo_bytes(photo["storage_id"])
-                        preview.image(image, width=80)
-                    except PhotoError:
-                        preview.caption("Anteprima non disponibile")
-                    locked = bool(photo.get("flipbook_locked"))
-                    label.write(f"**{position}. {photo['filename']}**")
-                    label.caption(f"Caricata da {photo['nickname']} #{photo['tag']} · {'🔒 Posizione bloccata' if locked else 'Posizione modificabile'}")
-                    position_column, apply_column, lock_column = st.columns([2, 1, 1])
-                    options = ([position] if locked else [
-                        candidate for candidate in range(1, len(ordered_flipbook) + 1)
-                        if candidate not in locked_positions or candidate == position
-                    ])
-                    position_key = f"flipbook-position-{photo['id']}"
-                    if ss.get(position_key) not in options:
-                        ss[position_key] = position
-                    chosen = position_column.selectbox(
-                        "Posizione", options, key=position_key, disabled=locked,
-                        label_visibility="collapsed",
+                compact_order = st.toggle("Vista compatta a griglia", value=True,
+                                          key="flipbook-compact-order")
+                order_page_size = 12 if compact_order else 6
+                order_pages = max(1, (len(ordered_flipbook) + order_page_size - 1) // order_page_size)
+                order_page = max(0, min(int(ss.get("flipbook_order_page", 0)), order_pages - 1))
+                ss.flipbook_order_page = order_page
+                if order_pages > 1:
+                    order_previous, order_counter, order_next = st.columns([1, 1.2, 1])
+                    if order_previous.button("← Precedenti", disabled=order_page == 0,
+                                             width="stretch", key="flipbook-order-previous"):
+                        ss.flipbook_order_page = order_page - 1
+                        st.rerun()
+                    order_counter.markdown(
+                        f"<p style='text-align:center'><strong>{order_page + 1} / {order_pages}</strong></p>",
+                        unsafe_allow_html=True,
                     )
-                    if apply_column.button("Assegna", key=f"flipbook-assign-{photo['id']}",
-                                           disabled=locked or chosen == position, width="stretch"):
-                        try:
-                            album.set_flipbook_position(photo["id"], chosen - 1)
-                            clear_photo_cache()
-                            st.rerun()
-                        except PhotoError as exc:
-                            st.error(str(exc))
-                    lock_label = "Sblocca" if locked else "Blocca"
-                    if lock_column.button(lock_label, key=f"flipbook-lock-{photo['id']}", width="stretch"):
-                        try:
-                            album.set_flipbook_locked(photo["id"], not locked)
-                            clear_photo_cache()
-                            st.rerun()
-                        except PhotoError as exc:
-                            st.error(str(exc))
+                    if order_next.button("Successive →", disabled=order_page == order_pages - 1,
+                                         width="stretch", key="flipbook-order-next"):
+                        ss.flipbook_order_page = order_page + 1
+                        st.rerun()
+                order_start = order_page * order_page_size
+                order_items = list(enumerate(
+                    ordered_flipbook[order_start:order_start + order_page_size],
+                    start=order_start + 1,
+                ))
+                if compact_order:
+                    for item_start in range(0, len(order_items), 3):
+                        grid_columns = st.columns(3)
+                        for column, (position, photo) in zip(
+                                grid_columns, order_items[item_start:item_start + 3]):
+                            with column:
+                                render_flipbook_order_item(
+                                    album, ordered_flipbook, photo, position,
+                                    locked_positions, compact=True,
+                                )
+                else:
+                    for position, photo in order_items:
+                        render_flipbook_order_item(
+                            album, ordered_flipbook, photo, position,
+                            locked_positions, compact=False,
+                        )
 
             pending_delete = ss.get("photo_delete_confirm", ())
             delete_selection = (tuple(pending_delete) if isinstance(pending_delete, (list, tuple, set))
@@ -480,8 +483,17 @@ def photo_upload_and_supervisor():
                     ss.pop("photo_delete_confirm", None)
                     st.rerun()
 
-    st.subheader("Tutte le foto della festa")
     if photos:
+        gallery_open = bool(ss.get("photo_gallery_open", False))
+        gallery_label = ("▲ Nascondi tutte le foto della festa" if gallery_open else
+                         f"📸 Mostra tutte le foto della festa ({len(photos)})")
+        if st.button(gallery_label, type="primary", width="stretch", key="toggle-photo-gallery"):
+            ss.photo_gallery_open = not gallery_open
+            st.rerun()
+        if not gallery_open:
+            st.caption("La galleria resta chiusa per rendere più rapido il caricamento delle tue foto.")
+            return
+        st.subheader("Tutte le foto della festa")
         total_pages = max(1, (len(photos) + PHOTO_GALLERY_PAGE_SIZE - 1) // PHOTO_GALLERY_PAGE_SIZE)
         gallery_page = max(0, min(int(ss.get("photo_gallery_page", 0)), total_pages - 1))
         ss.photo_gallery_page = gallery_page
@@ -502,6 +514,7 @@ def photo_upload_and_supervisor():
         start = gallery_page * PHOTO_GALLERY_PAGE_SIZE
         photo_columns(photos[start:start + PHOTO_GALLERY_PAGE_SIZE], "Foto non disponibile")
     else:
+        st.subheader("Tutte le foto della festa")
         st.caption("La galleria aspetta il primo scatto.")
 
 
@@ -511,6 +524,87 @@ def render_photo(photo, unavailable):
         st.image(image, caption=f"Caricata da {photo['nickname']} #{photo['tag']} · {photo['filename']}", width="stretch")
     except PhotoError:
         st.caption(unavailable)
+
+
+def render_flipbook_order_item(album, ordered_photos, photo, position, locked_positions, compact):
+    """Render one supervisor ordering card with swap, arrows and position lock."""
+    ss = st.session_state
+    locked = bool(photo.get("flipbook_locked"))
+    revision = int(ss.get("flipbook_order_revision", 0))
+
+    def refresh_order():
+        ss.flipbook_order_revision = revision + 1
+        clear_photo_cache()
+        st.rerun()
+
+    with st.container(border=True):
+        if compact:
+            try:
+                image, _ = cached_photo_bytes(photo["storage_id"])
+                st.image(image, width="stretch")
+            except PhotoError:
+                st.caption("Anteprima non disponibile")
+            st.markdown(f"**{position}. {photo['filename']}**")
+            st.caption(f"{photo['nickname']} #{photo['tag']} · {'🔒 Bloccata' if locked else 'Modificabile'}")
+        else:
+            preview, label = st.columns([1, 4])
+            try:
+                image, _ = cached_photo_bytes(photo["storage_id"])
+                preview.image(image, width=100)
+            except PhotoError:
+                preview.caption("Anteprima non disponibile")
+            label.write(f"**{position}. {photo['filename']}**")
+            label.caption(
+                f"Caricata da {photo['nickname']} #{photo['tag']} · "
+                f"{'🔒 Posizione bloccata' if locked else 'Posizione modificabile'}"
+            )
+
+        options = ([position] if locked else [
+            candidate for candidate in range(1, len(ordered_photos) + 1)
+            if candidate not in locked_positions or candidate == position
+        ])
+        chosen = st.selectbox(
+            "Scambia con la posizione", options,
+            key=f"flipbook-position-{photo['id']}-{revision}", disabled=locked,
+        )
+        previous_locked = position > 1 and bool(ordered_photos[position - 2].get("flipbook_locked"))
+        next_locked = position < len(ordered_photos) and bool(ordered_photos[position].get("flipbook_locked"))
+        move_previous, move_next = st.columns(2)
+        if move_previous.button(
+                "←", key=f"flipbook-up-{photo['id']}", width="stretch",
+                disabled=locked or position == 1 or previous_locked, help="Sposta una posizione prima"):
+            try:
+                album.move_flipbook_photo(photo["id"], -1)
+                refresh_order()
+            except PhotoError as exc:
+                st.error(str(exc))
+        if move_next.button(
+                "→", key=f"flipbook-down-{photo['id']}", width="stretch",
+                disabled=locked or position == len(ordered_photos) or next_locked,
+                help="Sposta una posizione dopo"):
+            try:
+                album.move_flipbook_photo(photo["id"], 1)
+                refresh_order()
+            except PhotoError as exc:
+                st.error(str(exc))
+
+        assign, lock = st.columns(2)
+        if assign.button(
+                "Assegna", key=f"flipbook-assign-{photo['id']}", width="stretch",
+                disabled=locked or chosen == position,
+                help="Scambia questa foto con quella nella posizione scelta"):
+            try:
+                album.set_flipbook_position(photo["id"], chosen - 1)
+                refresh_order()
+            except PhotoError as exc:
+                st.error(str(exc))
+        lock_label = "Sblocca" if locked else "Blocca"
+        if lock.button(lock_label, key=f"flipbook-lock-{photo['id']}", width="stretch"):
+            try:
+                album.set_flipbook_locked(photo["id"], not locked)
+                refresh_order()
+            except PhotoError as exc:
+                st.error(str(exc))
 
 
 def render_flipbook(photos):

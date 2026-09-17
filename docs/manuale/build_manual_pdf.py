@@ -156,7 +156,7 @@ for item in (
     "Premi Scegli fino a 20 foto.",
     "Puoi caricare JPG, PNG, WebP, HEIC e HEIF, massimo 10 MB ciascuna.",
     "Premi Carica le foto e attendi la conferma.",
-    "Tutti gli invitati vedono la galleria condivisa.",
+    "Premi Mostra tutte le foto della festa per aprire la galleria.",
     "Su Drive: MMDDYY_nickname_nomeoriginale.",
 ):
     y = bullet(c, item, x, y, width, size=8.8, leading=12) - 6
@@ -170,7 +170,9 @@ for item in (
     "Inserisci la password nell’area riservata.",
     "Seleziona più foto o usa Seleziona tutte.",
     "Pubblica nel Flipbook o Rimuovi dal Flipbook.",
-    "Scegli la posizione, premi Assegna e poi Blocca.",
+    "Assegna una posizione per scambiare due foto; usa anche le frecce.",
+    "La vista compatta a griglia facilita l’ordinamento di molte foto.",
+    "Quando l’ordine è definitivo premi Blocca.",
     "Usa Sblocca per rendere di nuovo modificabile la posizione.",
     "Elimina selezionate richiede conferma.",
     "Annulla selezione deseleziona tutto.",

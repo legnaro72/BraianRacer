@@ -32,7 +32,7 @@ Web app: <https://irenedaniele.streamlit.app/>
 2. Premi **Scegli fino a 20 foto** e seleziona gli scatti dalla galleria del telefono.
 3. Sono accettati JPG, JPEG, PNG, WebP, HEIC e HEIF, massimo 10 MB ciascuno.
 4. Premi **Carica le foto** e attendi la conferma.
-5. Tutti gli invitati possono vedere la galleria condivisa.
+5. Premi **Mostra tutte le foto della festa** per aprire volontariamente la galleria condivisa.
 
 Su Drive il nome viene salvato nel formato `MMDDYY_nickname_nomeoriginale`, per esempio `091726_max_foto1.jpg`.
 
@@ -45,10 +45,11 @@ Il pulsante **♥ Apri il Flipbook** si attiva quando gli sposi pubblicano almen
 1. Apri l'area riservata nella pagina **Foto ♥** e inserisci la password degli sposi.
 2. Seleziona più foto oppure usa **Seleziona tutte**.
 3. Usa **Pubblica nel Flipbook**, **Rimuovi dal Flipbook** o **Elimina selezionate**.
-4. Nella sezione **Ordine del Flipbook** scegli il numero della posizione e premi **Assegna**.
-5. Quando l'ordine è definitivo premi **Blocca**: quella posizione resta riservata. Premi **Sblocca** per modificarla.
-6. La cancellazione richiede una conferma.
-7. **Annulla selezione** deseleziona tutte le immagini.
+4. Nella sezione **Ordine del Flipbook** scegli il numero e premi **Assegna**: le due foto si scambiano la posizione.
+5. Usa le frecce per spostare una foto di un posto oppure attiva la **Vista compatta a griglia**.
+6. Quando l'ordine è definitivo premi **Blocca**: quella posizione resta riservata. Premi **Sblocca** per modificarla.
+7. La cancellazione richiede una conferma.
+8. **Annulla selezione** deseleziona tutte le immagini.
 
 ## Se qualcosa non risponde
 
