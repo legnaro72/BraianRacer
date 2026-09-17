@@ -19,6 +19,7 @@ from brain_racer.questions import QuestionBank
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("brain_racer")
+PHOTO_GALLERY_PAGE_SIZE = 9
 st.set_page_config(page_title="Irene & Daniele · La corsa degli sposi", page_icon="🏁", layout="wide",
                    initial_sidebar_state="collapsed")
 st.html("""<style>
@@ -324,6 +325,7 @@ def photo_upload_and_supervisor():
                 ss.photo_upload_fingerprints = list(seen | {
                     item.fingerprint for item in result.uploaded
                 })[-200:]
+                ss.photo_gallery_page = 0
                 clear_photo_cache()
             loaded, failed = len(result.uploaded), len(result.failures)
             if failed:
@@ -480,7 +482,25 @@ def photo_upload_and_supervisor():
 
     st.subheader("Tutte le foto della festa")
     if photos:
-        photo_columns(photos, "Foto non disponibile")
+        total_pages = max(1, (len(photos) + PHOTO_GALLERY_PAGE_SIZE - 1) // PHOTO_GALLERY_PAGE_SIZE)
+        gallery_page = max(0, min(int(ss.get("photo_gallery_page", 0)), total_pages - 1))
+        ss.photo_gallery_page = gallery_page
+        previous, counter, following = st.columns([1, 1.4, 1])
+        if previous.button("← Foto recenti", disabled=gallery_page == 0,
+                           width="stretch", key="photo-gallery-previous"):
+            ss.photo_gallery_page = gallery_page - 1
+            st.rerun()
+        counter.markdown(
+            f"<p style='text-align:center'><strong>Pagina {gallery_page + 1} di {total_pages}</strong>"
+            f"<br><small>{len(photos)} foto condivise</small></p>",
+            unsafe_allow_html=True,
+        )
+        if following.button("Foto precedenti →", disabled=gallery_page == total_pages - 1,
+                            width="stretch", key="photo-gallery-next"):
+            ss.photo_gallery_page = gallery_page + 1
+            st.rerun()
+        start = gallery_page * PHOTO_GALLERY_PAGE_SIZE
+        photo_columns(photos[start:start + PHOTO_GALLERY_PAGE_SIZE], "Foto non disponibile")
     else:
         st.caption("La galleria aspetta il primo scatto.")
 
