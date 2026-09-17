@@ -1,4 +1,5 @@
 from pathlib import Path
+import shutil
 
 from PIL import Image
 from reportlab.lib.colors import HexColor, black
@@ -11,6 +12,7 @@ from reportlab.pdfgen import canvas
 ROOT = Path(__file__).resolve().parents[2]
 SCREENS = ROOT / "docs" / "manuale" / "screens"
 OUT = ROOT / "output" / "pdf" / "Manuale_utente_Brain_Racer.pdf"
+STATIC_OUT = ROOT / "static" / "manuale-brain-racer.pdf"
 W, H = A4
 M = 42
 INK = HexColor("#3A2B36")
@@ -178,4 +180,5 @@ y -= 25
 paragraph(c, "Controlla la connessione, attendi qualche secondo e riprova. Per molte foto usa gruppi più piccoli. Dopo un aggiornamento ricarica completamente la pagina.", x, y, width, size=8.5, leading=12)
 footer(c, 4)
 c.save()
+shutil.copy2(OUT, STATIC_OUT)
 print(OUT)

@@ -218,6 +218,13 @@ test('top navigation remains usable during a game and resumes without a server r
   ui.click({target:{closest:()=>resume}});
   assert.equal(ui.menuOverlay,null);assert.equal(mounted,'QUIZ');
 });
+test('manual is always linked from desktop and mobile navigation',()=>{
+  const {ui}=uiHost();ui.data={...ui.data,player:null,game:null,room:null,page:'WELCOME'};
+  ui.audio={musicMuted:false,effectsMuted:false};
+  const html=ui.header();
+  assert.equal((html.match(/app\/static\/manuale-brain-racer\.pdf/g)||[]).length,2);
+  assert.match(html,/target="_blank"/);assert.match(html,/Manuale ↗/);
+});
 test('new game id never restores a finished engine session',()=>{
   const h=host(),old=h.make();old.state.done=true;old.state.score=99;old.state.lives=0;old.persist();
   h.data.id='fresh';const next=h.make();
