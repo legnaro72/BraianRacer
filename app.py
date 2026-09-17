@@ -286,7 +286,7 @@ def photo_upload_and_supervisor():
     if ss.get("photo_show_flipbook"):
         st.subheader("♥ Flipbook di Irene e Daniele")
         st.caption("Gli scatti scelti dagli sposi")
-        photo_columns(approved, "Foto non disponibile")
+        render_flipbook(approved)
         if st.button("← Torna a tutte le foto", width="stretch"):
             ss.photo_show_flipbook = False
             st.rerun()
@@ -431,6 +431,27 @@ def render_photo(photo, unavailable):
         st.image(image, caption=f"{photo['filename']} · {photo['nickname']} #{photo['tag']}", width="stretch")
     except PhotoError:
         st.caption(unavailable)
+
+
+def render_flipbook(photos):
+    """Show approved photos as a simple touch-friendly paged album."""
+    if not photos:
+        st.caption("Il Flipbook aspetta il primo scatto scelto dagli sposi.")
+        return
+    ss = st.session_state
+    page = max(0, min(int(ss.get("flipbook_page", 0)), len(photos) - 1))
+    previous, counter, following = st.columns([1, 1.4, 1])
+    go_previous = previous.button("← Precedente", disabled=page == 0, width="stretch")
+    go_next = following.button("Successiva →", disabled=page == len(photos) - 1, width="stretch")
+    if go_previous:
+        page -= 1
+        ss.flipbook_page = page
+    if go_next:
+        page += 1
+        ss.flipbook_page = page
+    counter.markdown(f"<p style='text-align:center'><strong>Pagina {page + 1} di {len(photos)}</strong></p>",
+                     unsafe_allow_html=True)
+    render_photo(photos[page], "Foto non disponibile")
 
 
 def photo_columns(photos, unavailable):
