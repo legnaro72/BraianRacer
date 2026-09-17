@@ -282,6 +282,7 @@ def photo_upload_and_supervisor():
     if st.button(flipbook_label, type="primary", disabled=not approved,
                  width="stretch", key="open-wedding-flipbook"):
         ss.photo_show_flipbook = True
+        ss.flipbook_page = 0
         st.rerun()
     if ss.get("photo_show_flipbook"):
         st.subheader("♥ Flipbook di Irene e Daniele")
@@ -439,19 +440,33 @@ def render_flipbook(photos):
         st.caption("Il Flipbook aspetta il primo scatto scelto dagli sposi.")
         return
     ss = st.session_state
-    page = max(0, min(int(ss.get("flipbook_page", 0)), len(photos) - 1))
+    total_pages = len(photos) + 1
+    page = max(0, min(int(ss.get("flipbook_page", 0)), total_pages - 1))
     previous, counter, following = st.columns([1, 1.4, 1])
     go_previous = previous.button("← Precedente", disabled=page == 0, width="stretch")
-    go_next = following.button("Successiva →", disabled=page == len(photos) - 1, width="stretch")
+    go_next = following.button("Successiva →", disabled=page == total_pages - 1, width="stretch")
     if go_previous:
         page -= 1
         ss.flipbook_page = page
     if go_next:
         page += 1
         ss.flipbook_page = page
-    counter.markdown(f"<p style='text-align:center'><strong>Pagina {page + 1} di {len(photos)}</strong></p>",
+    counter.markdown(f"<p style='text-align:center'><strong>Pagina {page + 1} di {total_pages}</strong></p>",
                      unsafe_allow_html=True)
-    render_photo(photos[page], "Foto non disponibile")
+    if page == 0:
+        st.markdown(
+            "<div style='text-align:center;padding:1.1rem .5rem .8rem'>"
+            "<div style='font-family:Georgia,serif;font-size:clamp(1.05rem,3.7vw,1.65rem);"
+            "color:#c06b51;margin:.3rem 0'>12 Settembre 2026</div>"
+            "<div style='font-family:Georgia,serif;font-size:clamp(1.45rem,5vw,2.6rem);"
+            "color:#9b4165;font-weight:700'>Irene e Daniele</div>"
+            "<div style='font-size:clamp(1rem,3.5vw,1.45rem);letter-spacing:.12em;"
+            "color:#725764'>OGGI SPOSI</div></div>",
+            unsafe_allow_html=True,
+        )
+        st.image(ROOT / "static" / "couple-cartoon.png", width="stretch")
+    else:
+        render_photo(photos[page - 1], "Foto non disponibile")
 
 
 def photo_columns(photos, unavailable):
