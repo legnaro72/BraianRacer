@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import re
 import time
 from dataclasses import dataclass
@@ -28,6 +29,25 @@ class StoredPhoto:
     storage_id: str
     filename: str
     mime_type: str
+
+
+@dataclass(frozen=True)
+class UploadedPhoto:
+    storage_id: str
+    filename: str
+    fingerprint: str
+
+
+@dataclass(frozen=True)
+class UploadFailure:
+    filename: str
+    message: str
+
+
+@dataclass(frozen=True)
+class UploadBatchResult:
+    uploaded: tuple[UploadedPhoto, ...]
+    failures: tuple[UploadFailure, ...]
 
 
 def safe_filename(value):
@@ -103,6 +123,9 @@ class AppsScriptDriveStorage:
         files = data.get("files")
         return files if isinstance(files, list) else []
 
+    def drive_delete_photo(self, file_id):
+        self.drive_request({"action": "delete", "fileId": file_id})
+
 
 class PhotoService:
     def __init__(self, database, storage=None, clock=time.time):
@@ -113,40 +136,52 @@ class PhotoService:
         return self.storage is not None
 
     @staticmethod
-    def _validate(files):
+    def _validate_count(files):
         if not files:
             raise PhotoError("Scegli almeno una foto.")
         if len(files) > MAX_FILES_PER_UPLOAD:
             raise PhotoError(f"Puoi caricare fino a {MAX_FILES_PER_UPLOAD} foto alla volta.")
-        normalized = []
-        for name, mime_type, content in files:
-            filename = safe_filename(name)
-            mime_type = normalized_mime_type(filename, mime_type)
-            if not isinstance(content, bytes) or not content or len(content) > MAX_FILE_BYTES:
-                raise PhotoError("Ogni foto deve pesare al massimo 10 MB.")
-            normalized.append((filename, mime_type, content))
-        return normalized
+
+    @staticmethod
+    def _validate_one(name, mime_type, content):
+        filename = safe_filename(name)
+        mime_type = normalized_mime_type(filename, mime_type)
+        if not isinstance(content, bytes) or not content or len(content) > MAX_FILE_BYTES:
+            raise PhotoError("La foto deve pesare al massimo 10 MB.")
+        return filename, mime_type, content
 
     def upload_many(self, player_id, files):
         if not self.storage:
             raise PhotoError("L'album fotografico non è ancora disponibile.")
-        uploaded = []
-        for name, mime_type, content in self._validate(files):
-            stored = self.storage.drive_upload_photo(name, mime_type, content)
+        self._validate_count(files)
+        with self.db.read() as s:
+            if not s.get(Player, player_id):
+                raise PhotoError("Profilo non trovato.")
+        uploaded, failures = [], []
+        for name, mime_type, content in files:
+            try:
+                filename, mime_type, content = self._validate_one(name, mime_type, content)
+                stored = self.storage.drive_upload_photo(filename, mime_type, content)
+            except PhotoError as exc:
+                try:
+                    failed_name = safe_filename(name)
+                except PhotoError:
+                    failed_name = "Foto"
+                failures.append(UploadFailure(failed_name, str(exc)))
+                continue
             try:
                 with self.db.transaction() as s:
-                    if not s.get(Player, player_id):
-                        raise PhotoError("Profilo non trovato.")
                     photo = EventPhoto(player_id=player_id, storage_id=stored.storage_id,
                                        filename=stored.filename[:255], mime_type=stored.mime_type,
                                        byte_size=len(content), uploaded_at=self.clock())
                     s.add(photo)
-            except PhotoError:
-                raise
             except Exception as exc:
-                raise PhotoError("La foto è stata ricevuta, ma non abbiamo potuto registrarla nell'album. Avvisa gli sposi.") from exc
-            uploaded.append(stored.storage_id)
-        return uploaded
+                failures.append(UploadFailure(filename,
+                    "Ricevuta da Drive, ma non registrata nell'album: avvisa gli sposi."))
+                continue
+            uploaded.append(UploadedPhoto(stored.storage_id, stored.filename,
+                                           hashlib.sha256(content).hexdigest()))
+        return UploadBatchResult(tuple(uploaded), tuple(failures))
 
     def get_photo(self, storage_id):
         if not self.storage:
@@ -180,3 +215,20 @@ class PhotoService:
             photo.approved = bool(approved)
             photo.approved_at = self.clock() if photo.approved else None
         return bool(approved)
+
+    def delete_photo(self, photo_id):
+        if not self.storage:
+            raise PhotoError("L'album fotografico non è ancora disponibile.")
+        with self.db.read() as s:
+            photo = s.get(EventPhoto, photo_id)
+            if not photo:
+                raise PhotoError("Foto non trovata.")
+            storage_id = photo.storage_id
+        self.storage.drive_delete_photo(storage_id)
+        try:
+            with self.db.transaction() as s:
+                photo = s.get(EventPhoto, photo_id)
+                if photo:
+                    s.delete(photo)
+        except Exception as exc:
+            raise PhotoError("La foto è stata eliminata da Drive, ma il catalogo non si è aggiornato. Avvisa gli sposi.") from exc

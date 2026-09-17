@@ -35,6 +35,14 @@ SUPERVISOR_PASSWORD = "INSERISCI_QUI_UNA_PASSWORD_FORTE"
 
 Le foto sono caricate e lette attraverso Apps Script, mentre lista, autore e stato Flipbook restano in Atlas. La cartella Drive rimane privata e non vengono esposti URL Drive agli invitati. La password supervisore serve soltanto ad approvare o rimuovere gli scatti dal Flipbook.
 
+Per consentire agli sposi di eliminare una foto, Apps Script deve accettare anche:
+
+```json
+{"token":"...", "action":"delete", "fileId":"..."}
+```
+
+e rispondere con `{"ok":true,"fileId":"..."}` soltanto dopo aver spostato il file nel cestino di Drive. Streamlit rimuove il record Atlas esclusivamente dopo questa conferma. L'operazione deve essere idempotente: una seconda richiesta sullo stesso file deve restituire `ok=true`, così un errore Atlas successivo alla cancellazione Drive può essere recuperato senza lasciare un record bloccato.
+
 ## 4. Pubblicare e provare
 
 Premi **Deploy** e attendi il completamento. Se compare un errore, apri i log da **Manage app** e condividi il tipo di errore senza credenziali.

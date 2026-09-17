@@ -187,12 +187,16 @@ def arcade():
                 if command["id"] in ss.seen_commands:
                     continue
                 changed = True
+                previous_page = ss.page
                 try:
                     dispatch(svc, command)
                     ss.pop("message", None)
                 except RuleError as exc:
                     ss.message = str(exc)
                 ss.seen_commands = (ss.seen_commands + [command["id"]])[-240:]
+                if command.get("action") == "NAV" and (
+                        previous_page == "PHOTOS" or command.get("page") == "PHOTOS"):
+                    ss.photo_page_rerun = True
         payload = {"booted": ss.get("booted", False), "page": ss.page,
                    "command_acks": ss.seen_commands, "message": ss.get("message")}
         if ss.get("identity_token"):
@@ -245,7 +249,8 @@ def arcade():
                                    p.stat().st_mtime_ns for p in sorted((ROOT / "static").glob("couple-*.png")))
         renderer(asset_revision)(data=payload, key="arcade_component", on_packet_change=lambda: None,
                    default={"packet": []}, width="stretch")
-        photo_upload_and_supervisor()
+        if ss.pop("photo_page_rerun", False):
+            st.rerun()
     except (SQLAlchemyError, PyMongoError, OSError, ValueError, TypeError, KeyError, IndexError):
         log.exception("Unable to update arcade")
         st.error("Il box è momentaneamente occupato. La connessione sarà ritentata automaticamente: attendi qualche secondo.")
@@ -264,6 +269,11 @@ def photo_upload_and_supervisor():
     if not album.ready:
         st.info("L'album fotografico sarà attivato dagli sposi a breve.")
         return
+    feedback = ss.get("photo_feedback")
+    if isinstance(feedback, dict) and time.monotonic() - feedback.get("at", 0) < 8:
+        getattr(st, feedback.get("kind", "info"))(feedback.get("message", ""))
+    else:
+        ss.pop("photo_feedback", None)
     with st.form("event-photo-upload", clear_on_submit=True):
         files = st.file_uploader("Scegli fino a 20 foto", type=["jpg", "jpeg", "png", "webp"],
                                  accept_multiple_files=True,
@@ -278,13 +288,22 @@ def photo_upload_and_supervisor():
                 st.info("Queste foto sono già state caricate in questa sessione.")
                 return
             with st.spinner("Carichiamo le foto una alla volta…"):
-                count = len(album.upload_many(ss.player_id, fresh_items))
-            ss.photo_upload_fingerprints = list((seen | {
-                hashlib.sha256(item[2]).hexdigest() for item in fresh_items
-            }))[-200:]
-            clear_photo_cache()
-            st.success(f"{count} foto caricate: grazie per aver condiviso questo ricordo!")
-            st.rerun()
+                result = album.upload_many(ss.player_id, fresh_items)
+            if result.uploaded:
+                ss.photo_upload_fingerprints = list(seen | {
+                    item.fingerprint for item in result.uploaded
+                })[-200:]
+                clear_photo_cache()
+            loaded, failed = len(result.uploaded), len(result.failures)
+            if failed:
+                details = "; ".join(f"{item.filename}: {item.message}" for item in result.failures[:4])
+                message = f"Caricate {loaded} foto su {loaded + failed}. {details}"
+                ss.photo_feedback = {"kind": "warning", "message": message, "at": time.monotonic()}
+                st.warning(message)
+            else:
+                message = f"{loaded} foto caricate: grazie per aver condiviso questo ricordo!"
+                ss.photo_feedback = {"kind": "success", "message": message, "at": time.monotonic()}
+                st.success(message)
         except PhotoError as exc:
             st.error(str(exc))
 
@@ -316,6 +335,29 @@ def photo_upload_and_supervisor():
                         album.set_approved(photo["id"], not photo["approved"])
                         clear_photo_cache()
                         st.rerun()
+                    if ss.get("photo_delete_confirm") == photo["id"]:
+                        st.warning("La foto sarà rimossa da Drive e dall'album.")
+                        confirm, cancel = st.columns(2)
+                        if confirm.button("Conferma eliminazione", key=f"confirm-photo-delete-{photo['id']}"):
+                            try:
+                                with st.spinner("Eliminazione in corso…"):
+                                    album.delete_photo(photo["id"])
+                                clear_photo_cache()
+                                cached_photo_bytes.clear()
+                                ss.pop("photo_delete_confirm", None)
+                                ss.photo_feedback = {"kind": "success", "message": "Foto eliminata.",
+                                                     "at": time.monotonic()}
+                                st.rerun()
+                            except PhotoError as exc:
+                                ss.photo_feedback = {"kind": "error", "message": str(exc),
+                                                     "at": time.monotonic()}
+                                st.error(str(exc))
+                        if cancel.button("Annulla", key=f"cancel-photo-delete-{photo['id']}"):
+                            ss.pop("photo_delete_confirm", None)
+                            st.rerun()
+                    elif st.button("Elimina foto", key=f"delete-photo-{photo['id']}"):
+                        ss.photo_delete_confirm = photo["id"]
+                        st.rerun()
 
     try:
         photos = cached_photo_records()
@@ -336,7 +378,7 @@ def photo_upload_and_supervisor():
 def render_photo(photo, unavailable):
     try:
         image, _ = cached_photo_bytes(photo["storage_id"])
-        st.image(image, caption=f"{photo['filename']} · {photo['nickname']} #{photo['tag']}", use_container_width=True)
+        st.image(image, caption=f"{photo['filename']} · {photo['nickname']} #{photo['tag']}", width="stretch")
     except PhotoError:
         st.caption(unavailable)
 
@@ -352,3 +394,4 @@ def photo_columns(photos, unavailable):
 
 
 arcade()
+photo_upload_and_supervisor()
