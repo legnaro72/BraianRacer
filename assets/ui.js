@@ -260,9 +260,13 @@ class BrainUI {
       '<div class="empty-board"><h3>Il primo pensiero potrebbe essere il tuo.</h3><p>Lascia un ricordo per gli sposi.</p></div>';
   }
   photos() {
+    const approved=Math.max(0,Number(this.data.photo_summary?.approved_count||0));
+    const flipbookAction=approved?
+      `<div class="flipbook-cta">${button(`♥ Apri il Flipbook (${approved} foto)`,'OPEN_FLIPBOOK','primary flipbook-open-button')}</div>`:
+      '<p class="flipbook-empty">Gli scatti scelti dagli sposi appariranno qui appena pubblicati.</p>';
     return this.intro('I RICORDI DELLA FESTA','Foto, sorrisi e momenti da rivivere.','Carica le tue foto qui sotto: appariranno nella galleria condivisa.')+
       `<section class="photo-upload-note panel"><span class="feature-icon">📷</span><div><h2>Condividi i tuoi scatti</h2><p>Puoi scegliere fino a 20 foto alla volta dalla galleria del telefono. Il caricamento e l'album sono qui sotto.</p></div></section>
-      <section class="flipbook"><div class="section-heading"><h2>♥ Flipbook di Irene e Daniele</h2><span>Gli scatti scelti dagli sposi</span></div><p class="flipbook-empty">Le foto restano private su Drive e sono mostrate qui dall'album.</p></section>`+this.back();
+      <section class="flipbook"><div class="section-heading"><h2>♥ Flipbook di Irene e Daniele</h2><span>Gli scatti scelti dagli sposi</span></div>${flipbookAction}</section>`+this.back();
   }
   stats() {
     const s=this.data.stats;
@@ -374,6 +378,9 @@ class BrainUI {
         this.optimisticPage=page;this.data.page=page;this.signature='';this.mountView(this.view());
       }
       this.send('NAV',{page});return;
+    }
+    if(action==='OPEN_FLIPBOOK'){
+      el.disabled=true;el.textContent='Apro il Flipbook…';this.send('OPEN_FLIPBOOK');return;
     }
     if(action==='RESUME'||(action==='START_SINGLE'&&this.menuOverlay&&(this.data.game||this.data.room))){
       this.menuOverlay=null;this.signature='';this.mountView(this.gameView());return;

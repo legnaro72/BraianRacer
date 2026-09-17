@@ -218,6 +218,17 @@ test('top navigation remains usable during a game and resumes without a server r
   ui.click({target:{closest:()=>resume}});
   assert.equal(ui.menuOverlay,null);assert.equal(mounted,'QUIZ');
 });
+test('Flipbook card opens the real album and shows the approved photo count',()=>{
+  const {ui}=uiHost();let sent=null;
+  ui.data={...ui.data,game:null,room:null,page:'PHOTOS',photo_summary:{approved_count:17}};
+  ui.send=action=>{sent=action;};
+  const html=ui.photos();
+  assert.match(html,/Apri il Flipbook \(17 foto\)/);
+  const open={disabled:false,textContent:'',dataset:{action:'OPEN_FLIPBOOK'}};
+  ui.click({target:{closest:()=>open}});
+  assert.equal(open.disabled,true);assert.equal(open.textContent,'Apro il Flipbook…');
+  assert.equal(sent,'OPEN_FLIPBOOK');
+});
 test('manual is always linked from desktop and mobile navigation',()=>{
   const {ui}=uiHost();ui.data={...ui.data,player:null,game:null,room:null,page:'WELCOME'};
   ui.audio={musicMuted:false,effectsMuted:false};

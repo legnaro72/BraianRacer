@@ -119,6 +119,12 @@ def dispatch(svc, command):
         page = command.get("page")
         if page in ("HOME", "LEADERBOARD", "STATS", "HELP", "MULTIPLAYER", "DEDICATIONS", "PHOTOS") and not (gid or rid):
             st.session_state.page = page
+            if page != "PHOTOS":
+                st.session_state.pop("photo_show_flipbook", None)
+    elif action == "OPEN_FLIPBOOK" and not (gid or rid):
+        st.session_state.page = "PHOTOS"
+        st.session_state.photo_show_flipbook = True
+        st.session_state.flipbook_page = 0
     elif action == "DEDICATE":
         svc.dedicate(pid, command.get("message"))
     elif action == "START_SINGLE" and not rid:
@@ -196,8 +202,9 @@ def arcade():
                 except RuleError as exc:
                     ss.message = str(exc)
                 ss.seen_commands = (ss.seen_commands + [command["id"]])[-240:]
-                if command.get("action") == "NAV" and (
-                        previous_page == "PHOTOS" or command.get("page") == "PHOTOS"):
+                if command.get("action") in ("NAV", "OPEN_FLIPBOOK") and (
+                        previous_page == "PHOTOS" or command.get("page") == "PHOTOS" or
+                        command.get("action") == "OPEN_FLIPBOOK"):
                     ss.photo_page_rerun = True
         payload = {"booted": ss.get("booted", False), "page": ss.page,
                    "command_acks": ss.seen_commands, "message": ss.get("message")}
@@ -246,6 +253,13 @@ def arcade():
             ss.setdefault("next_replay_seed", secrets.randbelow(2**31))
             payload["replay_template"] = {"seed": ss.next_replay_seed, "difficulty": difficulty(1),
                                           "quiz_preview": quiz_preview(svc, 1, ss.next_replay_seed)}
+        if ss.get("page") == "PHOTOS" and not (ss.get("game_id") or ss.get("room_id")):
+            try:
+                payload["photo_summary"] = {
+                    "approved_count": sum(photo["approved"] for photo in cached_photo_records()),
+                }
+            except PhotoError:
+                payload["photo_summary"] = {"approved_count": 0}
         asset_revision = tuple((ROOT / "assets" / f).stat().st_mtime_ns
                                for f in ("game.css", "course.js", "game.js", "ui.js")) + tuple(
                                    p.stat().st_mtime_ns for p in sorted((ROOT / "static").glob("couple-*.png")))
@@ -286,12 +300,6 @@ def photo_upload_and_supervisor():
     if not approved:
         ss.photo_show_flipbook = False
 
-    flipbook_label = f"♥ Apri il Flipbook ({len(approved)} foto)" if approved else "♥ Flipbook in preparazione"
-    if st.button(flipbook_label, type="primary", disabled=not approved,
-                 width="stretch", key="open-wedding-flipbook"):
-        ss.photo_show_flipbook = True
-        ss.flipbook_page = 0
-        st.rerun()
     if ss.get("photo_show_flipbook"):
         st.subheader("♥ Flipbook di Irene e Daniele")
         st.caption("Gli scatti scelti dagli sposi")
@@ -380,10 +388,20 @@ def photo_upload_and_supervisor():
                 publish, remove, delete = st.columns(3)
                 if publish.button("Pubblica nel Flipbook", disabled=not selected,
                                   type="primary", width="stretch"):
-                    album.set_approved_many(selected, True)
+                    published = album.set_approved_many(selected, True)
                     clear_photo_cache()
+                    ss.pop("menu_snapshot", None)
+                    ss.photo_show_flipbook = False
                     for photo_id in selected:
                         ss.pop(f"supervisor-photo-{photo_id}", None)
+                    ss.photo_feedback = {
+                        "kind": "success",
+                        "message": (
+                            f"{published} foto pubblicate nel Flipbook. "
+                            "Usa il pulsante ♥ Apri il Flipbook nel riquadro in alto."
+                        ),
+                        "at": time.monotonic(),
+                    }
                     st.rerun()
                 if remove.button("Rimuovi dal Flipbook", disabled=not selected, width="stretch"):
                     album.set_approved_many(selected, False)
