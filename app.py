@@ -48,8 +48,9 @@ def service():
     return GameService(db, bank)
 
 
-@st.cache_resource
 def photo_album():
+    # This wrapper is intentionally not cached: it is cheap, while caching it
+    # can retain an instance of an older PhotoService class across a Cloud hot deploy.
     try:
         storage = AppsScriptDriveStorage(
             st.secrets["GOOGLE_DRIVE_WEBAPP_URL"],
