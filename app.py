@@ -62,8 +62,8 @@ def photo_album():
     return PhotoService(service().db, storage)
 
 
-@st.cache_data(ttl=15, max_entries=4, show_spinner=False)
-def cached_photo_records():
+@st.cache_data(ttl=15, max_entries=12, show_spinner=False)
+def cached_photo_records(revision=0):
     return photo_album().list_photos()
 
 
@@ -73,6 +73,7 @@ def cached_photo_bytes(storage_id):
 
 
 def clear_photo_cache():
+    st.session_state.photo_records_revision = int(st.session_state.get("photo_records_revision", 0)) + 1
     cached_photo_records.clear()
     cached_photo_bytes.clear()
 
@@ -256,7 +257,9 @@ def arcade():
         if ss.get("page") == "PHOTOS" and not (ss.get("game_id") or ss.get("room_id")):
             try:
                 payload["photo_summary"] = {
-                    "approved_count": sum(photo["approved"] for photo in cached_photo_records()),
+                    "approved_count": sum(photo["approved"] for photo in cached_photo_records(
+                        int(ss.get("photo_records_revision", 0))
+                    )),
                 }
             except PhotoError:
                 payload["photo_summary"] = {"approved_count": 0}
@@ -286,7 +289,7 @@ def photo_upload_and_supervisor():
         st.info("L'album fotografico sarà attivato dagli sposi a breve.")
         return
     try:
-        photos = cached_photo_records()
+        photos = cached_photo_records(int(ss.get("photo_records_revision", 0)))
         approved = sorted(
             (photo for photo in photos if photo["approved"]),
             key=lambda photo: (
@@ -577,7 +580,8 @@ def render_flipbook_order_item(album, ordered_photos, photo, position, locked_po
     locked = bool(photo.get("flipbook_locked"))
     revision = int(ss.get("flipbook_order_revision", 0))
 
-    def refresh_order():
+    def refresh_order(message):
+        ss.photo_feedback = {"kind": "success", "message": message, "at": time.monotonic()}
         ss.flipbook_order_revision = revision + 1
         clear_photo_cache()
         st.rerun()
@@ -620,7 +624,7 @@ def render_flipbook_order_item(album, ordered_photos, photo, position, locked_po
                 disabled=locked or position == 1 or previous_locked, help="Sposta una posizione prima"):
             try:
                 album.move_flipbook_photo(photo["id"], -1)
-                refresh_order()
+                refresh_order(f"Foto spostata dalla posizione {position} alla posizione {position - 1}.")
             except PhotoError as exc:
                 st.error(str(exc))
         if move_next.button(
@@ -629,7 +633,7 @@ def render_flipbook_order_item(album, ordered_photos, photo, position, locked_po
                 help="Sposta una posizione dopo"):
             try:
                 album.move_flipbook_photo(photo["id"], 1)
-                refresh_order()
+                refresh_order(f"Foto spostata dalla posizione {position} alla posizione {position + 1}.")
             except PhotoError as exc:
                 st.error(str(exc))
 
@@ -640,14 +644,19 @@ def render_flipbook_order_item(album, ordered_photos, photo, position, locked_po
                 help="Scambia questa foto con quella nella posizione scelta"):
             try:
                 album.set_flipbook_position(photo["id"], chosen - 1)
-                refresh_order()
+                refresh_order(
+                    f"Scambio completato: la foto in posizione {position} è ora in posizione {chosen}; "
+                    f"la precedente posizione {chosen} è passata alla posizione {position}."
+                )
             except PhotoError as exc:
                 st.error(str(exc))
         lock_label = "Sblocca" if locked else "Blocca"
         if lock.button(lock_label, key=f"flipbook-lock-{photo['id']}", width="stretch"):
             try:
                 album.set_flipbook_locked(photo["id"], not locked)
-                refresh_order()
+                refresh_order(
+                    f"Posizione {position} {'bloccata' if not locked else 'sbloccata'} correttamente."
+                )
             except PhotoError as exc:
                 st.error(str(exc))
 
