@@ -109,3 +109,4 @@ class EventPhoto(Base):
     uploaded_at: Mapped[float] = mapped_column(Float, default=time.time, index=True)
     approved: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     approved_at: Mapped[float | None] = mapped_column(Float, nullable=True)
+    flipbook_order: Mapped[int | None] = mapped_column(Integer, nullable=True)

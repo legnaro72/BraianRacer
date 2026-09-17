@@ -2,7 +2,7 @@
 import logging
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine, event, select, text
+from sqlalchemy import create_engine, event, inspect, select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -30,6 +30,11 @@ class Database:
                 connection.execute("PRAGMA journal_mode=WAL")
                 connection.execute("PRAGMA busy_timeout=20000")
         Base.metadata.create_all(self.engine)
+        if self.sqlite:
+            columns = {column["name"] for column in inspect(self.engine).get_columns("event_photos")}
+            if "flipbook_order" not in columns:
+                with self.engine.begin() as connection:
+                    connection.execute(text("ALTER TABLE event_photos ADD COLUMN flipbook_order INTEGER"))
         try:
             with Session(self.engine) as session, session.begin():
                 if session.get(Coordination, 1) is None:

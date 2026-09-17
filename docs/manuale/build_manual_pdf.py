@@ -155,6 +155,7 @@ for item in (
     "Puoi caricare JPG, PNG, WebP, HEIC e HEIF, massimo 10 MB ciascuna.",
     "Premi Carica le foto e attendi la conferma.",
     "Tutti gli invitati vedono la galleria condivisa.",
+    "Su Drive: MMDDYY_nickname_nomeoriginale.",
 ):
     y = bullet(c, item, x, y, width, size=8.8, leading=12) - 6
 text(c, "Sfogliare il Flipbook", x, y - 2, size=13, font="ManualBold", color=black)
@@ -167,6 +168,7 @@ for item in (
     "Inserisci la password nell’area riservata.",
     "Seleziona più foto o usa Seleziona tutte.",
     "Pubblica nel Flipbook o Rimuovi dal Flipbook.",
+    "Usa le frecce su e giù per scegliere l’ordine.",
     "Elimina selezionate richiede conferma.",
     "Annulla selezione deseleziona tutto.",
 ):

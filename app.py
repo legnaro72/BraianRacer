@@ -272,7 +272,14 @@ def photo_upload_and_supervisor():
         return
     try:
         photos = cached_photo_records()
-        approved = [photo for photo in photos if photo["approved"]]
+        approved = sorted(
+            (photo for photo in photos if photo["approved"]),
+            key=lambda photo: (
+                photo.get("flipbook_order") is None,
+                photo.get("flipbook_order") if photo.get("flipbook_order") is not None else 0,
+                photo.get("approved_at") or photo["uploaded_at"],
+            ),
+        )
     except PhotoError:
         photos, approved = [], []
     if not approved:
@@ -385,6 +392,36 @@ def photo_upload_and_supervisor():
                 if delete.button("Elimina selezionate", disabled=not selected, width="stretch"):
                     ss.photo_delete_confirm = tuple(selected)
                     st.rerun()
+
+            ordered_flipbook = sorted(
+                (photo for photo in photos if photo["approved"]),
+                key=lambda photo: (
+                    photo.get("flipbook_order") is None,
+                    photo.get("flipbook_order") if photo.get("flipbook_order") is not None else 0,
+                    photo.get("approved_at") or photo["uploaded_at"],
+                ),
+            )
+            if ordered_flipbook:
+                st.markdown("#### Ordine del Flipbook")
+                st.caption("Usa le frecce per scegliere l'ordine in cui saranno mostrate le foto.")
+                for position, photo in enumerate(ordered_flipbook, start=1):
+                    preview, label, up, down = st.columns([1.3, 4, 1, 1])
+                    try:
+                        image, _ = cached_photo_bytes(photo["storage_id"])
+                        preview.image(image, width=80)
+                    except PhotoError:
+                        preview.caption("Anteprima non disponibile")
+                    label.write(f"**{position}. {photo['filename']}** · {photo['nickname']}")
+                    if up.button("↑", key=f"flipbook-up-{photo['id']}",
+                                 disabled=position == 1, help="Sposta prima"):
+                        album.move_flipbook_photo(photo["id"], -1)
+                        clear_photo_cache()
+                        st.rerun()
+                    if down.button("↓", key=f"flipbook-down-{photo['id']}",
+                                   disabled=position == len(ordered_flipbook), help="Sposta dopo"):
+                        album.move_flipbook_photo(photo["id"], 1)
+                        clear_photo_cache()
+                        st.rerun()
 
             pending_delete = ss.get("photo_delete_confirm", ())
             delete_selection = (tuple(pending_delete) if isinstance(pending_delete, (list, tuple, set))

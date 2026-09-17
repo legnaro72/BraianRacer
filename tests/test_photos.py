@@ -1,5 +1,7 @@
 import base64
 import io
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import pytest
 import requests
@@ -7,7 +9,8 @@ from PIL import Image
 
 from brain_racer.photo_service import (AppsScriptDriveStorage, MAX_FILE_BYTES,
                                        MAX_FILES_PER_UPLOAD, PhotoError,
-                                       PhotoService, prepare_photo, safe_filename)
+                                       PhotoService, dated_drive_filename,
+                                       prepare_photo, safe_filename)
 
 
 class FakeResponse:
@@ -73,8 +76,11 @@ def test_apps_script_errors_are_safe_for_guests(response):
 
 
 def test_shared_album_keeps_metadata_and_supports_flipbook_approval(svc, player):
+    uploaded_names = []
+
     class Storage:
         def drive_upload_photo(self, filename, mime_type, content):
+            uploaded_names.append(filename)
             return type("Stored", (), {"storage_id": "drive-1", "filename": filename, "mime_type": mime_type})()
 
     album = PhotoService(svc.db, Storage(), svc.clock)
@@ -82,8 +88,15 @@ def test_shared_album_keeps_metadata_and_supports_flipbook_approval(svc, player)
     assert [item.storage_id for item in result.uploaded] == ["drive-1"] and not result.failures
     photo = album.list_photos()[0]
     assert photo["nickname"] == "Pilota_1" and "url" not in photo
+    assert photo["filename"] == "arrivo.jpg"
+    assert uploaded_names[0].endswith("_Pilota_1_arrivo.jpg")
     assert album.set_approved(photo["id"], True) is True
     assert [row["id"] for row in album.list_photos(approved_only=True)] == [photo["id"]]
+
+
+def test_drive_filename_has_italian_upload_date_nickname_and_original_name():
+    uploaded_at = datetime(2026, 9, 17, 10, 30, tzinfo=ZoneInfo("Europe/Rome")).timestamp()
+    assert dated_drive_filename("foto1.jpg", "max", uploaded_at) == "091726_max_foto1.jpg"
 
 
 def test_supervisor_can_update_multiple_flipbook_photos(svc, player):
@@ -104,6 +117,27 @@ def test_supervisor_can_update_multiple_flipbook_photos(svc, player):
     assert len(album.list_photos(approved_only=True)) == 2
     assert album.set_approved_many(photo_ids, False) == 2
     assert album.list_photos(approved_only=True) == []
+
+
+def test_supervisor_can_choose_flipbook_order(svc, player):
+    class Storage:
+        next_id = 0
+
+        def drive_upload_photo(self, filename, mime_type, content):
+            self.next_id += 1
+            return type("Stored", (), {"storage_id": f"drive-order-{self.next_id}",
+                                        "filename": filename, "mime_type": mime_type})()
+
+    album = PhotoService(svc.db, Storage(), svc.clock)
+    album.upload_many(player, [("uno.jpg", "image/jpeg", b"one"),
+                               ("due.jpg", "image/jpeg", b"two")])
+    photo_ids = [photo["id"] for photo in album.list_photos()]
+    album.set_approved_many(photo_ids, True)
+    before = [photo["id"] for photo in album.list_photos(approved_only=True)]
+
+    album.move_flipbook_photo(before[1], -1)
+
+    assert [photo["id"] for photo in album.list_photos(approved_only=True)] == list(reversed(before))
 
 
 def test_photo_upload_validation_and_filename_sanitizing(svc, player):
@@ -135,7 +169,7 @@ def test_heic_photo_is_converted_to_jpeg():
 def test_batch_continues_after_one_photo_fails(svc, player):
     class Storage:
         def drive_upload_photo(self, filename, mime_type, content):
-            if filename == "due.jpg":
+            if filename.endswith("_due.jpg"):
                 raise PhotoError("errore controllato")
             return type("Stored", (), {"storage_id": filename, "filename": filename,
                                        "mime_type": mime_type})()
@@ -144,7 +178,9 @@ def test_batch_continues_after_one_photo_fails(svc, player):
         ("uno.jpg", "image/jpeg", b"1"), ("due.jpg", "image/jpeg", b"2"),
         ("tre.jpg", "image/jpeg", b"3"), ("quattro.jpg", "image/jpeg", b"4"),
     ])
-    assert [item.filename for item in result.uploaded] == ["uno.jpg", "tre.jpg", "quattro.jpg"]
+    assert [item.filename.rsplit("_", 1)[-1] for item in result.uploaded] == [
+        "uno.jpg", "tre.jpg", "quattro.jpg"
+    ]
     assert [(item.filename, item.message) for item in result.failures] == [("due.jpg", "errore controllato")]
 
 

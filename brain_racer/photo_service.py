@@ -8,7 +8,9 @@ import logging
 import re
 import time
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import PurePosixPath
+from zoneinfo import ZoneInfo
 
 import requests
 from PIL import Image, ImageOps
@@ -29,6 +31,7 @@ UPLOAD_TIMEOUT = (5, 35)
 MIME_BY_EXTENSION = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
 LOGGER = logging.getLogger(__name__)
 register_heif_opener()
+ROME = ZoneInfo("Europe/Rome")
 
 
 @dataclass(frozen=True)
@@ -97,6 +100,14 @@ def prepare_photo(filename, mime_type, content):
     else:
         mime_type = normalized_mime_type(filename, mime_type)
     return filename, mime_type, content
+
+
+def dated_drive_filename(filename, nickname, uploaded_at):
+    """Prefix Drive files with local upload date and the player's nickname."""
+    filename = safe_filename(filename)
+    nickname = re.sub(r"[^A-Za-z0-9_-]", "_", str(nickname or "ospite"))[:32] or "ospite"
+    date_prefix = datetime.fromtimestamp(uploaded_at, tz=ROME).strftime("%m%d%y")
+    return safe_filename(f"{date_prefix}_{nickname}_{filename}")
 
 
 class AppsScriptDriveStorage:
@@ -194,14 +205,18 @@ class PhotoService:
             raise PhotoError("L'album fotografico non è ancora disponibile.")
         self._validate_count(files)
         with self.db.read() as s:
-            if not s.get(Player, player_id):
+            player = s.get(Player, player_id)
+            if not player:
                 raise PhotoError("Profilo non trovato.")
+            nickname = player.nickname
         uploaded, failures = [], []
         for name, mime_type, content in files:
             try:
                 fingerprint = hashlib.sha256(content).hexdigest() if isinstance(content, bytes) else ""
                 filename, mime_type, content = self._validate_one(name, mime_type, content)
-                stored = self.storage.drive_upload_photo(filename, mime_type, content)
+                uploaded_at = self.clock()
+                drive_filename = dated_drive_filename(filename, nickname, uploaded_at)
+                stored = self.storage.drive_upload_photo(drive_filename, mime_type, content)
             except PhotoError as exc:
                 try:
                     failed_name = safe_filename(name)
@@ -212,14 +227,14 @@ class PhotoService:
             try:
                 with self.db.transaction() as s:
                     photo = EventPhoto(player_id=player_id, storage_id=stored.storage_id,
-                                       filename=stored.filename[:255], mime_type=stored.mime_type,
-                                       byte_size=len(content), uploaded_at=self.clock())
+                                       filename=filename[:255], mime_type=stored.mime_type,
+                                       byte_size=len(content), uploaded_at=uploaded_at)
                     s.add(photo)
             except Exception as exc:
                 failures.append(UploadFailure(filename,
                     "Ricevuta da Drive, ma non registrata nell'album: avvisa gli sposi."))
                 continue
-            uploaded.append(UploadedPhoto(stored.storage_id, stored.filename, fingerprint))
+            uploaded.append(UploadedPhoto(stored.storage_id, filename, fingerprint))
         return UploadBatchResult(tuple(uploaded), tuple(failures))
 
     def get_photo(self, storage_id):
@@ -240,10 +255,18 @@ class PhotoService:
                 result.append({
                     "id": photo.id, "storage_id": photo.storage_id, "filename": photo.filename,
                     "mime_type": photo.mime_type, "uploaded_at": photo.uploaded_at,
-                    "approved": photo.approved, "nickname": player.nickname, "tag": player.player_tag,
+                    "approved": photo.approved, "approved_at": photo.approved_at,
+                    "flipbook_order": photo.flipbook_order,
+                    "nickname": player.nickname, "tag": player.player_tag,
                 })
                 if limit is not None and len(result) >= limit:
                     break
+            if approved_only:
+                result.sort(key=lambda photo: (
+                    photo["flipbook_order"] is None,
+                    photo["flipbook_order"] if photo["flipbook_order"] is not None else 0,
+                    photo["approved_at"] or photo["uploaded_at"],
+                ))
             return result
 
     def set_approved(self, photo_id, approved):
@@ -259,10 +282,39 @@ class PhotoService:
             if any(photo is None for photo in photos):
                 raise PhotoError("Una delle foto selezionate non è più disponibile.")
             approved_at = self.clock() if approved else None
+            existing = s.find(EventPhoto)
+            next_order = max((photo.flipbook_order for photo in existing
+                              if photo.approved and photo.flipbook_order is not None), default=-1) + 1
             for photo in photos:
                 photo.approved = bool(approved)
                 photo.approved_at = approved_at
+                if approved and photo.flipbook_order is None:
+                    photo.flipbook_order = next_order
+                    next_order += 1
+                elif not approved:
+                    photo.flipbook_order = None
         return len(photos)
+
+    def move_flipbook_photo(self, photo_id, direction):
+        if direction not in (-1, 1):
+            raise PhotoError("Spostamento non valido.")
+        with self.db.transaction() as s:
+            photos = [photo for photo in s.find(EventPhoto) if photo.approved]
+            photos.sort(key=lambda photo: (
+                photo.flipbook_order is None,
+                photo.flipbook_order if photo.flipbook_order is not None else 0,
+                photo.approved_at or photo.uploaded_at,
+            ))
+            index = next((i for i, photo in enumerate(photos) if photo.id == photo_id), None)
+            if index is None:
+                raise PhotoError("Foto non trovata nel Flipbook.")
+            target = index + direction
+            if target < 0 or target >= len(photos):
+                return index
+            photos[index], photos[target] = photos[target], photos[index]
+            for order, photo in enumerate(photos):
+                photo.flipbook_order = order
+            return target
 
     def delete_photo(self, photo_id):
         if not self.storage:
