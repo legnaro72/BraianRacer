@@ -84,6 +84,26 @@ def test_shared_album_keeps_metadata_and_supports_flipbook_approval(svc, player)
     assert [row["id"] for row in album.list_photos(approved_only=True)] == [photo["id"]]
 
 
+def test_supervisor_can_update_multiple_flipbook_photos(svc, player):
+    class Storage:
+        next_id = 0
+
+        def drive_upload_photo(self, filename, mime_type, content):
+            self.next_id += 1
+            return type("Stored", (), {"storage_id": f"drive-{self.next_id}",
+                                        "filename": filename, "mime_type": mime_type})()
+
+    album = PhotoService(svc.db, Storage(), svc.clock)
+    album.upload_many(player, [("uno.jpg", "image/jpeg", b"one"),
+                               ("due.jpg", "image/jpeg", b"two")])
+    photo_ids = [photo["id"] for photo in album.list_photos()]
+
+    assert album.set_approved_many(photo_ids, True) == 2
+    assert len(album.list_photos(approved_only=True)) == 2
+    assert album.set_approved_many(photo_ids, False) == 2
+    assert album.list_photos(approved_only=True) == []
+
+
 def test_photo_upload_validation_and_filename_sanitizing(svc, player):
     album = PhotoService(svc.db)
     assert safe_filename("C:\\fake\\foto bella!.jpg") == "foto bella_.jpg"

@@ -223,13 +223,22 @@ class PhotoService:
             return result
 
     def set_approved(self, photo_id, approved):
-        with self.db.transaction() as s:
-            photo = s.get(EventPhoto, photo_id)
-            if not photo:
-                raise PhotoError("Foto non trovata.")
-            photo.approved = bool(approved)
-            photo.approved_at = self.clock() if photo.approved else None
+        self.set_approved_many([photo_id], approved)
         return bool(approved)
+
+    def set_approved_many(self, photo_ids, approved):
+        photo_ids = list(dict.fromkeys(photo_ids))
+        if not photo_ids:
+            raise PhotoError("Seleziona almeno una foto.")
+        with self.db.transaction() as s:
+            photos = [s.get(EventPhoto, photo_id) for photo_id in photo_ids]
+            if any(photo is None for photo in photos):
+                raise PhotoError("Una delle foto selezionate non è più disponibile.")
+            approved_at = self.clock() if approved else None
+            for photo in photos:
+                photo.approved = bool(approved)
+                photo.approved_at = approved_at
+        return len(photos)
 
     def delete_photo(self, photo_id):
         if not self.storage:

@@ -324,6 +324,16 @@ def photo_upload_and_supervisor():
             photos = cached_photo_records()
             pending = [photo for photo in photos if not photo["approved"]]
             st.caption(f"{len(photos)} foto ricevute · {len(pending)} da selezionare per il Flipbook")
+            select_all, clear_selection = st.columns(2)
+            if select_all.button("Seleziona tutte", disabled=not photos, width="stretch"):
+                for photo in photos:
+                    ss[f"supervisor-photo-{photo['id']}"] = True
+                st.rerun()
+            if clear_selection.button("Azzera selezione", disabled=not photos, width="stretch"):
+                for photo in photos:
+                    ss.pop(f"supervisor-photo-{photo['id']}", None)
+                st.rerun()
+            selected = []
             for photo in photos:
                 left, right = st.columns([1, 2])
                 with left:
@@ -331,34 +341,61 @@ def photo_upload_and_supervisor():
                 with right:
                     st.write(f"**{photo['filename']}**")
                     st.caption(f"Caricata da {photo['nickname']} #{photo['tag']}")
-                    label = "Rimuovi dal Flipbook" if photo["approved"] else "Pubblica nel Flipbook"
-                    if st.button(label, key=f"photo-approval-{photo['id']}"):
-                        album.set_approved(photo["id"], not photo["approved"])
-                        clear_photo_cache()
-                        st.rerun()
-                    if ss.get("photo_delete_confirm") == photo["id"]:
-                        st.warning("La foto sarà rimossa da Drive e dall'album.")
-                        confirm, cancel = st.columns(2)
-                        if confirm.button("Conferma eliminazione", key=f"confirm-photo-delete-{photo['id']}"):
+                    if photo["approved"]:
+                        st.caption("♥ Già nel Flipbook")
+                    if st.checkbox("Seleziona", key=f"supervisor-photo-{photo['id']}"):
+                        selected.append(photo["id"])
+
+            if photos:
+                st.caption(f"{len(selected)} foto selezionate")
+                publish, remove, delete = st.columns(3)
+                if publish.button("Pubblica nel Flipbook", disabled=not selected,
+                                  type="primary", width="stretch"):
+                    album.set_approved_many(selected, True)
+                    clear_photo_cache()
+                    for photo_id in selected:
+                        ss.pop(f"supervisor-photo-{photo_id}", None)
+                    st.rerun()
+                if remove.button("Rimuovi dal Flipbook", disabled=not selected, width="stretch"):
+                    album.set_approved_many(selected, False)
+                    clear_photo_cache()
+                    for photo_id in selected:
+                        ss.pop(f"supervisor-photo-{photo_id}", None)
+                    st.rerun()
+                if delete.button("Elimina selezionate", disabled=not selected, width="stretch"):
+                    ss.photo_delete_confirm = tuple(selected)
+                    st.rerun()
+
+            pending_delete = ss.get("photo_delete_confirm", ())
+            delete_selection = (tuple(pending_delete) if isinstance(pending_delete, (list, tuple, set))
+                                else ((pending_delete,) if pending_delete else ()))
+            if delete_selection:
+                st.warning(f"{len(delete_selection)} foto saranno rimosse da Drive e dall'album.")
+                confirm, cancel = st.columns(2)
+                if confirm.button("Conferma eliminazione", type="primary", width="stretch"):
+                    deleted, failures = 0, []
+                    with st.spinner("Eliminazione in corso…"):
+                        for photo_id in delete_selection:
                             try:
-                                with st.spinner("Eliminazione in corso…"):
-                                    album.delete_photo(photo["id"])
-                                clear_photo_cache()
-                                cached_photo_bytes.clear()
-                                ss.pop("photo_delete_confirm", None)
-                                ss.photo_feedback = {"kind": "success", "message": "Foto eliminata.",
-                                                     "at": time.monotonic()}
-                                st.rerun()
+                                album.delete_photo(photo_id)
+                                deleted += 1
                             except PhotoError as exc:
-                                ss.photo_feedback = {"kind": "error", "message": str(exc),
-                                                     "at": time.monotonic()}
-                                st.error(str(exc))
-                        if cancel.button("Annulla", key=f"cancel-photo-delete-{photo['id']}"):
-                            ss.pop("photo_delete_confirm", None)
-                            st.rerun()
-                    elif st.button("Elimina foto", key=f"delete-photo-{photo['id']}"):
-                        ss.photo_delete_confirm = photo["id"]
-                        st.rerun()
+                                failures.append(str(exc))
+                    clear_photo_cache()
+                    cached_photo_bytes.clear()
+                    ss.pop("photo_delete_confirm", None)
+                    for photo_id in delete_selection:
+                        ss.pop(f"supervisor-photo-{photo_id}", None)
+                    if failures:
+                        message = f"Eliminate {deleted} foto su {len(delete_selection)}. {failures[0]}"
+                        ss.photo_feedback = {"kind": "warning", "message": message, "at": time.monotonic()}
+                    else:
+                        ss.photo_feedback = {"kind": "success", "message": f"{deleted} foto eliminate.",
+                                             "at": time.monotonic()}
+                    st.rerun()
+                if cancel.button("Annulla", width="stretch"):
+                    ss.pop("photo_delete_confirm", None)
+                    st.rerun()
 
     try:
         photos = cached_photo_records()
