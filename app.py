@@ -350,11 +350,9 @@ def photo_upload_and_supervisor():
             if select_all.button("Seleziona tutte", disabled=not photos, width="stretch"):
                 for photo in photos:
                     ss[f"supervisor-photo-{photo['id']}"] = True
-                st.rerun()
-            if clear_selection.button("Azzera selezione", disabled=not photos, width="stretch"):
+            if clear_selection.button("Annulla selezione", disabled=not photos, width="stretch"):
                 for photo in photos:
                     ss.pop(f"supervisor-photo-{photo['id']}", None)
-                st.rerun()
             selected = []
             for photo in photos:
                 left, right = st.columns([1, 2])
