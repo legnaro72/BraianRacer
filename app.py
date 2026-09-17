@@ -363,6 +363,9 @@ def photo_upload_and_supervisor():
             st.success("Area supervisore attiva")
             pending = [photo for photo in photos if not photo["approved"]]
             st.caption(f"{len(photos)} foto ricevute · {len(pending)} da selezionare per il Flipbook")
+            pending_delete = ss.get("photo_delete_confirm", ())
+            delete_selection = (tuple(pending_delete) if isinstance(pending_delete, (list, tuple, set))
+                                else ((pending_delete,) if pending_delete else ()))
             select_all, clear_selection = st.columns(2)
             if select_all.button("Seleziona tutte", disabled=not photos, width="stretch"):
                 for photo in photos:
@@ -371,17 +374,12 @@ def photo_upload_and_supervisor():
                 for photo in photos:
                     ss.pop(f"supervisor-photo-{photo['id']}", None)
             selected = []
-            for photo in photos:
-                left, right = st.columns([1, 2])
-                with left:
-                    render_photo(photo, "Anteprima non disponibile")
-                with right:
-                    st.write(f"**{photo['filename']}**")
-                    st.caption(f"Caricata da {photo['nickname']} #{photo['tag']}")
-                    if photo["approved"]:
-                        st.caption("♥ Già nel Flipbook")
-                    if st.checkbox("Seleziona", key=f"supervisor-photo-{photo['id']}"):
-                        selected.append(photo["id"])
+            for first in range(0, len(photos), 3):
+                cards = st.columns(3)
+                for card, photo in zip(cards, photos[first:first + 3]):
+                    with card:
+                        if render_supervisor_photo_card(photo, photo["id"] in delete_selection):
+                            selected.append(photo["id"])
 
             if photos:
                 st.caption(f"{len(selected)} foto selezionate")
@@ -411,6 +409,34 @@ def photo_upload_and_supervisor():
                     st.rerun()
                 if delete.button("Elimina selezionate", disabled=not selected, width="stretch"):
                     ss.photo_delete_confirm = tuple(selected)
+                    st.rerun()
+
+            if delete_selection:
+                st.warning(f"{len(delete_selection)} foto saranno rimosse da Drive e dall'album.")
+                confirm, cancel = st.columns(2)
+                if confirm.button("Conferma eliminazione", type="primary", width="stretch"):
+                    deleted, failures = 0, []
+                    with st.spinner("Eliminazione in corso…"):
+                        for photo_id in delete_selection:
+                            try:
+                                album.delete_photo(photo_id)
+                                deleted += 1
+                            except PhotoError as exc:
+                                failures.append(str(exc))
+                    clear_photo_cache()
+                    cached_photo_bytes.clear()
+                    ss.pop("photo_delete_confirm", None)
+                    for photo_id in delete_selection:
+                        ss.pop(f"supervisor-photo-{photo_id}", None)
+                    if failures:
+                        message = f"Eliminate {deleted} foto su {len(delete_selection)}. {failures[0]}"
+                        ss.photo_feedback = {"kind": "warning", "message": message, "at": time.monotonic()}
+                    else:
+                        ss.photo_feedback = {"kind": "success", "message": f"{deleted} foto eliminate.",
+                                             "at": time.monotonic()}
+                    st.rerun()
+                if cancel.button("Annulla", width="stretch"):
+                    ss.pop("photo_delete_confirm", None)
                     st.rerun()
 
             ordered_flipbook = sorted(
@@ -470,37 +496,6 @@ def photo_upload_and_supervisor():
                             locked_positions, compact=False,
                         )
 
-            pending_delete = ss.get("photo_delete_confirm", ())
-            delete_selection = (tuple(pending_delete) if isinstance(pending_delete, (list, tuple, set))
-                                else ((pending_delete,) if pending_delete else ()))
-            if delete_selection:
-                st.warning(f"{len(delete_selection)} foto saranno rimosse da Drive e dall'album.")
-                confirm, cancel = st.columns(2)
-                if confirm.button("Conferma eliminazione", type="primary", width="stretch"):
-                    deleted, failures = 0, []
-                    with st.spinner("Eliminazione in corso…"):
-                        for photo_id in delete_selection:
-                            try:
-                                album.delete_photo(photo_id)
-                                deleted += 1
-                            except PhotoError as exc:
-                                failures.append(str(exc))
-                    clear_photo_cache()
-                    cached_photo_bytes.clear()
-                    ss.pop("photo_delete_confirm", None)
-                    for photo_id in delete_selection:
-                        ss.pop(f"supervisor-photo-{photo_id}", None)
-                    if failures:
-                        message = f"Eliminate {deleted} foto su {len(delete_selection)}. {failures[0]}"
-                        ss.photo_feedback = {"kind": "warning", "message": message, "at": time.monotonic()}
-                    else:
-                        ss.photo_feedback = {"kind": "success", "message": f"{deleted} foto eliminate.",
-                                             "at": time.monotonic()}
-                    st.rerun()
-                if cancel.button("Annulla", width="stretch"):
-                    ss.pop("photo_delete_confirm", None)
-                    st.rerun()
-
     if photos:
         gallery_open = bool(ss.get("photo_gallery_open", False))
         gallery_label = ("▲ Nascondi tutte le foto della festa" if gallery_open else
@@ -542,6 +537,38 @@ def render_photo(photo, unavailable):
         st.image(image, caption=f"Caricata da {photo['nickname']} #{photo['tag']} · {photo['filename']}", width="stretch")
     except PhotoError:
         st.caption(unavailable)
+
+
+def render_supervisor_photo_card(photo, marked_for_deletion):
+    """Compact selection card with a durable visual state for wedding supervisors."""
+    ss = st.session_state
+    photo_id = photo["id"]
+    selected = bool(ss.get(f"supervisor-photo-{photo_id}", False))
+    if marked_for_deletion:
+        color, shade, label = "#d74b55", "#fff0f1", "⚠ In attesa di conferma eliminazione"
+    elif selected:
+        color, shade, label = "#d5a619", "#fff9df", "● Selezionata"
+    elif photo["approved"]:
+        color, shade, label = "#40a35c", "#effaf1", "♥ Già nel Flipbook"
+    else:
+        color, shade, label = "#e6cdbd", "#fffdf9", "Da selezionare"
+    card_key = f"supervisor-card-{photo_id}"
+    st.html(
+        f"<style>.st-key-{card_key},.st-key-{card_key} [data-testid='stVerticalBlockBorderWrapper']"
+        f"{{border:3px solid {color}!important;background:{shade}!important;"
+        f"border-radius:16px!important;box-shadow:0 5px 16px {color}2b!important}}</style>"
+    )
+    with st.container(border=True, key=card_key):
+        try:
+            image, _ = cached_photo_bytes(photo["storage_id"])
+            st.image(image, width="stretch")
+        except PhotoError:
+            st.caption("Anteprima non disponibile")
+        st.markdown(f"**{photo['filename']}**")
+        st.caption(f"Caricata da {photo['nickname']} #{photo['tag']}")
+        st.caption(label)
+        return st.checkbox("Seleziona", key=f"supervisor-photo-{photo_id}",
+                           disabled=marked_for_deletion)
 
 
 def render_flipbook_order_item(album, ordered_photos, photo, position, locked_positions, compact):
