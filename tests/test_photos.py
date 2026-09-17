@@ -140,6 +140,35 @@ def test_supervisor_can_choose_flipbook_order(svc, player):
     assert [photo["id"] for photo in album.list_photos(approved_only=True)] == list(reversed(before))
 
 
+def test_locked_flipbook_position_is_unavailable_until_unlocked(svc, player):
+    class Storage:
+        next_id = 0
+
+        def drive_upload_photo(self, filename, mime_type, content):
+            self.next_id += 1
+            return type("Stored", (), {"storage_id": f"drive-lock-{self.next_id}",
+                                        "filename": filename, "mime_type": mime_type})()
+
+    album = PhotoService(svc.db, Storage(), svc.clock)
+    album.upload_many(player, [("uno.jpg", "image/jpeg", b"one"),
+                               ("due.jpg", "image/jpeg", b"two"),
+                               ("tre.jpg", "image/jpeg", b"three")])
+    photo_ids = [photo["id"] for photo in album.list_photos()]
+    album.set_approved_many(photo_ids, True)
+    ordered = album.list_photos(approved_only=True)
+    locked_id, moving_id = ordered[1]["id"], ordered[2]["id"]
+
+    assert album.set_flipbook_locked(locked_id, True) is True
+    with pytest.raises(PhotoError, match="bloccata"):
+        album.set_flipbook_position(moving_id, 1)
+    assert album.set_flipbook_locked(locked_id, False) is False
+    album.set_flipbook_position(moving_id, 1)
+
+    result = album.list_photos(approved_only=True)
+    assert result[1]["id"] == moving_id
+    assert result[1]["flipbook_locked"] is False
+
+
 def test_photo_upload_validation_and_filename_sanitizing(svc, player):
     album = PhotoService(svc.db)
     assert safe_filename("C:\\fake\\foto bella!.jpg") == "foto bella_.jpg"

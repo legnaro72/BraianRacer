@@ -45,9 +45,10 @@ Il pulsante **♥ Apri il Flipbook** si attiva quando gli sposi pubblicano almen
 1. Apri l'area riservata nella pagina **Foto ♥** e inserisci la password degli sposi.
 2. Seleziona più foto oppure usa **Seleziona tutte**.
 3. Usa **Pubblica nel Flipbook**, **Rimuovi dal Flipbook** o **Elimina selezionate**.
-4. Nella sezione **Ordine del Flipbook** usa le frecce su e giù accanto alle miniature.
-5. La cancellazione richiede una conferma.
-6. **Annulla selezione** deseleziona tutte le immagini.
+4. Nella sezione **Ordine del Flipbook** scegli il numero della posizione e premi **Assegna**.
+5. Quando l'ordine è definitivo premi **Blocca**: quella posizione resta riservata. Premi **Sblocca** per modificarla.
+6. La cancellazione richiede una conferma.
+7. **Annulla selezione** deseleziona tutte le immagini.
 
 ## Se qualcosa non risponde
 

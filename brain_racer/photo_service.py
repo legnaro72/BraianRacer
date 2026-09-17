@@ -257,6 +257,7 @@ class PhotoService:
                     "mime_type": photo.mime_type, "uploaded_at": photo.uploaded_at,
                     "approved": photo.approved, "approved_at": photo.approved_at,
                     "flipbook_order": photo.flipbook_order,
+                    "flipbook_locked": bool(photo.flipbook_locked),
                     "nickname": player.nickname, "tag": player.player_tag,
                 })
                 if limit is not None and len(result) >= limit:
@@ -293,24 +294,74 @@ class PhotoService:
                     next_order += 1
                 elif not approved:
                     photo.flipbook_order = None
+                    photo.flipbook_locked = False
         return len(photos)
+
+    @staticmethod
+    def _ordered_flipbook(photos):
+        photos = [photo for photo in photos if photo.approved]
+        photos.sort(key=lambda photo: (
+            photo.flipbook_order is None,
+            photo.flipbook_order if photo.flipbook_order is not None else 0,
+            photo.approved_at or photo.uploaded_at,
+        ))
+        return photos
+
+    def set_flipbook_position(self, photo_id, position):
+        with self.db.transaction() as s:
+            photos = self._ordered_flipbook(s.find(EventPhoto))
+            if not photos:
+                raise PhotoError("Il Flipbook non contiene ancora foto.")
+            position = int(position)
+            if position < 0 or position >= len(photos):
+                raise PhotoError("Posizione non valida.")
+            moving = next((photo for photo in photos if photo.id == photo_id), None)
+            if not moving:
+                raise PhotoError("Foto non trovata nel Flipbook.")
+            if moving.flipbook_locked:
+                raise PhotoError("Sblocca la foto prima di cambiarne la posizione.")
+            locked = {index: photo for index, photo in enumerate(photos)
+                      if photo.flipbook_locked and photo.id != photo_id}
+            if position in locked:
+                raise PhotoError("Questa posizione è bloccata da un'altra foto.")
+
+            result = [None] * len(photos)
+            for index, photo in locked.items():
+                result[index] = photo
+            result[position] = moving
+            remaining = [photo for photo in photos
+                         if photo.id != photo_id and not photo.flipbook_locked]
+            for index in range(len(result)):
+                if result[index] is None:
+                    result[index] = remaining.pop(0)
+            for order, photo in enumerate(result):
+                photo.flipbook_order = order
+            return position
+
+    def set_flipbook_locked(self, photo_id, locked):
+        with self.db.transaction() as s:
+            photos = self._ordered_flipbook(s.find(EventPhoto))
+            photo = next((item for item in photos if item.id == photo_id), None)
+            if not photo:
+                raise PhotoError("Foto non trovata nel Flipbook.")
+            for order, item in enumerate(photos):
+                item.flipbook_order = order
+            photo.flipbook_locked = bool(locked)
+            return photo.flipbook_locked
 
     def move_flipbook_photo(self, photo_id, direction):
         if direction not in (-1, 1):
             raise PhotoError("Spostamento non valido.")
         with self.db.transaction() as s:
-            photos = [photo for photo in s.find(EventPhoto) if photo.approved]
-            photos.sort(key=lambda photo: (
-                photo.flipbook_order is None,
-                photo.flipbook_order if photo.flipbook_order is not None else 0,
-                photo.approved_at or photo.uploaded_at,
-            ))
+            photos = self._ordered_flipbook(s.find(EventPhoto))
             index = next((i for i, photo in enumerate(photos) if photo.id == photo_id), None)
             if index is None:
                 raise PhotoError("Foto non trovata nel Flipbook.")
             target = index + direction
             if target < 0 or target >= len(photos):
                 return index
+            if photos[index].flipbook_locked or photos[target].flipbook_locked:
+                raise PhotoError("Sblocca la posizione prima di spostare la foto.")
             photos[index], photos[target] = photos[target], photos[index]
             for order, photo in enumerate(photos):
                 photo.flipbook_order = order

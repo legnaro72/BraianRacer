@@ -170,7 +170,8 @@ for item in (
     "Inserisci la password nell’area riservata.",
     "Seleziona più foto o usa Seleziona tutte.",
     "Pubblica nel Flipbook o Rimuovi dal Flipbook.",
-    "Usa le frecce su e giù per scegliere l’ordine.",
+    "Scegli la posizione, premi Assegna e poi Blocca.",
+    "Usa Sblocca per rendere di nuovo modificabile la posizione.",
     "Elimina selezionate richiede conferma.",
     "Annulla selezione deseleziona tutto.",
 ):

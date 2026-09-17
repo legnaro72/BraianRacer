@@ -403,25 +403,49 @@ def photo_upload_and_supervisor():
             )
             if ordered_flipbook:
                 st.markdown("#### Ordine del Flipbook")
-                st.caption("Usa le frecce per scegliere l'ordine in cui saranno mostrate le foto.")
+                st.caption("Scegli una posizione, premi Assegna e blocca la foto quando l'ordine è definitivo. Puoi sempre sbloccarla per cambiarlo.")
+                locked_positions = {
+                    position for position, photo in enumerate(ordered_flipbook, start=1)
+                    if photo.get("flipbook_locked")
+                }
                 for position, photo in enumerate(ordered_flipbook, start=1):
-                    preview, label, up, down = st.columns([1.3, 4, 1, 1])
+                    preview, label = st.columns([1, 4])
                     try:
                         image, _ = cached_photo_bytes(photo["storage_id"])
                         preview.image(image, width=80)
                     except PhotoError:
                         preview.caption("Anteprima non disponibile")
-                    label.write(f"**{position}. {photo['filename']}** · {photo['nickname']}")
-                    if up.button("↑", key=f"flipbook-up-{photo['id']}",
-                                 disabled=position == 1, help="Sposta prima"):
-                        album.move_flipbook_photo(photo["id"], -1)
-                        clear_photo_cache()
-                        st.rerun()
-                    if down.button("↓", key=f"flipbook-down-{photo['id']}",
-                                   disabled=position == len(ordered_flipbook), help="Sposta dopo"):
-                        album.move_flipbook_photo(photo["id"], 1)
-                        clear_photo_cache()
-                        st.rerun()
+                    locked = bool(photo.get("flipbook_locked"))
+                    label.write(f"**{position}. {photo['filename']}**")
+                    label.caption(f"Caricata da {photo['nickname']} #{photo['tag']} · {'🔒 Posizione bloccata' if locked else 'Posizione modificabile'}")
+                    position_column, apply_column, lock_column = st.columns([2, 1, 1])
+                    options = ([position] if locked else [
+                        candidate for candidate in range(1, len(ordered_flipbook) + 1)
+                        if candidate not in locked_positions or candidate == position
+                    ])
+                    position_key = f"flipbook-position-{photo['id']}"
+                    if ss.get(position_key) not in options:
+                        ss[position_key] = position
+                    chosen = position_column.selectbox(
+                        "Posizione", options, key=position_key, disabled=locked,
+                        label_visibility="collapsed",
+                    )
+                    if apply_column.button("Assegna", key=f"flipbook-assign-{photo['id']}",
+                                           disabled=locked or chosen == position, width="stretch"):
+                        try:
+                            album.set_flipbook_position(photo["id"], chosen - 1)
+                            clear_photo_cache()
+                            st.rerun()
+                        except PhotoError as exc:
+                            st.error(str(exc))
+                    lock_label = "Sblocca" if locked else "Blocca"
+                    if lock_column.button(lock_label, key=f"flipbook-lock-{photo['id']}", width="stretch"):
+                        try:
+                            album.set_flipbook_locked(photo["id"], not locked)
+                            clear_photo_cache()
+                            st.rerun()
+                        except PhotoError as exc:
+                            st.error(str(exc))
 
             pending_delete = ss.get("photo_delete_confirm", ())
             delete_selection = (tuple(pending_delete) if isinstance(pending_delete, (list, tuple, set))
@@ -464,7 +488,7 @@ def photo_upload_and_supervisor():
 def render_photo(photo, unavailable):
     try:
         image, _ = cached_photo_bytes(photo["storage_id"])
-        st.image(image, caption=f"{photo['filename']} · {photo['nickname']} #{photo['tag']}", width="stretch")
+        st.image(image, caption=f"Caricata da {photo['nickname']} #{photo['tag']} · {photo['filename']}", width="stretch")
     except PhotoError:
         st.caption(unavailable)
 

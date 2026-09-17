@@ -35,6 +35,9 @@ class Database:
             if "flipbook_order" not in columns:
                 with self.engine.begin() as connection:
                     connection.execute(text("ALTER TABLE event_photos ADD COLUMN flipbook_order INTEGER"))
+            if "flipbook_locked" not in columns:
+                with self.engine.begin() as connection:
+                    connection.execute(text("ALTER TABLE event_photos ADD COLUMN flipbook_locked BOOLEAN DEFAULT 0"))
         try:
             with Session(self.engine) as session, session.begin():
                 if session.get(Coordination, 1) is None:
