@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import io
 import logging
 import re
 import time
@@ -10,6 +11,8 @@ from dataclasses import dataclass
 from pathlib import PurePosixPath
 
 import requests
+from PIL import Image, ImageOps
+from pillow_heif import register_heif_opener
 
 from .models import EventPhoto, Player
 
@@ -19,11 +22,13 @@ class PhotoError(ValueError):
 
 
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp"}
+HEIC_TYPES = {"image/heic", "image/heif", "image/heic-sequence", "image/heif-sequence"}
 MAX_FILES_PER_UPLOAD = 20
 MAX_FILE_BYTES = 10 * 1024 * 1024
 UPLOAD_TIMEOUT = (5, 35)
 MIME_BY_EXTENSION = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
 LOGGER = logging.getLogger(__name__)
+register_heif_opener()
 
 
 @dataclass(frozen=True)
@@ -69,6 +74,29 @@ def normalized_mime_type(filename, value):
     if mime_type not in ALLOWED_TYPES:
         raise PhotoError("Sono accettate solo foto JPG, PNG o WebP.")
     return mime_type
+
+
+def prepare_photo(filename, mime_type, content):
+    """Validate an upload and convert iPhone HEIC/HEIF photos to displayable JPEG."""
+    filename = safe_filename(filename)
+    if not isinstance(content, bytes) or not content or len(content) > MAX_FILE_BYTES:
+        raise PhotoError("La foto deve pesare al massimo 10 MB.")
+    suffix = PurePosixPath(filename).suffix.lower()
+    mime_type = str(mime_type or "").lower().strip()
+    if mime_type in HEIC_TYPES or suffix in {".heic", ".heif"}:
+        try:
+            with Image.open(io.BytesIO(content)) as source:
+                image = ImageOps.exif_transpose(source).convert("RGB")
+                converted = io.BytesIO()
+                image.save(converted, format="JPEG", quality=90, optimize=True)
+        except (OSError, ValueError) as exc:
+            raise PhotoError("La foto HEIC non può essere letta. Prova a esportarla come JPG.") from exc
+        content = converted.getvalue()
+        filename = str(PurePosixPath(filename).with_suffix(".jpg"))
+        mime_type = "image/jpeg"
+    else:
+        mime_type = normalized_mime_type(filename, mime_type)
+    return filename, mime_type, content
 
 
 class AppsScriptDriveStorage:
@@ -159,11 +187,7 @@ class PhotoService:
 
     @staticmethod
     def _validate_one(name, mime_type, content):
-        filename = safe_filename(name)
-        mime_type = normalized_mime_type(filename, mime_type)
-        if not isinstance(content, bytes) or not content or len(content) > MAX_FILE_BYTES:
-            raise PhotoError("La foto deve pesare al massimo 10 MB.")
-        return filename, mime_type, content
+        return prepare_photo(name, mime_type, content)
 
     def upload_many(self, player_id, files):
         if not self.storage:
@@ -175,6 +199,7 @@ class PhotoService:
         uploaded, failures = [], []
         for name, mime_type, content in files:
             try:
+                fingerprint = hashlib.sha256(content).hexdigest() if isinstance(content, bytes) else ""
                 filename, mime_type, content = self._validate_one(name, mime_type, content)
                 stored = self.storage.drive_upload_photo(filename, mime_type, content)
             except PhotoError as exc:
@@ -194,8 +219,7 @@ class PhotoService:
                 failures.append(UploadFailure(filename,
                     "Ricevuta da Drive, ma non registrata nell'album: avvisa gli sposi."))
                 continue
-            uploaded.append(UploadedPhoto(stored.storage_id, stored.filename,
-                                           hashlib.sha256(content).hexdigest()))
+            uploaded.append(UploadedPhoto(stored.storage_id, stored.filename, fingerprint))
         return UploadBatchResult(tuple(uploaded), tuple(failures))
 
     def get_photo(self, storage_id):

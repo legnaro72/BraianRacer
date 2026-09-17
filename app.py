@@ -299,9 +299,9 @@ def photo_upload_and_supervisor():
     else:
         ss.pop("photo_feedback", None)
     with st.form("event-photo-upload", clear_on_submit=True):
-        files = st.file_uploader("Scegli fino a 20 foto", type=["jpg", "jpeg", "png", "webp"],
+        files = st.file_uploader("Scegli fino a 20 foto", type=["jpg", "jpeg", "png", "webp", "heic", "heif"],
                                  accept_multiple_files=True,
-                                 help="Massimo 10 MB per foto. Puoi selezionarne molte dalla galleria del telefono.")
+                                 help="JPG, PNG, WebP o HEIC. Massimo 10 MB per foto. Puoi selezionarne molte dalla galleria del telefono.")
         submitted = st.form_submit_button("Carica le foto")
     if submitted:
         try:

@@ -1,11 +1,13 @@
 import base64
+import io
 
 import pytest
 import requests
+from PIL import Image
 
 from brain_racer.photo_service import (AppsScriptDriveStorage, MAX_FILE_BYTES,
                                        MAX_FILES_PER_UPLOAD, PhotoError,
-                                       PhotoService, safe_filename)
+                                       PhotoService, prepare_photo, safe_filename)
 
 
 class FakeResponse:
@@ -116,6 +118,18 @@ def test_photo_upload_validation_and_filename_sanitizing(svc, player):
     with pytest.raises(PhotoError):
         album.upload_many(player, [(f"{i}.jpg", "image/jpeg", b"x")
                                     for i in range(MAX_FILES_PER_UPLOAD + 1)])
+
+
+def test_heic_photo_is_converted_to_jpeg():
+    source = io.BytesIO()
+    Image.new("RGB", (8, 6), (240, 120, 80)).save(source, format="HEIF")
+
+    filename, mime_type, content = prepare_photo("iphone.heic", "image/heic", source.getvalue())
+
+    assert filename == "iphone.jpg"
+    assert mime_type == "image/jpeg"
+    with Image.open(io.BytesIO(content)) as converted:
+        assert converted.format == "JPEG" and converted.size == (8, 6)
 
 
 def test_batch_continues_after_one_photo_fails(svc, player):

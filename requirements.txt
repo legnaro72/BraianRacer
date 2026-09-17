@@ -4,3 +4,4 @@ psycopg[binary]==3.3.3
 pytest==9.0.2
 pymongo==4.16.0
 requests==2.34.2
+pillow-heif==1.7.0
