@@ -43,6 +43,8 @@ Per consentire agli sposi di eliminare una foto, Apps Script deve accettare anch
 
 e rispondere con `{"ok":true,"fileId":"..."}` soltanto dopo aver spostato il file nel cestino di Drive. Streamlit rimuove il record Atlas esclusivamente dopo questa conferma. L'operazione deve essere idempotente: una seconda richiesta sullo stesso file deve restituire `ok=true`, così un errore Atlas successivo alla cancellazione Drive può essere recuperato senza lasciare un record bloccato.
 
+Il sorgente completo del backend, inclusa l'azione `delete`, è in `google_apps_script/Code.gs`. Dopo averlo copiato nell'editor Apps Script, occorre aggiornare il deployment della web app creando una **nuova versione**; il semplice salvataggio del progetto non aggiorna l'URL `/exec` già usato da Streamlit.
+
 ## 4. Pubblicare e provare
 
 Premi **Deploy** e attendi il completamento. Se compare un errore, apri i log da **Manage app** e condividi il tipo di errore senza credenziali.
