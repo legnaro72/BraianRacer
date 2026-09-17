@@ -466,7 +466,9 @@ def render_flipbook(photos):
         )
         st.image(ROOT / "static" / "couple-cartoon.png", width="stretch")
     else:
-        render_photo(photos[page - 1], "Foto non disponibile")
+        # Keep navigation safe if a browser session carries an index from an older release.
+        photo_index = max(0, min(page - 1, len(photos) - 1))
+        render_photo(photos[photo_index], "Foto non disponibile")
 
 
 def photo_columns(photos, unavailable):
