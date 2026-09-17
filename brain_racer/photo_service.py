@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import logging
 import re
 import time
 from dataclasses import dataclass
@@ -22,6 +23,7 @@ MAX_FILES_PER_UPLOAD = 20
 MAX_FILE_BYTES = 10 * 1024 * 1024
 UPLOAD_TIMEOUT = (5, 35)
 MIME_BY_EXTENSION = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -82,12 +84,25 @@ class AppsScriptDriveStorage:
         body = {"token": self.api_token, **payload}
         try:
             response = self._post(self.webapp_url, json=body, timeout=UPLOAD_TIMEOUT)
-            response.raise_for_status()
-            data = response.json()
         except requests.Timeout as exc:
             raise PhotoError("Il caricamento sta impiegando troppo tempo. Controlla la connessione e riprova.") from exc
         except requests.RequestException as exc:
             raise PhotoError("Non riusciamo a contattare l'album fotografico. Riprova tra poco.") from exc
+
+        status_code = response.status_code
+        if status_code >= 400:
+            # Status only: never log the URL, token, request data or response body.
+            LOGGER.warning("Apps Script photo backend returned HTTP %s", status_code)
+            if status_code == 413:
+                raise PhotoError("La foto è troppo grande per l'album. Prova a ridurne le dimensioni.")
+            if status_code == 429:
+                raise PhotoError("L'album è momentaneamente occupato. Attendi qualche secondo e riprova.")
+            if status_code >= 500:
+                raise PhotoError("Google non ha completato il caricamento. Attendi qualche secondo e riprova.")
+            raise PhotoError(f"L'album ha rifiutato la richiesta (HTTP {status_code}).")
+
+        try:
+            data = response.json()
         except ValueError as exc:
             raise PhotoError("L'album fotografico ha restituito una risposta non valida. Riprova.") from exc
         if not isinstance(data, dict) or data.get("ok") is not True:

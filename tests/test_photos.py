@@ -9,8 +9,8 @@ from brain_racer.photo_service import (AppsScriptDriveStorage, MAX_FILE_BYTES,
 
 
 class FakeResponse:
-    def __init__(self, payload, error=None):
-        self.payload, self.error = payload, error
+    def __init__(self, payload, error=None, status_code=200):
+        self.payload, self.error, self.status_code = payload, error, status_code
 
     def raise_for_status(self):
         if self.error:
@@ -18,6 +18,21 @@ class FakeResponse:
 
     def json(self):
         return self.payload
+
+
+@pytest.mark.parametrize(("status_code", "expected"), [
+    (413, "troppo grande"),
+    (429, "momentaneamente occupato"),
+    (503, "Google non ha completato"),
+])
+def test_apps_script_reports_safe_http_failure(status_code, expected):
+    storage = AppsScriptDriveStorage(
+        "https://script.google.com/macros/s/test/exec", "secret",
+        lambda *args, **kwargs: FakeResponse({}, status_code=status_code),
+    )
+
+    with pytest.raises(PhotoError, match=expected):
+        storage.drive_list_photos()
 
 
 def test_apps_script_uses_private_post_json_for_upload_and_get():
