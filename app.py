@@ -296,6 +296,56 @@ def arcade():
             st.rerun()
 
 
+@st.fragment
+def persistent_photo_upload_panel(album, player_id):
+    """Keep per-photo component events from rerunning the whole arcade page."""
+    ss = st.session_state
+    uploader_revision = tuple(
+        (ROOT / "assets" / name).stat().st_mtime_ns
+        for name in ("photo_uploader.js", "photo_uploader.css")
+    )
+    upload_state = persistent_photo_uploader(uploader_revision)(
+        data={
+            "owner": player_id,
+            "ack": ss.get("persistent_photo_ack"),
+            "max_files": 20,
+            "max_bytes": 10 * 1024 * 1024,
+        },
+        key="persistent-photo-uploader",
+        default={"item": None},
+        on_item_change=lambda: None,
+        width="stretch",
+    )
+    upload_item = getattr(upload_state, "item", None)
+    if not isinstance(upload_item, dict):
+        return
+    request_id = str(upload_item.get("request_id") or "")
+    local_id = str(upload_item.get("local_id") or "")
+    if not request_id or request_id == ss.get("persistent_photo_request"):
+        return
+    ss.persistent_photo_request = request_id
+    try:
+        encoded = upload_item.get("data")
+        if not isinstance(encoded, str):
+            raise PhotoError("La foto selezionata non può essere letta.")
+        content = base64.b64decode(encoded, validate=True)
+        result = album.upload_many(player_id, [(
+            upload_item.get("name"), upload_item.get("mime"), content,
+        )])
+        if result.uploaded:
+            clear_photo_cache()
+            ss.photo_gallery_page = 0
+            ack = {"request_id": request_id, "local_id": local_id, "ok": True}
+        else:
+            message = result.failures[0].message if result.failures else "Caricamento non riuscito. Riprova."
+            ack = {"request_id": request_id, "local_id": local_id, "ok": False, "message": message}
+    except (PhotoError, ValueError, TypeError) as exc:
+        ack = {"request_id": request_id, "local_id": local_id, "ok": False,
+               "message": str(exc) if isinstance(exc, PhotoError) else "La foto non può essere letta."}
+    ss.persistent_photo_ack = ack
+    st.rerun(scope="fragment")
+
+
 def photo_upload_and_supervisor():
     """Native file transport and private gallery; all Drive access stays server-side."""
     ss = st.session_state
@@ -335,49 +385,7 @@ def photo_upload_and_supervisor():
         getattr(st, feedback.get("kind", "info"))(feedback.get("message", ""))
     else:
         ss.pop("photo_feedback", None)
-    uploader_revision = tuple(
-        (ROOT / "assets" / name).stat().st_mtime_ns
-        for name in ("photo_uploader.js", "photo_uploader.css")
-    )
-    upload_state = persistent_photo_uploader(uploader_revision)(
-        data={
-            "owner": ss.player_id,
-            "ack": ss.get("persistent_photo_ack"),
-            "max_files": 20,
-            "max_bytes": 10 * 1024 * 1024,
-        },
-        key="persistent-photo-uploader",
-        default={"item": None},
-        on_item_change=lambda: None,
-        width="stretch",
-    )
-    upload_item = getattr(upload_state, "item", None)
-    if isinstance(upload_item, dict):
-        request_id = str(upload_item.get("request_id") or "")
-        local_id = str(upload_item.get("local_id") or "")
-        if request_id and request_id != ss.get("persistent_photo_request"):
-            ss.persistent_photo_request = request_id
-            try:
-                encoded = upload_item.get("data")
-                if not isinstance(encoded, str):
-                    raise PhotoError("La foto selezionata non può essere letta.")
-                content = base64.b64decode(encoded, validate=True)
-                result = album.upload_many(ss.player_id, [(
-                    upload_item.get("name"), upload_item.get("mime"), content,
-                )])
-                if result.uploaded:
-                    clear_photo_cache()
-                    ss.photo_gallery_page = 0
-                    ack = {"request_id": request_id, "local_id": local_id, "ok": True}
-                else:
-                    message = result.failures[0].message if result.failures else "Caricamento non riuscito. Riprova."
-                    ack = {"request_id": request_id, "local_id": local_id, "ok": False,
-                           "message": message}
-            except (PhotoError, ValueError, TypeError) as exc:
-                ack = {"request_id": request_id, "local_id": local_id, "ok": False,
-                       "message": str(exc) if isinstance(exc, PhotoError) else "La foto non può essere letta."}
-            ss.persistent_photo_ack = ack
-            st.rerun()
+    persistent_photo_upload_panel(album, ss.player_id)
 
     try:
         configured_password = st.secrets["SUPERVISOR_PASSWORD"]
