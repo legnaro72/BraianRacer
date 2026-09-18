@@ -243,6 +243,24 @@ test('new game id never restores a finished engine session',()=>{
   assert.equal(next.state.t,0);assert.equal(next.state.pending.length,0);
 });
 
+test('independent multiplayer follows own phase and advances without the guest',()=>{
+  const {ui}=uiHost();
+  ui.data.room={id:'room',independent:true,phase:'DRIVING',players:[]};
+  ui.data.game={...ui.data.game,mode:'multi',independent:true,phase:'LEVEL_SUMMARY',screen_phase:'LEVEL_SUMMARY',level:2,next_quiz_preview:[{id:'q3'}]};
+  assert.equal(ui.gameView(),'LEVEL_SUMMARY');
+  let mounted;
+  ui.mountView=view=>{mounted=view;};
+  ui.click({target:{closest:()=>({dataset:{action:'NEXT_LEVEL'}})}});
+  assert.equal(mounted,'DRIVING');
+  assert.equal(ui.data.game.level,3);
+  assert.equal(ui.pending[0].game_id,'g');
+  ui.pending=[];ui.data.game.level=5;
+  ui.click({target:{closest:()=>({dataset:{action:'NEXT_LEVEL'}})}});
+  assert.equal(mounted,'PIT');
+  assert.equal(ui.data.game.phase,'CHALLENGE_DONE');
+  assert.equal(ui.pending[0].game_id,'g');
+});
+
 test('touching the track fires immediately, keeps steering and respects cooldown/pause',()=>{
   const e=host().make();e.state.started=true;
   const touch={preventDefault(){},pointerType:'touch',pointerId:1,clientX:250};

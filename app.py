@@ -196,8 +196,10 @@ def dispatch(svc, command):
         target = command.get("game_id")
         if target and (rid or target == gid):
             svc.answer(target, pid, command.get("level"), command.get("index"), command.get("choice"))
-    elif action == "NEXT_LEVEL" and gid:
-        svc.next_level(gid, pid)
+    elif action == "NEXT_LEVEL":
+        target = gid or (command.get("game_id") if rid else None)
+        if target:
+            svc.next_level(target, pid)
     elif action == "ABORT" and gid:
         svc.abort(gid, pid)
     elif action == "LEAVE_ROOM" and rid:
@@ -274,7 +276,7 @@ def arcade():
                     previous_room_phase = ss.get("arcade_room_phase")
                     time_sensitive = previous_phase in ("QUIZ", "REVEAL") or previous_room_phase in (
                         "COUNTDOWN", "QUIZ", "REVEAL", "ROUND_RESULTS")
-                    write_interval = .45 if time_sensitive else (1.0 if ss.get("room_id") else 2.0)
+                    write_interval = .45 if time_sensitive else (3.0 if ss.get("room_id") else 2.0)
                     write_due = monotonic_now - float(ss.get("last_snapshot_write", 0) or 0) >= write_interval
                     fast_read = changed or (active and not write_due)
                     snapshot = svc.snapshot(ss.player_id, ss.get("game_id"), ss.get("room_id"),

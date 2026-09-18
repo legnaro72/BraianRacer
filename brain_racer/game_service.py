@@ -222,15 +222,20 @@ class GameService:
             g = self._owned(s, game_id, player_id)
             ready = g.state["phase"] == "LEVEL_SUMMARY" or (
                 g.state["phase"] == "REVEAL" and g.state.get("qindex") == QUESTIONS_PER_LEVEL - 1)
-            if g.mode == "single" and ready:
-                self._reset_round(g, g.state["level"] + 1, self.clock())
+            if (g.mode == "single" or g.state.get("independent")) and ready:
+                if g.state.get("independent") and g.state["level"] >= MATCH_LEVELS:
+                    g.state.update(phase="CHALLENGE_DONE", deadline=None)
+                    self._finish(g, self.clock())
+                    save_state(g)
+                else:
+                    self._reset_round(g, g.state["level"] + 1, self.clock())
 
     def _reset_round(self, g, level, start_at):
         st = g.state
         if st["lives"] <= 0:
             return  # Spectating does not inflate the highest level reached.
         st.update(phase="DRIVING" if st["lives"] > 0 else "ELIMINATED", level=level,
-                  start_at=start_at, progress=0, collected=[], hit=[], shield=False,
+                  start_at=start_at, deadline=None, progress=0, collected=[], hit=[], shield=False,
                   balloon_hit=[], round_hearts=0, last_bouquet=-100,
                   last_collision=-100, round_score=st["score"], round_stars=0,
                   round_correct=0, round_wrong=0, questions=[], qindex=0, acks=[], finish_time=None)
@@ -261,7 +266,7 @@ class GameService:
             st = g.state
             if g.status != "active" or st["level"] != level:
                 return
-            if g.mode == "single":
+            if g.mode == "single" or st.get("independent"):
                 if st["phase"] == "REVEAL" and index == st["qindex"] + 1:
                     st.update(phase="QUIZ", qindex=index, deadline=now + QUIZ_SECONDS)
                 if st["phase"] != "QUIZ" or st["qindex"] != index:
@@ -294,7 +299,8 @@ class GameService:
             g.state = _game_state(g.state, now)
             if g.mode == "multi":
                 room = s.get(Room, g.room_id)
-                if room.status not in ("COUNTDOWN", "DRIVING") or now > room.state["deadline"]:
+                if room.status not in ("COUNTDOWN", "DRIVING") or (
+                        not g.state.get("independent") and now > room.state["deadline"]):
                     return
             if g.status != "active" or g.state["phase"] != "DRIVING" or g.state["level"] != level:
                 return
@@ -375,7 +381,7 @@ class GameService:
                         st["finished_levels"] += 1
                         st["driving_ms"] += round(max(0, elapsed) * 1000)
                         st["finish_time"] = round(elapsed, 1)
-                        if g.mode == "single":
+                        if g.mode == "single" or st.get("independent"):
                             if not st["questions"]:
                                 st["questions"] = self.bank.select(level, st["used"], st["seed"] + level)
                             st.update(phase="QUIZ", qindex=0, deadline=now + QUIZ_SECONDS)
@@ -446,7 +452,7 @@ class GameService:
                     st.update(phase="QUIZ", qindex=st["qindex"] + 1, deadline=now + QUIZ_SECONDS)
                 save_state(g)
 
-    def create_room(self, player_id):
+    def create_room(self, player_id, independent=True):
         with self.db.transaction() as s:
             old = self._active_room(s, player_id)
             if old:
@@ -455,7 +461,7 @@ class GameService:
             while s.first(Room, room_code=code):
                 code = "".join(secrets.choice(CODE_ALPHABET) for _ in range(6))
             room = Room(room_code=code, host_player_id=player_id,
-                        state={"phase": "LOBBY", "level": 1, "seed": secrets.randbelow(2**31),
+                        state={"phase": "LOBBY", "independent": independent, "level": 1, "seed": secrets.randbelow(2**31),
                                "used": [], "questions": [], "qindex": 0, "deadline": None,
                                "start_at": None, "answers": {}})
             s.add(room)
@@ -514,6 +520,9 @@ class GameService:
             for member in members:
                 g = GameSession(player_id=member.player_id, room_id=room.id, mode="multi",
                                 started_at=now, state=initial_state(room.state["seed"], now, COUNTDOWN_SECONDS))
+                if room.state.get("independent"):
+                    g.state["independent"] = True
+                    g.state["questions"] = self.bank.select(1, g.state["used"], room.state["seed"] + 1)
                 s.add(g)
             save_state(room)
             log.info("Match started: %s", room.room_code)
@@ -533,6 +542,8 @@ class GameService:
                 for g in self._games(s, room_id):
                     if g.player_id == player_id and g.status == "active":
                         g.state.update(phase="ELIMINATED", lives=0, disconnected=True)
+                        if g.state.get("independent"):
+                            self._finish(g, self.clock())
                         save_state(g)
                 member.last_seen_at = 0
                 self._tick_room(s, room, self.clock())
@@ -548,6 +559,8 @@ class GameService:
         winner = ranking[0].id if ranking else None
         for g in games:
             self._finish(g, now, victory=g.id == winner)
+            if room.state.get("independent"):
+                g.victory = g.id == winner
         self._set_phase(room, "MATCH_RESULTS", None)
         log.info("Match finished: %s", room.room_code)
 
@@ -567,6 +580,23 @@ class GameService:
         if room.status in ("MATCH_RESULTS", "CLOSED"):
             return
         games = self._games(s, room.id)
+        if room.state.get("independent"):
+            last_seen = {m.player_id: _number(m.last_seen_at) for m in members}
+            for g in games:
+                if g.state.get("phase") in ("CHALLENGE_DONE", "ELIMINATED"):
+                    self._finish(g, now)
+                    continue
+                if now - last_seen.get(g.player_id, 0) > 300:
+                    g.state.update(lives=0, phase="ELIMINATED", disconnected=True)
+                    self._finish(g, now)
+                    save_state(g)
+                else:
+                    self._tick_single(s, g, now)
+            if games and all(g.state.get("phase") in ("CHALLENGE_DONE", "ELIMINATED") for g in games):
+                self._end_match(s, room, games, now)
+            elif room.status == "COUNTDOWN" and now >= room.state["start_at"]:
+                self._set_phase(room, "DRIVING", None)
+            return
         for g in games:
             g.state = _game_state(g.state, now, room.state.get("seed", 0), room.state.get("level", 1))
         last_seen = {m.player_id: _number(m.last_seen_at) for m in members}
@@ -656,6 +686,11 @@ class GameService:
         save_state(room)
 
     def _public_game(self, s, g, room=None):
+        if room and room.state.get("independent"):
+            result = self._public_game(s, g)
+            if result["phase"] in ("CHALLENGE_DONE", "ELIMINATED"):
+                result["screen_phase"] = "PIT"
+            return result
         now = self.clock()
         room_state = _room_state(room.state, now) if room else None
         state = _game_state(g.state, now,
@@ -686,7 +721,7 @@ class GameService:
         if phase == "DRIVING" and question_ids:
             state["quiz_preview"] = [self.bank.public(question_id, reveal=True)
                                      for question_id in question_ids if question_id in self.bank.by_id]
-        if g.mode == "single" and g.status == "active":
+        if (g.mode == "single" or state.get("independent")) and g.status == "active":
             next_used = list(used_ids)
             next_ids = self.bank.select(state["level"] + 1, next_used,
                                         state["seed"] + state["level"] + 1)
@@ -715,7 +750,7 @@ class GameService:
         elif room and room.status in ("DRIVING", "QUIZ"):
             state["eligible"] = False
         state["difficulty"] = difficulty(state["level"])
-        if g.mode == "single":
+        if g.mode == "single" or state.get("independent"):
             state["next_difficulty"] = difficulty(state["level"] + 1)
         if state.get("screen_phase") == "LEVEL_SUMMARY":
             state["next_difficulty"] = difficulty(state["level"] + 1)

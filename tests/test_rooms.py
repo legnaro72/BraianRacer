@@ -38,6 +38,50 @@ def test_bad_room_codes(svc, player, code):
     with pytest.raises(RuleError): svc.join_room(code, player)
 
 
+def test_independent_challenge_full_match_and_host_start(svc):
+    host, _ = svc.register("HostIndependent")
+    guest, _ = svc.register("GuestIndependent")
+    rid = svc.create_room(host)
+    code = svc.snapshot(host, room_id=rid)["room"]["code"]
+    svc.join_room(code, guest)
+    with pytest.raises(RuleError):
+        svc.start_room(rid, guest)
+    with pytest.raises(RuleError):
+        svc.start_room(rid, host)
+    svc.ready(rid, guest)
+    svc.start_room(rid, host)  # Host need not press READY separately.
+    questions = {}
+    for pid in (host, guest):
+        for level in range(1, MATCH_LEVELS + 1):
+            svc.clock.advance(65)
+            heartbeat_all(svc, rid, (host, guest))
+            snap = svc.snapshot(pid, room_id=rid)["game"]
+            gid = snap["id"]
+            assert snap["level"] == level and snap["screen_phase"] == "DRIVING"
+            finish_drive(svc, pid, gid, level)
+            quiz = svc.snapshot(pid, room_id=rid)["game"]
+            assert quiz["screen_phase"] == "QUIZ"
+            for index in range(3):
+                with svc.db.read() as session:
+                    game = session.get(GameSession, gid)
+                    question_id = game.state["questions"][index]
+                questions.setdefault((level, index), question_id)
+                assert questions[level, index] == question_id
+                correct = svc.bank.by_id[question_id]["correct_index"]
+                svc.answer(gid, pid, level, index, correct)
+                svc.answer(gid, pid, level, index, correct)  # Retried packet is idempotent.
+            svc.next_level(gid, pid)  # No server reveal timer wait is required.
+        done = svc.snapshot(pid, room_id=rid)
+        assert done["game"]["score"] == 15
+        assert svc.snapshot(pid)["stats"]["games"] == 1
+        if pid == host:
+            assert done["game"]["screen_phase"] == "PIT"
+            assert svc.snapshot(guest, room_id=rid)["game"]["level"] == 1
+            svc.leave_room(rid, host)  # Completed score/lives must survive leaving.
+    assert done["room"]["phase"] == "MATCH_RESULTS"
+    assert sum(svc.snapshot(pid)["stats"]["wins"] for pid in (host, guest)) == 1
+
+
 def test_shared_course_questions_private_answers_and_automatic_next_round(svc):
     rid, players = setup_room(svc)
     snapshots = [svc.snapshot(p, room_id=rid) for p in players]

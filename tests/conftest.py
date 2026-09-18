@@ -35,7 +35,7 @@ def event(kind, eid, **payload):
 
 def setup_room(svc, count=2):
     players = [svc.register(f"Pilota_{i}")[0] for i in range(count)]
-    room = svc.create_room(players[0])
+    room = svc.create_room(players[0], independent=False)
     code = svc.snapshot(players[0], room_id=room)["room"]["code"]
     for p in players[1:]:
         svc.join_room(code, p)

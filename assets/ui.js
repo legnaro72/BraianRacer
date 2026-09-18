@@ -57,6 +57,8 @@ class BrainUI {
       photos:component.data.photos||this.data?.photos||[]};
     const data=this.data;
     this.pending=this.pending.filter(p=>!data.command_acks.includes(p.id));
+    if(previous?.game?.phase==='CHALLENGE_DONE'&&this.pending.some(p=>p.action==='NEXT_LEVEL'))
+      this.data.game=previous.game;
     if(this.optimisticPage){
       if(component.data.page===this.optimisticPage)this.optimisticPage=null;
       else this.data.page=this.optimisticPage;
@@ -66,7 +68,7 @@ class BrainUI {
       else if(previous?.game?.level===this.optimisticNextLevel){
         this.data.game=previous.game;
         if(!this.pending.some(p=>p.action==='NEXT_LEVEL')&&Date.now()-(this.lastNextRetry||0)>900){
-          this.lastNextRetry=Date.now();queueMicrotask(()=>this.send('NEXT_LEVEL'));
+          this.lastNextRetry=Date.now();queueMicrotask(()=>this.send('NEXT_LEVEL',{game_id:this.data.game.id}));
         }
       }
     }
@@ -75,7 +77,7 @@ class BrainUI {
       else if(previous?.game?.seed===this.optimisticStart)this.data.game=previous.game;
     }
     if(this.localQuizActive){
-      if(component.data.game?.screen_phase==='LEVEL_SUMMARY')this.localQuizActive=false;
+      if(['LEVEL_SUMMARY','PIT'].includes(component.data.game?.screen_phase)||component.data.room?.phase==='MATCH_RESULTS')this.localQuizActive=false;
       else if(['QUIZ','LEVEL_SUMMARY'].includes(previous?.game?.screen_phase))this.data.game=previous.game;
     }
     this.serverOffset=(data.now || Date.now()/1000)*1000-Date.now();
@@ -142,7 +144,7 @@ class BrainUI {
   openLocalQuiz(game) {
     if(this.localQuizActive||!game?.quiz_preview?.length)return;
     const now=(Date.now()+(this.serverOffset||0))/1000;
-    this.localQuizActive=game.mode==='single';
+    this.localQuizActive=game.mode==='single'||Boolean(game.independent);
     this.data.game={...game,phase:'QUIZ',screen_phase:'QUIZ',qindex:0,
       question:game.quiz_preview[0],deadline:now+15,answered:false,eligible:true};
     this.signature='';this.mountView('QUIZ');
@@ -191,6 +193,7 @@ class BrainUI {
     if(r){
       if(r.phase==='CLOSED')return 'CLOSED';
       if(r.phase==='LOBBY')return 'LOBBY';
+      if(r.independent)return r.phase==='MATCH_RESULTS'?'MATCH_RESULTS':g?.screen_phase||'PIT';
       if(['COUNTDOWN','DRIVING'].includes(r.phase))return ['QUIZ','REVEAL'].includes(g?.screen_phase)?g.screen_phase:g?.phase==='DRIVING'?'DRIVING':'PIT';
       if(r.phase==='QUIZ')return g?.screen_phase||'PIT';
       return r.phase;
@@ -287,7 +290,7 @@ class BrainUI {
   help() {
     return this.intro('POCHE REGOLE. TANTA VOGLIA DI RIPROVARCI.','Prima il volante. Poi il cervello.')+
       `<div class="help-grid">${[['01','Guida e sopravvivi.','Muoviti con ← → oppure A e D. Tieni premuto ↑, W o Shift per accelerare fino a 1,6 volte la velocità; rilascia per rallentare. Su smartphone usa i pulsanti o trascina il dito sulla pista e tieni premuto ACCELERA per aumentare la velocità. Parti con 3 vite: ogni urto ne costa una, poi hai 1,3 secondi di protezione.'],['02','Attraversa il traguardo.','Tocca la pista, premi F o tocca ✿ BOUQUET per lanciare fiori: mira ai palloncini a cuore, ogni colpo riuscito vale +2 punti. Puoi tenere premuto. Supera i gruppi di ostacoli fino al termine del percorso. Le stelle valgono +1, lo scudo assorbe un urto e il bonus tempo rallenta la strada per 4 secondi.'],['03','Pensa veloce.','Rispondi a 3 domande, con 15 secondi per ognuna. Risposta corretta: +1. Sbagliata o tempo scaduto: −2. I punteggi negativi sono possibili, ma gli errori al quiz non tolgono vite.']].map(([n,h,p])=>`<section class="panel"><span class="step-number">${n}</span><h2>${h}</h2><p>${p}</p></section>`).join('')}</div>
-      <section class="panel help-multi"><span class="feature-icon lavender">${icons.people}</span><div><h2>Una griglia, fino a sei rivali.</h2><p>Create una stanza, segnatevi pronti e lasciate partire l'host. Avrete la stessa pista e le stesse domande per 5 livelli. I risultati delle risposte restano nascosti fino alla chiusura della domanda. Chi non arriva entro 85 secondi perde una vita e salta il quiz. Chi esaurisce le vite può restare a guardare.</p><p>In singolo puoi mettere in pausa con Spazio. In multiplayer il tempo condiviso continua anche se cambi scheda. Una disconnessione oltre 40 secondi elimina il pilota. Se l'host lascia la lobby, il comando passa a un altro giocatore.</p></div></section>`+this.back();
+      <section class="panel help-multi"><span class="feature-icon lavender">${icons.people}</span><div><h2>Una sfida, fino a sei amici.</h2><p>Create una stanza e condividete il codice. Gli invitati premono Sono pronto, poi l'host preme Inizia gara. Avrete la stessa pista e le stesse domande per 5 livelli: ciascuno guida la propria auto e avanza al proprio ritmo, senza aspettare gli altri.</p><p>Le risposte danno subito un feedback verde o rosso. La classifica mostra punteggio e livello degli amici; il podio definitivo arriva quando tutti hanno concluso. Terminata la tua corsa puoi tornare al Garage: il risultato resta salvato. Una disconnessione di oltre 5 minuti chiude la corsa ancora in corso. In singolo puoi mettere in pausa con Spazio.</p></div></section>`+this.back();
   }
   lobby() {
     const r=this.data.room,players=r.players,playerId=String(this.data.player.id),me=players.find(p=>String(p.player_id)===playerId);
@@ -306,15 +309,15 @@ class BrainUI {
       <div class="race-layout"><section class="race-main"><div class="race-hud"><div><span>PUNTEGGIO</span><strong data-local-score>${g.score}</strong></div><div class="hud-lives"><span>VITE</span><strong data-local-lives>${'♥'.repeat(g.lives)}</strong></div><div><span>PERCORSO</span><strong class="progress-text" data-local-progress>${g.progress} / ${g.difficulty.groups}</strong></div></div><div class="route-bar"><i data-local-bar style="width:${g.progress/g.difficulty.groups*100}%"></i></div>
       <div class="canvas-wrap"><canvas tabindex="0" aria-label="Pista di Brain Racer. Usa le frecce sinistra e destra, A e D, o trascina per guidare."></canvas></div>
       <div class="touch-controls wedding-controls"><button data-steer="arrowleft" aria-label="Sterza a sinistra">←<span>SINISTRA</span></button><button data-steer="arrowup" data-accelerator aria-label="Tieni premuto per accelerare">↑<span>ACCELERA<small>×1,00</small></span></button><button data-steer="f" data-action="BOUQUET" class="bouquet-control" aria-label="Lancia bouquet contro i cuori">✿<span>BOUQUET<small>♥ +2 punti</small></span></button><button data-steer="arrowright" aria-label="Sterza a destra">→<span>DESTRA</span></button></div><div class="wedding-plaque"><b>Irene <span>♥</span> Daniele</b><small data-power>F / ✿ lancia bouquet · cuore +2</small></div></section>
-      <aside class="race-sidebar">${coupleArt("race","In viaggio insieme a te!")}${r?`<section class="panel opponents-panel"><span class="eyebrow">LA GARA IN DIRETTA</span><div data-opponents>${this.opponents()}</div><div class="deadline-note">Tempo gara <b data-countdown data-end="${r.deadline}"></b></div></section>`:
+      <aside class="race-sidebar">${coupleArt("race","In viaggio insieme a te!")}${r?`<section class="panel opponents-panel"><span class="eyebrow">LA GARA IN DIRETTA</span><div data-opponents>${this.opponents()}</div>${r.independent?'<div class="deadline-note">5 livelli · avanza al tuo ritmo</div>':`<div class="deadline-note">Tempo gara <b data-countdown data-end="${r.deadline}"></b></div>`}</section>`:
       `<section class="panel mission"><span class="eyebrow">LA TUA MISSIONE</span><span class="feature-icon lime">${icons.flag}</span><h2>Prima il traguardo.<br>Poi la sfida.</h2><p>Supera ${g.difficulty.groups} gruppi di ostacoli per sbloccare le 3 domande di questo livello.</p><div class="mini-record"><span>IL TUO RECORD</span><strong>${this.data.stats.best} <small>PT</small></strong></div></section>`}
       <section class="panel bonus-guide"><h3>Una marcia in più</h3><div><b class="lime-text">★</b><span>Stella<small>+1 punto</small></span></div><div><b class="cyan-text">⬡</b><span>Scudo<small>Assorbe un urto</small></span></div><div><b class="lavender-text">◷</b><span>Tempo lento<small>4 secondi per respirare</small></span></div></section>
       <div class="drive-controls"><span><kbd>←</kbd> <kbd>→</kbd> sterza · <kbd>↑</kbd> <kbd>W</kbd> accelera · <kbd>F</kbd> bouquet</span>${r?'':button('Ⅱ Pausa','PAUSE','secondary')} ${button(r?'Lascia la gara':'Termina partita',r?'CONFIRM_LEAVE':'CONFIRM_ABORT','ghost')}</div></aside></div>`;
   }
   opponents() {
     const r=this.data.room;if(!r)return '';
-    const labels={WAITING:'Al traguardo',ELIMINATED:'Eliminato',DNF:'Traguardo non raggiunto',DRIVING:'In pista'};
-    return r.players.map((p,i)=>`<div class="opponent ${p.player_id===this.data.player.id?'is-you':''}"><div><b>${i+1}. ${esc(p.nickname)}</b><span>${p.score} PT</span></div><div class="opponent-track"><i style="width:${Math.min(100,p.progress/(this.data.game?.difficulty.groups||20)*100)}%"></i></div><small>${labels[p.phase]||'In attesa'} · ${'♥'.repeat(Math.max(0,p.lives))}${p.online?'':' · Connessione…'}</small></div>`).join('');
+    const labels={WAITING:'Al traguardo',ELIMINATED:'Corsa terminata',CHALLENGE_DONE:'Sfida completata',LEVEL_SUMMARY:'Livello completato',QUIZ:'Quiz',REVEAL:'Quiz',DNF:'Traguardo non raggiunto',DRIVING:'In pista'};
+    return r.players.map((p,i)=>`<div class="opponent ${p.player_id===this.data.player.id?'is-you':''}"><div><b>${i+1}. ${esc(p.nickname)}</b><span>${p.score} PT</span></div><div class="opponent-track"><i style="width:${Math.min(100,p.progress/levelDifficulty(p.level||1).groups*100)}%"></i></div><small>Livello ${p.level||1} · ${labels[p.phase]||'In attesa'} · ${'♥'.repeat(Math.max(0,p.lives))}${p.online||['CHALLENGE_DONE','ELIMINATED'].includes(p.phase)?'':' · Connessione…'}</small></div>`).join('');
   }
   quiz(reveal) {
     const g=this.data.game,q=g.question,r=this.data.room;
@@ -335,7 +338,7 @@ class BrainUI {
     const g=this.data.game,delta=g.score-g.round_score;
     return `${coupleArt("celebration","Questo traguardo è anche vostro!","jump")}<section class="result-hero"><div class="result-symbol">${icons.flag}</div><span class="eyebrow">BEN FATTO, PILOTA</span><h1>Livello ${g.level} completato<span class="lime-text">.</span></h1><p>La prossima strada è un po' più veloce.<br>Il tuo cervello è già pronto.</p><div class="total-score">${g.score}<small>PUNTI TOTALI</small></div></section>
       <div class="summary-grid">${[['Cuori scoppiati',g.round_hearts||0],['Stelle raccolte',g.round_stars],['Corrette',g.round_correct],['Sbagliate',g.round_wrong],['Punti del livello',(delta>0?'+':'')+delta],['Vite rimaste','♥'.repeat(g.lives)],['Record personale',this.data.stats.best]].map(([l,v])=>`<div class="stat-card"><span>${l}</span><strong>${v}</strong></div>`).join('')}</div>
-      <div class="center-actions">${button('Continua al livello successivo '+icons.arrow,'NEXT_LEVEL')}${button('Concludi e salva','ABORT','ghost')}</div>`;
+      <div class="center-actions">${button(g.independent&&g.level>=5?'Concludi la sfida':('Continua al livello successivo '+icons.arrow),'NEXT_LEVEL')}${button(g.independent?'Lascia la sfida':'Concludi e salva',g.independent?'CONFIRM_LEAVE':'ABORT','ghost')}</div>`;
   }
   gameOver() {
     const g=this.data.game,rank=this.data.leaderboard.find(p=>p.player_id===this.data.player.id);
@@ -344,6 +347,7 @@ class BrainUI {
   }
   pit() {
     const g=this.data.game,eliminated=g?.phase==='ELIMINATED';
+    if(g?.independent)return `<section class="panel"><h1>${eliminated?'Corsa terminata':'Sfida completata!'}</h1><p>${g.score} punti · La classifica si aggiorna mentre gli amici completano le loro corse. Puoi tornare al Garage.</p><div data-opponents>${this.opponents()}</div>${button('Torna al Garage','LEAVE_ROOM','secondary')}</section>`;
     return `<div class="pit-layout"><section class="result-hero"><div class="pit-icon">${eliminated?'◇':icons.flag}</div><span class="eyebrow">${eliminated?'LA GARA CONTINUA':'HAI TAGLIATO IL TRAGUARDO'}</span><h1>${eliminated?'Resti in prima fila.':'PIT STOP.'}</h1><p>${eliminated?'Sei eliminato. Segui gli altri piloti fino al podio.':'Riprendi fiato. Tra poco si accende il cervello.'}</p><div class="waiting-dots"><i></i><i></i><i></i></div><small>In attesa degli altri giocatori</small></section><aside class="panel"><h2>La gara in diretta</h2><div data-opponents>${this.opponents()}</div></aside></div>`;
   }
   results(final) {
@@ -356,6 +360,11 @@ class BrainUI {
   tick() {
     if(!this.data)return;
     const liveNow=(Date.now()+(this.serverOffset||0))/1000;
+    if(this.localQuizActive&&this.data.game?.screen_phase==='QUIZ'&&!this.answerLock&&liveNow>=this.data.game.deadline){
+      const g=this.data.game;
+      this.send('ANSWER',{game_id:g.id,level:g.level,index:g.qindex,choice:null});
+      this.advanceLocalQuiz(null);this.signature='';this.mountView('REVEAL');
+    }
     const now=this.view()==='QUIZ' && this.answerLock ? this.answerLock.at : liveNow;
     if(this.view()==='QUIZ' && this.data.game.answered && !this.answerLock)
       this.answerLock={key:`${this.data.game.id}:${this.data.game.level}:${this.data.game.qindex}`,at:now};
@@ -428,12 +437,17 @@ class BrainUI {
     }
     if(action==='NEXT_LEVEL'){
       const g=this.data.game,now=(Date.now()+(this.serverOffset||0))/1000;
+      if(g.independent&&g.level>=5){
+        this.localQuizActive=false;this.data.game={...g,phase:'CHALLENGE_DONE',screen_phase:'PIT'};
+        this.signature='';this.mountView('PIT');this.send('NEXT_LEVEL',{game_id:g.id});return;
+      }
+      this.localQuizActive=false;
       const nextDifficulty=g.next_difficulty||levelDifficulty(g.level+1);
       this.data.game={...g,screen_phase:'DRIVING',phase:'DRIVING',level:g.level+1,start_at:now,
         progress:0,collected:[],hit:[],balloon_hit:[],shield:false,qindex:0,answered:false,
         difficulty:nextDifficulty,next_difficulty:null,quiz_preview:g.next_quiz_preview||[],acks:[]};
       this.optimisticNextLevel=g.level+1;
-      this.signature='';this.mountView('DRIVING');this.send('NEXT_LEVEL');return;
+      this.signature='';this.mountView('DRIVING');this.send('NEXT_LEVEL',{game_id:g.id});return;
     }
     if(action==='FOCUS_NAME'){this.root.querySelector('#nickname')?.focus();this.notify('Scegli un nickname per sbloccare il Multiplayer.');return;}
     if(action==='PAUSE'){this.engine?.togglePause();el.textContent=this.engine?.paused?'▶ Riprendi':'Ⅱ Pausa';return;}
