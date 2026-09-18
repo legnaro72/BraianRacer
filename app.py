@@ -322,11 +322,22 @@ def photo_upload_and_supervisor():
         getattr(st, feedback.get("kind", "info"))(feedback.get("message", ""))
     else:
         ss.pop("photo_feedback", None)
-    with st.form("event-photo-upload", clear_on_submit=True):
-        files = st.file_uploader("Scegli fino a 20 foto", type=["jpg", "jpeg", "png", "webp", "heic", "heif"],
-                                 accept_multiple_files=True,
-                                 help="JPG, PNG, WebP o HEIC. Massimo 10 MB per foto. Puoi selezionarne molte dalla galleria del telefono.")
-        submitted = st.form_submit_button("Carica le foto")
+    upload_generation = int(ss.get("photo_upload_generation", 0))
+    files = st.file_uploader(
+        "Scegli fino a 20 foto",
+        type=["jpg", "jpeg", "png", "webp", "heic", "heif"],
+        accept_multiple_files=True,
+        key=f"event-photo-files-{upload_generation}",
+        help=("Dopo aver premuto Fatto nella galleria, attendi qui la conferma delle foto pronte. "
+              "JPG, PNG, WebP o HEIC; massimo 10 MB per foto."),
+    )
+    if files:
+        st.success(f"{len(files)} foto pronte per il caricamento.")
+        st.caption("Ora puoi premere Carica le foto. La selezione resta disponibile per riprovare in caso di errore.")
+    else:
+        st.caption("Apri Browse, scegli le foto con calma e premi Fatto nella galleria: qui comparirà la conferma.")
+    submitted = st.button("Carica le foto", type="primary", disabled=not files,
+                          key=f"event-photo-submit-{upload_generation}", width="stretch")
     if submitted:
         try:
             items = [(uploaded.name, uploaded.type, uploaded.getvalue()) for uploaded in files]
@@ -352,7 +363,10 @@ def photo_upload_and_supervisor():
             else:
                 message = f"{loaded} foto caricate: grazie per aver condiviso questo ricordo!"
                 ss.photo_feedback = {"kind": "success", "message": message, "at": time.monotonic()}
-                st.success(message)
+                # A new uploader key clears only after every selected file has
+                # reached Drive and Atlas; failures keep the same selection for retry.
+                ss.photo_upload_generation = upload_generation + 1
+                st.rerun()
         except PhotoError as exc:
             st.error(str(exc))
 

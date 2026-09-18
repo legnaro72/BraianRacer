@@ -14,3 +14,7 @@ showErrorDetails = false
 headless = true
 enableStaticServing = true
 maxUploadSize = 10
+# Keep mobile session state and selected uploads available through a temporary
+# network drop while the native photo picker is open.
+websocketPingInterval = 30
+disconnectedSessionTTL = 300
