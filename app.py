@@ -73,9 +73,14 @@ def cached_photo_bytes(storage_id):
 
 
 def clear_photo_cache():
+    clear_photo_records()
+    cached_photo_bytes.clear()
+
+
+def clear_photo_records():
+    """Refresh only Atlas metadata; keep already-downloaded image previews warm."""
     st.session_state.photo_records_revision = int(st.session_state.get("photo_records_revision", 0)) + 1
     cached_photo_records.clear()
-    cached_photo_bytes.clear()
 
 
 @st.cache_resource
@@ -356,7 +361,9 @@ def photo_upload_and_supervisor():
     except (KeyError, FileNotFoundError, st.errors.StreamlitSecretNotFoundError):
         configured_password = None
     st.divider()
-    with st.expander("Area riservata Irene e Daniele"):
+    st.markdown("### 🔐 Area riservata Irene e Daniele")
+    st.caption("Gestite le foto della festa, scegliete il Flipbook e decidetene l'ordine.")
+    with st.container(border=True):
         if not configured_password:
             st.caption("Area supervisore non ancora configurata.")
         else:
@@ -364,140 +371,26 @@ def photo_upload_and_supervisor():
             is_supervisor = entered and secrets.compare_digest(entered, str(configured_password))
         if configured_password and is_supervisor:
             st.success("Area supervisore attiva")
+            active_panel = ss.get("supervisor_photo_panel", "SELECT")
+            select_panel, order_panel = st.columns(2)
+            if select_panel.button(
+                    "✓ Scegli foto e Flipbook",
+                    type="primary" if active_panel == "SELECT" else "secondary",
+                    width="stretch", key="supervisor-select-panel"):
+                ss.supervisor_photo_panel = "SELECT"
+                active_panel = "SELECT"
+            if order_panel.button(
+                    "↕ Ordina il Flipbook",
+                    type="primary" if active_panel == "ORDER" else "secondary",
+                    width="stretch", key="supervisor-order-panel"):
+                ss.supervisor_photo_panel = "ORDER"
+                active_panel = "ORDER"
             pending = [photo for photo in photos if not photo["approved"]]
             st.caption(f"{len(photos)} foto ricevute · {len(pending)} da selezionare per il Flipbook")
-            pending_delete = ss.get("photo_delete_confirm", ())
-            delete_selection = (tuple(pending_delete) if isinstance(pending_delete, (list, tuple, set))
-                                else ((pending_delete,) if pending_delete else ()))
-            select_all, clear_selection = st.columns(2)
-            if select_all.button("Seleziona tutte", disabled=not photos, width="stretch"):
-                for photo in photos:
-                    ss[f"supervisor-photo-{photo['id']}"] = True
-            if clear_selection.button("Annulla selezione", disabled=not photos, width="stretch"):
-                for photo in photos:
-                    ss.pop(f"supervisor-photo-{photo['id']}", None)
-            selected = []
-            for first in range(0, len(photos), 3):
-                cards = st.columns(3)
-                for card, photo in zip(cards, photos[first:first + 3]):
-                    with card:
-                        if render_supervisor_photo_card(photo, photo["id"] in delete_selection):
-                            selected.append(photo["id"])
-
-            if photos:
-                st.caption(f"{len(selected)} foto selezionate")
-                publish, remove, delete = st.columns(3)
-                if publish.button("Pubblica nel Flipbook", disabled=not selected,
-                                  type="primary", width="stretch"):
-                    published = album.set_approved_many(selected, True)
-                    clear_photo_cache()
-                    ss.pop("menu_snapshot", None)
-                    ss.photo_show_flipbook = False
-                    for photo_id in selected:
-                        ss.pop(f"supervisor-photo-{photo_id}", None)
-                    ss.photo_feedback = {
-                        "kind": "success",
-                        "message": (
-                            f"{published} foto pubblicate nel Flipbook. "
-                            "Usa il pulsante ♥ Apri il Flipbook nel riquadro in alto."
-                        ),
-                        "at": time.monotonic(),
-                    }
-                    st.rerun()
-                if remove.button("Rimuovi dal Flipbook", disabled=not selected, width="stretch"):
-                    album.set_approved_many(selected, False)
-                    clear_photo_cache()
-                    for photo_id in selected:
-                        ss.pop(f"supervisor-photo-{photo_id}", None)
-                    st.rerun()
-                if delete.button("Elimina selezionate", disabled=not selected, width="stretch"):
-                    ss.photo_delete_confirm = tuple(selected)
-                    st.rerun()
-
-            if delete_selection:
-                st.warning(f"{len(delete_selection)} foto saranno rimosse da Drive e dall'album.")
-                confirm, cancel = st.columns(2)
-                if confirm.button("Conferma eliminazione", type="primary", width="stretch"):
-                    deleted, failures = 0, []
-                    with st.spinner("Eliminazione in corso…"):
-                        for photo_id in delete_selection:
-                            try:
-                                album.delete_photo(photo_id)
-                                deleted += 1
-                            except PhotoError as exc:
-                                failures.append(str(exc))
-                    clear_photo_cache()
-                    cached_photo_bytes.clear()
-                    ss.pop("photo_delete_confirm", None)
-                    for photo_id in delete_selection:
-                        ss.pop(f"supervisor-photo-{photo_id}", None)
-                    if failures:
-                        message = f"Eliminate {deleted} foto su {len(delete_selection)}. {failures[0]}"
-                        ss.photo_feedback = {"kind": "warning", "message": message, "at": time.monotonic()}
-                    else:
-                        ss.photo_feedback = {"kind": "success", "message": f"{deleted} foto eliminate.",
-                                             "at": time.monotonic()}
-                    st.rerun()
-                if cancel.button("Annulla", width="stretch"):
-                    ss.pop("photo_delete_confirm", None)
-                    st.rerun()
-
-            ordered_flipbook = sorted(
-                (photo for photo in photos if photo["approved"]),
-                key=lambda photo: (
-                    photo.get("flipbook_order") is None,
-                    photo.get("flipbook_order") if photo.get("flipbook_order") is not None else 0,
-                    photo.get("approved_at") or photo["uploaded_at"],
-                ),
-            )
-            if ordered_flipbook:
-                st.markdown("#### Ordine del Flipbook")
-                st.caption("Assegna un numero per scambiare due foto, usa le frecce per piccoli spostamenti e blocca le posizioni definitive.")
-                locked_positions = {
-                    position for position, photo in enumerate(ordered_flipbook, start=1)
-                    if photo.get("flipbook_locked")
-                }
-                compact_order = st.toggle("Vista compatta a griglia", value=True,
-                                          key="flipbook-compact-order")
-                order_page_size = 12 if compact_order else 6
-                order_pages = max(1, (len(ordered_flipbook) + order_page_size - 1) // order_page_size)
-                order_page = max(0, min(int(ss.get("flipbook_order_page", 0)), order_pages - 1))
-                ss.flipbook_order_page = order_page
-                if order_pages > 1:
-                    order_previous, order_counter, order_next = st.columns([1, 1.2, 1])
-                    if order_previous.button("← Precedenti", disabled=order_page == 0,
-                                             width="stretch", key="flipbook-order-previous"):
-                        ss.flipbook_order_page = order_page - 1
-                        st.rerun()
-                    order_counter.markdown(
-                        f"<p style='text-align:center'><strong>{order_page + 1} / {order_pages}</strong></p>",
-                        unsafe_allow_html=True,
-                    )
-                    if order_next.button("Successive →", disabled=order_page == order_pages - 1,
-                                         width="stretch", key="flipbook-order-next"):
-                        ss.flipbook_order_page = order_page + 1
-                        st.rerun()
-                order_start = order_page * order_page_size
-                order_items = list(enumerate(
-                    ordered_flipbook[order_start:order_start + order_page_size],
-                    start=order_start + 1,
-                ))
-                if compact_order:
-                    for item_start in range(0, len(order_items), 3):
-                        grid_columns = st.columns(3)
-                        for column, (position, photo) in zip(
-                                grid_columns, order_items[item_start:item_start + 3]):
-                            with column:
-                                render_flipbook_order_item(
-                                    album, ordered_flipbook, photo, position,
-                                    locked_positions, compact=True,
-                                )
-                else:
-                    for position, photo in order_items:
-                        render_flipbook_order_item(
-                            album, ordered_flipbook, photo, position,
-                            locked_positions, compact=False,
-                        )
+            if active_panel == "SELECT":
+                render_supervisor_selection(album, photos)
+            else:
+                render_flipbook_ordering(album, photos)
 
     if photos:
         gallery_open = bool(ss.get("photo_gallery_open", False))
@@ -542,6 +435,152 @@ def render_photo(photo, unavailable):
         st.caption(unavailable)
 
 
+
+def render_supervisor_selection(album, photos):
+    """Render only the choice/delete tools while the sposi selection panel is open."""
+    ss = st.session_state
+    st.markdown("#### Scegli le foto da conservare o inserire nel Flipbook")
+    pending = [photo for photo in photos if not photo["approved"]]
+    st.caption(f"{len(photos)} foto ricevute · {len(pending)} da selezionare per il Flipbook")
+    pending_delete = ss.get("photo_delete_confirm", ())
+    delete_selection = (tuple(pending_delete) if isinstance(pending_delete, (list, tuple, set))
+                        else ((pending_delete,) if pending_delete else ()))
+    select_all, clear_selection = st.columns(2)
+    if select_all.button("Seleziona tutte", disabled=not photos, width="stretch"):
+        for photo in photos:
+            ss[f"supervisor-photo-{photo['id']}"] = True
+    if clear_selection.button("Annulla selezione", disabled=not photos, width="stretch"):
+        for photo in photos:
+            ss.pop(f"supervisor-photo-{photo['id']}", None)
+    selected = []
+    for first in range(0, len(photos), 3):
+        cards = st.columns(3)
+        for card, photo in zip(cards, photos[first:first + 3]):
+            with card:
+                if render_supervisor_photo_card(photo, photo["id"] in delete_selection):
+                    selected.append(photo["id"])
+
+    if photos:
+        st.caption(f"{len(selected)} foto selezionate")
+        publish, remove, delete = st.columns(3)
+        if publish.button("Pubblica nel Flipbook", disabled=not selected,
+                          type="primary", width="stretch"):
+            published = album.set_approved_many(selected, True)
+            clear_photo_records()
+            ss.pop("menu_snapshot", None)
+            ss.photo_show_flipbook = False
+            for photo_id in selected:
+                ss.pop(f"supervisor-photo-{photo_id}", None)
+            ss.photo_feedback = {
+                "kind": "success",
+                "message": (
+                    f"{published} foto pubblicate nel Flipbook. "
+                    "Usa il pulsante ♥ Apri il Flipbook nel riquadro in alto."
+                ),
+                "at": time.monotonic(),
+            }
+            st.rerun()
+        if remove.button("Rimuovi dal Flipbook", disabled=not selected, width="stretch"):
+            album.set_approved_many(selected, False)
+            clear_photo_records()
+            for photo_id in selected:
+                ss.pop(f"supervisor-photo-{photo_id}", None)
+            st.rerun()
+        if delete.button("Elimina selezionate", disabled=not selected, width="stretch"):
+            ss.photo_delete_confirm = tuple(selected)
+            st.rerun()
+
+    if delete_selection:
+        st.warning(f"{len(delete_selection)} foto saranno rimosse da Drive e dall'album.")
+        confirm, cancel = st.columns(2)
+        if confirm.button("Conferma eliminazione", type="primary", width="stretch"):
+            deleted, failures = 0, []
+            with st.spinner("Eliminazione in corso…"):
+                for photo_id in delete_selection:
+                    try:
+                        album.delete_photo(photo_id)
+                        deleted += 1
+                    except PhotoError as exc:
+                        failures.append(str(exc))
+            clear_photo_cache()
+            cached_photo_bytes.clear()
+            ss.pop("photo_delete_confirm", None)
+            for photo_id in delete_selection:
+                ss.pop(f"supervisor-photo-{photo_id}", None)
+            if failures:
+                message = f"Eliminate {deleted} foto su {len(delete_selection)}. {failures[0]}"
+                ss.photo_feedback = {"kind": "warning", "message": message, "at": time.monotonic()}
+            else:
+                ss.photo_feedback = {"kind": "success", "message": f"{deleted} foto eliminate.",
+                                     "at": time.monotonic()}
+            st.rerun()
+        if cancel.button("Annulla", width="stretch"):
+            ss.pop("photo_delete_confirm", None)
+            st.rerun()
+
+
+
+def render_flipbook_ordering(album, photos):
+    """Render only ordering controls, avoiding a second gallery during position changes."""
+    ss = st.session_state
+    st.markdown("#### Ordina il Flipbook")
+    ordered_flipbook = sorted(
+        (photo for photo in photos if photo["approved"]),
+        key=lambda photo: (
+            photo.get("flipbook_order") is None,
+            photo.get("flipbook_order") if photo.get("flipbook_order") is not None else 0,
+            photo.get("approved_at") or photo["uploaded_at"],
+        ),
+    )
+    if ordered_flipbook:
+        st.markdown("#### Ordine del Flipbook")
+        st.caption("Assegna un numero per scambiare due foto, usa le frecce per piccoli spostamenti e blocca le posizioni definitive.")
+        locked_positions = {
+            position for position, photo in enumerate(ordered_flipbook, start=1)
+            if photo.get("flipbook_locked")
+        }
+        compact_order = st.toggle("Vista compatta a griglia", value=True,
+                                  key="flipbook-compact-order")
+        order_page_size = 12 if compact_order else 6
+        order_pages = max(1, (len(ordered_flipbook) + order_page_size - 1) // order_page_size)
+        order_page = max(0, min(int(ss.get("flipbook_order_page", 0)), order_pages - 1))
+        ss.flipbook_order_page = order_page
+        if order_pages > 1:
+            order_previous, order_counter, order_next = st.columns([1, 1.2, 1])
+            if order_previous.button("← Precedenti", disabled=order_page == 0,
+                                     width="stretch", key="flipbook-order-previous"):
+                ss.flipbook_order_page = order_page - 1
+                st.rerun()
+            order_counter.markdown(
+                f"<p style='text-align:center'><strong>{order_page + 1} / {order_pages}</strong></p>",
+                unsafe_allow_html=True,
+            )
+            if order_next.button("Successive →", disabled=order_page == order_pages - 1,
+                                 width="stretch", key="flipbook-order-next"):
+                ss.flipbook_order_page = order_page + 1
+                st.rerun()
+        order_start = order_page * order_page_size
+        order_items = list(enumerate(
+            ordered_flipbook[order_start:order_start + order_page_size],
+            start=order_start + 1,
+        ))
+        if compact_order:
+            for item_start in range(0, len(order_items), 3):
+                grid_columns = st.columns(3)
+                for column, (position, photo) in zip(
+                        grid_columns, order_items[item_start:item_start + 3]):
+                    with column:
+                        render_flipbook_order_item(
+                            album, ordered_flipbook, photo, position,
+                            locked_positions, compact=True,
+                        )
+        else:
+            for position, photo in order_items:
+                render_flipbook_order_item(
+                    album, ordered_flipbook, photo, position,
+                    locked_positions, compact=False,
+                )
+
 def render_supervisor_photo_card(photo, marked_for_deletion):
     """Compact selection card with a durable visual state for wedding supervisors."""
     ss = st.session_state
@@ -583,7 +622,9 @@ def render_flipbook_order_item(album, ordered_photos, photo, position, locked_po
     def refresh_order(message):
         ss.photo_feedback = {"kind": "success", "message": message, "at": time.monotonic()}
         ss.flipbook_order_revision = revision + 1
-        clear_photo_cache()
+        # A position change updates Atlas metadata only: retaining previews avoids
+        # downloading the same Drive images again on every click.
+        clear_photo_records()
         st.rerun()
 
     with st.container(border=True):
@@ -620,7 +661,7 @@ def render_flipbook_order_item(album, ordered_photos, photo, position, locked_po
         next_locked = position < len(ordered_photos) and bool(ordered_photos[position].get("flipbook_locked"))
         move_previous, move_next = st.columns(2)
         if move_previous.button(
-                "←", key=f"flipbook-up-{photo['id']}", width="stretch",
+                "← Prima", key=f"flipbook-up-{photo['id']}", width="stretch",
                 disabled=locked or position == 1 or previous_locked, help="Sposta una posizione prima"):
             try:
                 album.move_flipbook_photo(photo["id"], -1)
@@ -628,7 +669,7 @@ def render_flipbook_order_item(album, ordered_photos, photo, position, locked_po
             except PhotoError as exc:
                 st.error(str(exc))
         if move_next.button(
-                "→", key=f"flipbook-down-{photo['id']}", width="stretch",
+                "Dopo →", key=f"flipbook-down-{photo['id']}", width="stretch",
                 disabled=locked or position == len(ordered_photos) or next_locked,
                 help="Sposta una posizione dopo"):
             try:
