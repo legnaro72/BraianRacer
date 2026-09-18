@@ -148,13 +148,14 @@ c.showPage()
 # Page 4
 title(c, "Foto e Flipbook", "Gli invitati condividono gli scatti; Irene e Daniele scelgono quelli del Flipbook.")
 shot_x, shot_y, shot_w, shot_h = M, 75, 245, 665
-screenshot_box(c, SCREENS / "03-foto.png", shot_x, shot_y, shot_w, shot_h, "Foto ♥ e accesso al Flipbook")
+screenshot_box(c, SCREENS / "03-foto-upload.jpg", shot_x, shot_y, shot_w, shot_h, "Area aggiornata per scegliere e caricare le foto")
 x, y, width = 315, H - 105, W - 315 - M
 text(c, "Caricare le foto", x, y, size=13, font="ManualBold", color=black)
 y -= 25
 for item in (
-    "Premi Scegli fino a 20 foto.",
-    "Puoi caricare JPG, PNG, WebP, HEIC e HEIF, massimo 10 MB ciascuna.",
+    "Dal Garage premi Carica le tue foto: arrivi direttamente al selettore.",
+    "Premi Scegli le foto e scegli fino a 20 scatti dalla galleria del telefono.",
+    "Puoi caricare JPG, PNG, WebP, HEIC e HEIF, massimo 20 MB ciascuna.",
     "Premi Carica le foto e attendi la conferma.",
     "Premi Mostra tutte le foto della festa per aprire la galleria.",
     "Su Drive: MMDDYY_nickname_nomeoriginale.",
@@ -167,10 +168,11 @@ y -= 15
 text(c, "Area riservata sposi", x, y, size=13, font="ManualBold", color=black)
 y -= 24
 for item in (
-    "Inserisci la password nell’area riservata.",
+    "Apri il pulsante dorato Area Sposi e inserisci la password.",
     "Seleziona più foto o usa Seleziona tutte.",
     "Pubblica nel Flipbook o Rimuovi dal Flipbook.",
     "Assegna una posizione per scambiare due foto; usa anche le frecce.",
+    "Nella preselezione la Vista a griglia mostra tre miniature per riga anche sul telefono.",
     "La vista compatta a griglia facilita l’ordinamento di molte foto.",
     "Quando l’ordine è definitivo premi Blocca.",
     "Usa Sblocca per rendere di nuovo modificabile la posizione.",

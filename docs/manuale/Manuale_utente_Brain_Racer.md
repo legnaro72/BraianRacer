@@ -28,9 +28,9 @@ Web app: <https://irenedaniele.streamlit.app/>
 
 ## Foto e Flipbook
 
-1. Dal menu scegli **Foto ♥**.
-2. Premi **Scegli fino a 20 foto** e seleziona gli scatti dalla galleria del telefono.
-3. Sono accettati JPG, JPEG, PNG, WebP, HEIC e HEIF, massimo 10 MB ciascuno.
+1. Dal Garage premi **Carica le tue foto**, oppure dal menu scegli **Foto ♥**: l'accesso dal Garage porta direttamente al selettore.
+2. Premi **Scegli le foto** e seleziona fino a 20 scatti dalla galleria del telefono. Puoi restare nella galleria tutto il tempo necessario.
+3. Sono accettati JPG, JPEG, PNG, WebP, HEIC e HEIF, massimo 20 MB ciascuno.
 4. Premi **Carica le foto** e attendi la conferma.
 5. Premi **Mostra tutte le foto della festa** per aprire volontariamente la galleria condivisa.
 
@@ -42,14 +42,15 @@ Il pulsante **♥ Apri il Flipbook** si attiva quando gli sposi pubblicano almen
 
 ## Area riservata Irene e Daniele
 
-1. Apri l'area riservata nella pagina **Foto ♥** e inserisci la password degli sposi.
+1. Apri **🔐 Area Sposi** dal menu dorato o dal Garage e inserisci la password degli sposi.
 2. Seleziona più foto oppure usa **Seleziona tutte**.
 3. Usa **Pubblica nel Flipbook**, **Rimuovi dal Flipbook** o **Elimina selezionate**.
 4. Nella sezione **Ordine del Flipbook** scegli il numero e premi **Assegna**: le due foto si scambiano la posizione.
-5. Usa le frecce per spostare una foto di un posto oppure attiva la **Vista compatta a griglia**.
-6. Quando l'ordine è definitivo premi **Blocca**: quella posizione resta riservata. Premi **Sblocca** per modificarla.
-7. La cancellazione richiede una conferma.
-8. **Annulla selezione** deseleziona tutte le immagini.
+5. Nella preselezione attiva **Vista a griglia** per vedere tre miniature per riga anche sul telefono. Le foto nel Flipbook hanno il bordo verde; quelle selezionate il bordo giallo.
+6. Usa le frecce per spostare una foto di un posto oppure attiva la **Vista compatta a griglia** nell'ordinamento.
+7. Quando l'ordine è definitivo premi **Blocca**: quella posizione resta riservata. Premi **Sblocca** per modificarla.
+8. La cancellazione richiede una conferma.
+9. **Annulla selezione** deseleziona tutte le immagini.
 
 ## Se qualcosa non risponde
 
