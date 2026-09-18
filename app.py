@@ -129,6 +129,22 @@ def dispatch(svc, command):
         if command.get("play"):
             st.session_state.game_id = svc.new_game(pid)
         return
+    if action == "LOGOUT":
+        if pid:
+            game_id = st.session_state.get("game_id")
+            room_id = st.session_state.get("room_id")
+            if game_id:
+                svc.abort(game_id, pid)
+            if room_id:
+                svc.leave_room(room_id, pid)
+        for key in (
+            "player_id", "identity_token", "game_id", "room_id", "menu_snapshot",
+            "next_game_seed", "next_replay_seed", "photo_show_flipbook",
+            "photo_gallery_open", "supervisor_photo_panel", "supervisor_password",
+        ):
+            st.session_state.pop(key, None)
+        st.session_state.update(booted=False, page="HOME")
+        return
     if not pid:
         return
     gid, rid = st.session_state.get("game_id"), st.session_state.get("room_id")
