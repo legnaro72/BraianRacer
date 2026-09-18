@@ -8,10 +8,11 @@ Web app: <https://irenedaniele.streamlit.app/>
 
 1. Apri la web app dal telefono, dal tablet o dal computer.
 2. Scrivi un nickname di 3-16 caratteri e premi **Gioca**.
-3. Usa **Sinistra** e **Destra** per sterzare e tieni premuto **Accelera** per aumentare la velocità.
-4. Sul touchscreen premi la pista per lanciare il bouquet contro i palloncini a cuore.
-5. Al traguardo rispondi alle tre domande. Verde significa risposta corretta, rosso risposta errata.
-6. Dopo Game Over premi **Gioca ancora** per ripartire.
+3. Nel Garage trovi subito, nello stesso formato: **📸 Condividi le foto della festa**, **🏁 Gioca** e **🔐 Area Sposi**.
+4. Usa **Sinistra** e **Destra** per sterzare e tieni premuto **Accelera** per aumentare la velocità.
+5. Sul touchscreen premi la pista per lanciare il bouquet contro i palloncini a cuore.
+6. Al traguardo rispondi alle tre domande. Verde significa risposta corretta, rosso risposta errata.
+7. Dopo Game Over premi **Gioca ancora** per ripartire.
 
 ![Schermata iniziale](screens/01-home.png)
 

@@ -113,6 +113,7 @@ title(c, "Iniziare a giocare", "Apri la web app dal telefono, dal tablet o dal c
 y = H - 100
 for item in (
     "Scrivi un nickname di 3-16 caratteri e premi Gioca.",
+    "Nel Garage trovi, in ordine: Condividi le foto della festa, Gioca e Area Sposi.",
     "Usa Sinistra e Destra per sterzare. Tieni premuto Accelera per aumentare la velocità.",
     "Sul touchscreen premi la pista per lanciare il bouquet contro i palloncini a cuore.",
     "Al traguardo rispondi alle tre domande. Verde significa risposta corretta, rosso risposta errata.",
