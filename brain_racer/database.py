@@ -38,6 +38,9 @@ class Database:
             if "flipbook_locked" not in columns:
                 with self.engine.begin() as connection:
                     connection.execute(text("ALTER TABLE event_photos ADD COLUMN flipbook_locked BOOLEAN DEFAULT 0"))
+            if "thumbnail_storage_id" not in columns:
+                with self.engine.begin() as connection:
+                    connection.execute(text("ALTER TABLE event_photos ADD COLUMN thumbnail_storage_id VARCHAR(160)"))
         try:
             with Session(self.engine) as session, session.begin():
                 if session.get(Coordination, 1) is None:

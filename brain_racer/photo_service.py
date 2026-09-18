@@ -102,6 +102,19 @@ def prepare_photo(filename, mime_type, content):
     return filename, mime_type, content
 
 
+def make_thumbnail(content):
+    """Create a small JPEG preview for fast private gallery grids."""
+    try:
+        with Image.open(io.BytesIO(content)) as source:
+            image = ImageOps.exif_transpose(source).convert("RGB")
+            image.thumbnail((360, 360), Image.Resampling.LANCZOS)
+            target = io.BytesIO()
+            image.save(target, format="JPEG", quality=72, optimize=True)
+            return target.getvalue()
+    except (OSError, ValueError):
+        return None
+
+
 def dated_drive_filename(filename, nickname, uploaded_at):
     """Prefix Drive files with local upload date and the player's nickname."""
     filename = safe_filename(filename)
@@ -224,9 +237,21 @@ class PhotoService:
                     failed_name = "Foto"
                 failures.append(UploadFailure(failed_name, str(exc)))
                 continue
+            thumbnail_storage_id = None
+            thumbnail = make_thumbnail(content)
+            if thumbnail:
+                try:
+                    thumbnail_name = safe_filename(f"thumb_{drive_filename.rsplit('.', 1)[0]}.jpg")
+                    thumbnail_stored = self.storage.drive_upload_photo(
+                        thumbnail_name, "image/jpeg", thumbnail,
+                    )
+                    thumbnail_storage_id = thumbnail_stored.storage_id
+                except PhotoError:
+                    LOGGER.warning("Photo thumbnail could not be stored; falling back to original preview")
             try:
                 with self.db.transaction() as s:
                     photo = EventPhoto(player_id=player_id, storage_id=stored.storage_id,
+                                       thumbnail_storage_id=thumbnail_storage_id,
                                        filename=filename[:255], mime_type=stored.mime_type,
                                        byte_size=len(content), uploaded_at=uploaded_at)
                     s.add(photo)
@@ -253,7 +278,8 @@ class PhotoService:
                 if not player:
                     continue
                 result.append({
-                    "id": photo.id, "storage_id": photo.storage_id, "filename": photo.filename,
+                    "id": photo.id, "storage_id": photo.storage_id,
+                    "thumbnail_storage_id": photo.thumbnail_storage_id, "filename": photo.filename,
                     "mime_type": photo.mime_type, "uploaded_at": photo.uploaded_at,
                     "approved": photo.approved, "approved_at": photo.approved_at,
                     "flipbook_order": photo.flipbook_order,
@@ -365,8 +391,13 @@ class PhotoService:
             photo = s.get(EventPhoto, photo_id)
             if not photo:
                 raise PhotoError("Foto non trovata.")
-            storage_id = photo.storage_id
+            storage_id, thumbnail_storage_id = photo.storage_id, photo.thumbnail_storage_id
         self.storage.drive_delete_photo(storage_id)
+        if thumbnail_storage_id:
+            try:
+                self.storage.drive_delete_photo(thumbnail_storage_id)
+            except PhotoError:
+                LOGGER.warning("Photo thumbnail could not be deleted")
         try:
             with self.db.transaction() as s:
                 photo = s.get(EventPhoto, photo_id)

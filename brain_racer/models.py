@@ -103,6 +103,7 @@ class EventPhoto(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     player_id: Mapped[str] = mapped_column(ForeignKey("players.id"), index=True)
     storage_id: Mapped[str] = mapped_column(String(160), unique=True)
+    thumbnail_storage_id: Mapped[str | None] = mapped_column(String(160), nullable=True)
     filename: Mapped[str] = mapped_column(String(255))
     mime_type: Mapped[str] = mapped_column(String(100))
     byte_size: Mapped[int] = mapped_column(Integer)

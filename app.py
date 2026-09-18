@@ -452,15 +452,19 @@ def photo_upload_and_supervisor():
             ss.photo_gallery_page = gallery_page + 1
             st.rerun()
         start = gallery_page * PHOTO_GALLERY_PAGE_SIZE
-        photo_columns(photos[start:start + PHOTO_GALLERY_PAGE_SIZE], "Foto non disponibile")
+        photo_columns(photos[start:start + PHOTO_GALLERY_PAGE_SIZE], "Foto non disponibile", use_thumbnail=True)
     else:
         st.subheader("Tutte le foto della festa")
         st.caption("La galleria aspetta il primo scatto.")
 
 
-def render_photo(photo, unavailable):
+def preview_storage_id(photo):
+    return photo.get("thumbnail_storage_id") or photo["storage_id"]
+
+
+def render_photo(photo, unavailable, use_thumbnail=False):
     try:
-        image, _ = cached_photo_bytes(photo["storage_id"])
+        image, _ = cached_photo_bytes(preview_storage_id(photo) if use_thumbnail else photo["storage_id"])
         st.image(image, caption=f"Caricata da {photo['nickname']} #{photo['tag']} · {photo['filename']}", width="stretch")
     except PhotoError:
         st.caption(unavailable)
@@ -633,7 +637,7 @@ def render_supervisor_photo_card(photo, marked_for_deletion):
     )
     with st.container(border=True, key=card_key):
         try:
-            image, _ = cached_photo_bytes(photo["storage_id"])
+            image, _ = cached_photo_bytes(preview_storage_id(photo))
             st.image(image, width="stretch")
         except PhotoError:
             st.caption("Anteprima non disponibile")
@@ -661,7 +665,7 @@ def render_flipbook_order_item(album, ordered_photos, photo, position, locked_po
     with st.container(border=True):
         if compact:
             try:
-                image, _ = cached_photo_bytes(photo["storage_id"])
+                image, _ = cached_photo_bytes(preview_storage_id(photo))
                 st.image(image, width="stretch")
             except PhotoError:
                 st.caption("Anteprima non disponibile")
@@ -670,7 +674,7 @@ def render_flipbook_order_item(album, ordered_photos, photo, position, locked_po
         else:
             preview, label = st.columns([1, 4])
             try:
-                image, _ = cached_photo_bytes(photo["storage_id"])
+                image, _ = cached_photo_bytes(preview_storage_id(photo))
                 preview.image(image, width=100)
             except PhotoError:
                 preview.caption("Anteprima non disponibile")
@@ -778,12 +782,12 @@ def render_flipbook(photos):
         render_photo(photos[photo_index], "Foto non disponibile")
 
 
-def photo_columns(photos, unavailable):
+def photo_columns(photos, unavailable, use_thumbnail=False):
     for index in range(0, len(photos), 3):
         columns = st.columns(3)
         for column, photo in zip(columns, photos[index:index + 3]):
             with column:
-                render_photo(photo, unavailable)
+                render_photo(photo, unavailable, use_thumbnail=use_thumbnail)
                 if photo["approved"]:
                     st.caption("♥ Nel Flipbook")
 
