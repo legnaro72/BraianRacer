@@ -79,7 +79,7 @@ class PersistentPhotoUploader {
     this.root = parent.querySelector('#persistent-photo-uploader');
     this.owner = component.data.owner;
     this.ackKey = `irene-daniele-photo-ack:${this.owner}`;
-    this.ackId = localStorage.getItem(this.ackKey) || '';
+    try { this.ackId = localStorage.getItem(this.ackKey) || ''; } catch (_) { this.ackId = ''; }
     this.sending = false;
     this.current = null;
     this.attempt = 0;
@@ -90,11 +90,12 @@ class PersistentPhotoUploader {
   }
 
   update(component) {
+    if(this.disposed)return;
     this.component = component;
     const ack = component.data.ack;
     if (ack?.request_id && ack.request_id !== this.ackId) {
       this.ackId = ack.request_id;
-      localStorage.setItem(this.ackKey, this.ackId);
+      try { localStorage.setItem(this.ackKey, this.ackId); } catch (_) {}
       this.handleAck(ack);
     }
   }
@@ -128,6 +129,7 @@ class PersistentPhotoUploader {
   setProgress(value) { this.bar.style.width = `${Math.max(0, Math.min(100, value))}%`; }
 
   async choose(files) {
+    if(this.sending || this.choosing)return;
     const maxFiles = Number(this.component.data.max_files || 20);
     const maxBytes = Number(this.component.data.max_bytes || 20971520);
     if (!files.length) return;
@@ -138,6 +140,10 @@ class PersistentPhotoUploader {
     if (oversized) {
       this.progress.textContent = `${oversized.name} supera il limite di 20 MB.`; return;
     }
+    this.choosing=true;
+    this.input.disabled=true;this.upload.disabled=true;this.clear.disabled=true;
+    this.progress.textContent='Preparazione delle foto selezionate…';
+    try {
     await clearOwner(this.owner);
     this.total = 0;
     this.setProgress(0);
@@ -148,9 +154,15 @@ class PersistentPhotoUploader {
         id: `${this.owner}:${stamp}:${index}`, owner: this.owner, name: file.name,
         mime: file.type || '', size: file.size, blob: file, order: index,
       });
+      this.setProgress((index + 1) / files.length * 100);
     }
     this.progress.textContent = 'Selezione conservata sul telefono. Ora puoi caricarla.';
+    } catch (_) {
+      this.progress.textContent='Non è stato possibile conservare tutte le foto. Controlla lo spazio del telefono e riprova.';
+    } finally {
+    this.choosing=false;this.input.disabled=false;
     await this.refresh();
+    }
   }
 
   async rows() {
@@ -158,6 +170,8 @@ class PersistentPhotoUploader {
   }
 
   async refresh() {
+    if(this.disposed)return;
+    try {
     const rows = await this.rows();
     const totalMb = rows.reduce((sum, row) => sum + row.size, 0) / 1048576;
     this.selection.textContent = rows.length
@@ -165,10 +179,15 @@ class PersistentPhotoUploader {
       : 'Nessuna foto selezionata.';
     this.upload.disabled = !rows.length || this.sending;
     this.clear.disabled = !rows.length || this.sending;
+    this.input.disabled = this.sending || Boolean(this.choosing);
+    } catch (_) {
+      this.upload.disabled=true;this.clear.disabled=true;
+      this.progress.textContent='La memoria del browser non è disponibile. Consenti la memorizzazione per selezionare le foto.';
+    }
   }
 
   async sendNext() {
-    if (!this.sending || this.current) return;
+    if (this.disposed || !this.sending || this.current) return;
     const rows = await this.rows();
     if (!rows.length) {
       this.sending = false;
@@ -188,7 +207,8 @@ class PersistentPhotoUploader {
       const prepared = await prepareForTransfer(this.current);
       this.progress.textContent = `Foto ${currentNumber} di ${this.total} · invio in corso…`;
       const data = await fileAsBase64(prepared.blob);
-      const requestId = `${this.current.id}:${this.attempt}`;
+      if(this.disposed)return;
+      const requestId = `${this.current.id}:${crypto.randomUUID()}`;
       this.component.setStateValue('item', {
         request_id: requestId, local_id: this.current.id, name: prepared.name,
         mime: prepared.mime, data,
@@ -201,7 +221,7 @@ class PersistentPhotoUploader {
   }
 
   async handleAck(ack) {
-    if (!ack.local_id) return;
+    if (this.disposed || !ack.local_id || !ack.local_id.startsWith(`${this.owner}:`)) return;
     if (ack.ok) {
       await deleteRecord(ack.local_id);
       this.current = null;
@@ -217,7 +237,9 @@ class PersistentPhotoUploader {
 
 export default function(component) {
   const parent = component.parentElement;
-  if (!parent.__persistentPhotoUploader) {
+  if (!parent.__persistentPhotoUploader || parent.__persistentPhotoUploader.owner !== component.data.owner ||
+      parent.__persistentPhotoUploader.root !== parent.querySelector('#persistent-photo-uploader')) {
+    if(parent.__persistentPhotoUploader)parent.__persistentPhotoUploader.disposed=true;
     parent.__persistentPhotoUploader = new PersistentPhotoUploader(parent, component);
   } else {
     parent.__persistentPhotoUploader.update(component);

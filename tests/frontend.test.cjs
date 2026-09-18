@@ -223,7 +223,7 @@ test('Flipbook card opens the real album and shows the approved photo count',()=
   ui.data={...ui.data,game:null,room:null,page:'PHOTOS',photo_summary:{approved_count:17}};
   ui.send=action=>{sent=action;};
   const html=ui.photos();
-  assert.match(html,/Apri il Flipbook \(17 foto\)/);
+  assert.match(html,/L'album di Irene e Daniele · 17 foto/);
   const open={disabled:false,textContent:'',dataset:{action:'OPEN_FLIPBOOK'}};
   ui.click({target:{closest:()=>open}});
   assert.equal(open.disabled,true);assert.equal(open.textContent,'Apro il Flipbook…');
@@ -259,6 +259,37 @@ test('independent multiplayer follows own phase and advances without the guest',
   assert.equal(mounted,'PIT');
   assert.equal(ui.data.game.phase,'CHALLENGE_DONE');
   assert.equal(ui.pending[0].game_id,'g');
+});
+
+test('delayed cloud snapshot cannot replace the local answer feedback',()=>{
+  const {ui}=uiHost();
+  ui.localQuizActive=true;
+  ui.data.game={...ui.data.game,screen_phase:'REVEAL',phase:'REVEAL',answered:true,score:7,answer:{correct:true}};
+  const previous=ui.data.game;
+  ui.mountView=()=>{};
+  ui.update({data:{...ui.data,now:100,game:{...previous,screen_phase:'QUIZ',phase:'QUIZ',answered:false,score:6}}});
+  assert.equal(ui.data.game,previous);
+  assert.equal(ui.data.game.score,7);
+  assert.equal(ui.view(),'REVEAL');
+});
+
+test('photo count changes repaint the album entry without navigation',()=>{
+  const {ui}=uiHost();let mounts=0;
+  ui.data={...ui.data,game:null,page:'PHOTOS',photo_summary:{approved_count:1}};
+  ui.mountView=()=>{mounts++;};
+  ui.update({data:{...ui.data,now:100}});
+  ui.update({data:{...ui.data,now:101,photo_summary:{approved_count:2}}});
+  assert.equal(mounts,2);
+});
+
+test('cloud clock corrections do not change the time available in a local quiz',()=>{
+  const {ui,timer,setTime}=uiHost();
+  ui.localQuizActive=true;ui.quizClockOffset=0;
+  ui.data.game.deadline=115;
+  ui.serverOffset=-8000;ui.tick();
+  assert.equal(timer.textContent,'15s');
+  setTime(102000);ui.serverOffset=3000;ui.tick();
+  assert.equal(timer.textContent,'13s');
 });
 
 test('touching the track fires immediately, keeps steering and respects cooldown/pause',()=>{

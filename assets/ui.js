@@ -78,7 +78,7 @@ class BrainUI {
     }
     if(this.localQuizActive){
       if(['LEVEL_SUMMARY','PIT'].includes(component.data.game?.screen_phase)||component.data.room?.phase==='MATCH_RESULTS')this.localQuizActive=false;
-      else if(['QUIZ','LEVEL_SUMMARY'].includes(previous?.game?.screen_phase))this.data.game=previous.game;
+      else if(['QUIZ','REVEAL','LEVEL_SUMMARY'].includes(previous?.game?.screen_phase))this.data.game=previous.game;
     }
     this.serverOffset=(data.now || Date.now()/1000)*1000-Date.now();
     if(!data.booted&&!this.identitySent){this.identitySent=true;
@@ -96,7 +96,9 @@ class BrainUI {
     this.handledError=data.message;
     const signature=[view,view==='DRIVING'?game?.seed:game?.id,game?.level,game?.qindex,
       ['QUIZ','REVEAL'].includes(view)?game?.answered:'',
-      view==='LOBBY'?JSON.stringify(room?.players):'',data.player?.id||''].join(':');
+      view==='LOBBY'?JSON.stringify([room?.host,room?.players]):'',data.player?.id||'',
+      ['HOME','STATS','LEADERBOARD'].includes(view)?JSON.stringify([data.stats,data.leaderboard]):'',
+      view==='PHOTOS'?data.photo_summary?.approved_count:''].join(':');
     if(signature!==this.signature){
       this.signature=signature;
       this.mountView(view);
@@ -117,10 +119,12 @@ class BrainUI {
   }
   mountView(view) {
     const data=this.data,game=data.game;
+    const keepQuizPosition=['QUIZ','REVEAL'].includes(view)&&['QUIZ','REVEAL'].includes(this.mountedView);
+    this.mountedView=view;
     if(this.engine){this.engine.destroy();this.engine=null;}
     this.root.innerHTML=this.header()+`<main class="screen screen-${view.toLowerCase()}">${this.render(view)}</main>`+this.footer()+
       '<div class="toast" role="alert" hidden></div>';
-    this.root.scrollIntoView({block:'start',behavior:'instant'});
+    if(!keepQuizPosition)this.root.scrollIntoView({block:'start',behavior:'instant'});
     if(view==='DRIVING'){
       this.engine=new DrivingEngine(this.root.querySelector('canvas'),{...game,serverNow:data.now},events=>{
         const current=this.data.game;
@@ -143,7 +147,8 @@ class BrainUI {
   }
   openLocalQuiz(game) {
     if(this.localQuizActive||!game?.quiz_preview?.length)return;
-    const now=(Date.now()+(this.serverOffset||0))/1000;
+    this.quizClockOffset=this.serverOffset||0;
+    const now=(Date.now()+this.quizClockOffset)/1000;
     this.localQuizActive=game.mode==='single'||Boolean(game.independent);
     this.data.game={...game,phase:'QUIZ',screen_phase:'QUIZ',qindex:0,
       question:game.quiz_preview[0],deadline:now+15,answered:false,eligible:true};
@@ -160,7 +165,7 @@ class BrainUI {
       if(!this.localQuizActive||current.level!==level||current.qindex!==index)return;
       this.answerLock=null;
       if(index+1<current.quiz_preview.length){
-        const now=(Date.now()+(this.serverOffset||0))/1000;
+        const now=(Date.now()+(this.quizClockOffset||0))/1000;
         this.data.game={...current,phase:'QUIZ',screen_phase:'QUIZ',qindex:index+1,
           question:current.quiz_preview[index+1],deadline:now+15,answered:false,answer:null};
         this.signature='';this.mountView('QUIZ');
@@ -359,7 +364,7 @@ class BrainUI {
   }
   tick() {
     if(!this.data)return;
-    const liveNow=(Date.now()+(this.serverOffset||0))/1000;
+    const liveNow=(Date.now()+(this.localQuizActive?(this.quizClockOffset||0):(this.serverOffset||0)))/1000;
     if(this.localQuizActive&&this.data.game?.screen_phase==='QUIZ'&&!this.answerLock&&liveNow>=this.data.game.deadline){
       const g=this.data.game;
       this.send('ANSWER',{game_id:g.id,level:g.level,index:g.qindex,choice:null});
@@ -383,8 +388,8 @@ class BrainUI {
   click(event) {
     const el=event.target.closest('[data-action]');if(!el||el.disabled)return;
     const action=el.dataset.action;
-    if(action==='MUSIC'){this.audio.toggleMusic();el.textContent=this.audio.musicMuted?'🔕':'🎵';el.setAttribute('aria-label',this.audio.musicMuted?'Attiva musica di sottofondo':'Disattiva musica di sottofondo');return;}
-    if(action==='EFFECTS'){this.audio.toggleEffects();el.textContent=this.audio.effectsMuted?'🔇':'🔊';el.setAttribute('aria-label',this.audio.effectsMuted?'Attiva effetti sonori':'Disattiva effetti sonori');return;}
+    if(action==='MUSIC'){this.audio.toggleMusic();el.querySelector('span').textContent=this.audio.musicMuted?'🔕':'🎵';el.setAttribute('aria-label',this.audio.musicMuted?'Attiva musica di sottofondo':'Disattiva musica di sottofondo');return;}
+    if(action==='EFFECTS'){this.audio.toggleEffects();el.querySelector('span').textContent=this.audio.effectsMuted?'🔇':'🔊';el.setAttribute('aria-label',this.audio.effectsMuted?'Attiva effetti sonori':'Disattiva effetti sonori');return;}
     if(action==='LOGOUT'){
       safeStorage.remove('br:identity');this.identitySent=false;this.savedToken=null;this.menuOverlay=null;this.pending=[];
       this.data={...this.data,booted:false,player:null,game:null,room:null,page:'HOME'};
@@ -474,7 +479,7 @@ class BrainUI {
       const g=this.data.game;
       if(this.answerLock || g.answered || g.screen_phase!=='QUIZ')return;
       const choice=Number(el.dataset.choice),correctIndex=Number(g.question?.correct_index);
-      this.answerLock={key:`${g.id}:${g.level}:${g.qindex}`,at:(Date.now()+(this.serverOffset||0))/1000};
+      this.answerLock={key:`${g.id}:${g.level}:${g.qindex}`,at:(Date.now()+(this.localQuizActive?(this.quizClockOffset||0):(this.serverOffset||0)))/1000};
       this.root.querySelectorAll('.answer').forEach((answer,index)=>{
         answer.disabled=true;
         if(Number.isInteger(correctIndex)&&index===correctIndex)answer.classList.add('correct');
@@ -489,7 +494,7 @@ class BrainUI {
         this.audio.play(correct?'correct':'wrong');
       }
       this.send('ANSWER',{game_id:g.id,level:g.level,index:g.qindex,choice});
-      if(this.localQuizActive)this.advanceLocalQuiz(choice);
+      if(this.localQuizActive){this.advanceLocalQuiz(choice);this.signature='';this.mountView('REVEAL');}
       return;
     }
     this.send(action);

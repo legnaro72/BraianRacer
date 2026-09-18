@@ -252,9 +252,9 @@ def arcade():
                 except RuleError as exc:
                     ss.message = str(exc)
                 ss.seen_commands = (ss.seen_commands + [command["id"]])[-240:]
-                if command.get("action") in ("NAV", "OPEN_FLIPBOOK") and (
-                        previous_page == "PHOTOS" or command.get("page") == "PHOTOS" or
-                        command.get("action") == "OPEN_FLIPBOOK"):
+                if (previous_page != ss.page and
+                        {previous_page, ss.page} & {"PHOTOS", "SUPERVISOR"}) or command.get("action") in (
+                        "OPEN_FLIPBOOK", "OPEN_PHOTO_UPLOAD"):
                     ss.photo_page_rerun = True
         payload = {"booted": ss.get("booted", False), "page": ss.page,
                    "command_acks": ss.seen_commands, "message": ss.get("message")}
@@ -267,7 +267,7 @@ def arcade():
                 active = bool(ss.get("game_id") or ss.get("room_id"))
                 cache_fresh = (isinstance(cached, (tuple, list)) and len(cached) == 3
                                and cached[0] == cache_key and isinstance(cached[1], (int, float))
-                               and isinstance(cached[2], dict) and time.monotonic() - cached[1] < 3)
+                               and isinstance(cached[2], dict) and time.monotonic() - cached[1] < 15)
                 if not active and not changed and cache_fresh:
                     payload.update(cached[2])
                     payload["now"] = time.time()
@@ -476,6 +476,9 @@ def render_supervisor_area(album, photos):
             st.caption("Inserite la password per accedere alla gestione privata dell'album.")
             return
         st.success("Area supervisore attiva")
+        feedback = ss.get("photo_feedback")
+        if isinstance(feedback, dict) and time.monotonic() - feedback.get("at", 0) < 8:
+            getattr(st, feedback.get("kind", "info"))(feedback.get("message", ""))
         active_panel = ss.get("supervisor_photo_panel", "SELECT")
         select_panel, order_panel = st.columns(2)
         if select_panel.button(
@@ -518,17 +521,27 @@ def render_supervisor_selection(album, photos):
     pending = [photo for photo in photos if not photo["approved"]]
     st.caption(f"{len(photos)} foto ricevute · {len(pending)} da selezionare per il Flipbook")
     pending_delete = ss.get("photo_delete_confirm", ())
+    valid_ids = {photo["id"] for photo in photos}
+    ss.supervisor_selected_ids = set(ss.get("supervisor_selected_ids", ())) & valid_ids
     delete_selection = (tuple(pending_delete) if isinstance(pending_delete, (list, tuple, set))
                         else ((pending_delete,) if pending_delete else ()))
     select_all, clear_selection = st.columns(2)
     if select_all.button("Seleziona tutte", disabled=not photos, width="stretch"):
+        ss.supervisor_selected_ids = valid_ids.copy()
         for photo in photos:
             ss[f"supervisor-photo-{photo['id']}"] = True
     if clear_selection.button("Annulla selezione", disabled=not photos, width="stretch"):
+        ss.supervisor_selected_ids = set()
         for photo in photos:
-            ss.pop(f"supervisor-photo-{photo['id']}", None)
+            ss[f"supervisor-photo-{photo['id']}"] = False
     grid_view = st.toggle("Vista a griglia", value=True, key="supervisor-photo-grid")
-    selected = []
+    page_count = max(1, (len(photos) + 8) // 9)
+    page_number = max(1, min(int(ss.get("supervisor_selection_page", 1)), page_count))
+    ss.supervisor_selection_page = page_number
+    if page_count > 1:
+        page_number = int(st.number_input("Pagina foto (9 per pagina)", min_value=1,
+                                         max_value=page_count, step=1, key="supervisor_selection_page"))
+    visible_photos = photos[(page_number - 1) * 9:page_number * 9]
     if grid_view:
         st.html("""<style>
         @media (max-width: 640px) {
@@ -547,16 +560,16 @@ def render_supervisor_selection(album, photos):
           [class*="st-key-supervisor-card-"] label { font-size: .68rem !important; }
         }
         </style>""")
-        for first in range(0, len(photos), 3):
+        for first in range(0, len(visible_photos), 3):
             cards = st.columns(3, gap="small")
-            for card, photo in zip(cards, photos[first:first + 3]):
+            for card, photo in zip(cards, visible_photos[first:first + 3]):
                 with card:
-                    if render_supervisor_photo_card(photo, photo["id"] in delete_selection):
-                        selected.append(photo["id"])
+                    render_supervisor_photo_card(photo, photo["id"] in delete_selection)
     else:
-        for photo in photos:
-            if render_supervisor_photo_card(photo, photo["id"] in delete_selection):
-                selected.append(photo["id"])
+        for photo in visible_photos:
+            render_supervisor_photo_card(photo, photo["id"] in delete_selection)
+
+    selected = [photo["id"] for photo in photos if photo["id"] in ss.supervisor_selected_ids]
 
     if photos:
         st.caption(f"{len(selected)} foto selezionate")
@@ -564,6 +577,7 @@ def render_supervisor_selection(album, photos):
         if publish.button("Pubblica nel Flipbook", disabled=not selected,
                           type="primary", width="stretch"):
             published = album.set_approved_many(selected, True)
+            ss.supervisor_selected_ids = set()
             clear_photo_records()
             ss.pop("menu_snapshot", None)
             ss.photo_show_flipbook = False
@@ -580,6 +594,7 @@ def render_supervisor_selection(album, photos):
             st.rerun()
         if remove.button("Rimuovi dal Flipbook", disabled=not selected, width="stretch"):
             album.set_approved_many(selected, False)
+            ss.supervisor_selected_ids = set()
             clear_photo_records()
             for photo_id in selected:
                 ss.pop(f"supervisor-photo-{photo_id}", None)
@@ -600,9 +615,9 @@ def render_supervisor_selection(album, photos):
                         deleted += 1
                     except PhotoError as exc:
                         failures.append(str(exc))
-            clear_photo_cache()
-            cached_photo_bytes.clear()
+            clear_photo_records()
             ss.pop("photo_delete_confirm", None)
+            ss.supervisor_selected_ids.difference_update(delete_selection)
             for photo_id in delete_selection:
                 ss.pop(f"supervisor-photo-{photo_id}", None)
             if failures:
@@ -683,6 +698,17 @@ def render_supervisor_photo_card(photo, marked_for_deletion):
     """Compact selection card with a durable visual state for wedding supervisors."""
     ss = st.session_state
     photo_id = photo["id"]
+    selection_key = f"supervisor-photo-{photo_id}"
+    if selection_key not in ss:
+        ss[selection_key] = photo_id in ss.get("supervisor_selected_ids", set())
+
+    def remember_selection():
+        selection = set(ss.get("supervisor_selected_ids", ()))
+        if ss.get(selection_key):
+            selection.add(photo_id)
+        else:
+            selection.discard(photo_id)
+        ss.supervisor_selected_ids = selection
     selected = bool(ss.get(f"supervisor-photo-{photo_id}", False))
     if marked_for_deletion:
         color, shade, label = "#d74b55", "#fff0f1", "⚠ In attesa di conferma eliminazione"
@@ -708,7 +734,7 @@ def render_supervisor_photo_card(photo, marked_for_deletion):
         st.caption(f"Caricata da {photo['nickname']} #{photo['tag']}")
         st.caption(label)
         return st.checkbox("Seleziona", key=f"supervisor-photo-{photo_id}",
-                           disabled=marked_for_deletion)
+                           disabled=marked_for_deletion, on_change=remember_selection)
 
 
 def render_flipbook_order_item(album, ordered_photos, photo, position, locked_positions, compact):
