@@ -131,6 +131,14 @@ class BrainUI {
       },this.audio);
     }
   }
+  notify(message) {
+    const toast=this.root.querySelector('.toast');
+    if(!toast)return;
+    toast.textContent=message;
+    toast.hidden=false;
+    clearTimeout(this.toastTimer);
+    this.toastTimer=setTimeout(()=>{toast.hidden=true;},4200);
+  }
   openLocalQuiz(game) {
     if(this.localQuizActive||!game?.quiz_preview?.length)return;
     const now=(Date.now()+(this.serverOffset||0))/1000;
@@ -377,6 +385,9 @@ class BrainUI {
     }
     if(action==='NAV'){
       const page=el.dataset.page;
+      if((this.data.game||this.data.room)&&page==='MULTIPLAYER'){
+        this.notify('Hai una partita in corso. Termina o esci dalla gara prima di aprire il Multiplayer.');return;
+      }
       if((this.data.game||this.data.room)&&['HOME','LEADERBOARD','STATS','HELP','DEDICATIONS','PHOTOS','SUPERVISOR'].includes(page)){
         this.menuOverlay=page;this.signature='';this.mountView(page);return;
       }
@@ -406,7 +417,7 @@ class BrainUI {
       this.optimisticNextLevel=g.level+1;
       this.signature='';this.mountView('DRIVING');this.send('NEXT_LEVEL');return;
     }
-    if(action==='FOCUS_NAME'){this.root.querySelector('#nickname')?.focus();return;}
+    if(action==='FOCUS_NAME'){this.root.querySelector('#nickname')?.focus();this.notify('Scegli un nickname per sbloccare il Multiplayer.');return;}
     if(action==='PAUSE'){this.engine?.togglePause();el.textContent=this.engine?.paused?'▶ Riprendi':'Ⅱ Pausa';return;}
     if(action==='BOUQUET'){if(this.engine?.state.started)this.engine.throwBouquet();return;}
     if(action==='COPY'){
