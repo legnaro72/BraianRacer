@@ -493,13 +493,16 @@ class GameService:
 
     def start_room(self, room_id, player_id):
         with self.db.transaction() as s:
-            room, _ = self._member(s, room_id, player_id)
+            room, host_member = self._member(s, room_id, player_id)
             if room.status != "LOBBY":
                 return
             if room.host_player_id != player_id:
                 raise RuleError("Solo l'host può avviare la gara.")
             members = self._members(s, room_id)
             now = self.clock()
+            # Starting the match is also an explicit ready signal from the host.
+            host_member.ready = True
+            host_member.last_seen_at = now
             if len(members) < 2 or not all(m.ready and now - _number(m.last_seen_at) < DISCONNECT_SECONDS
                                            for m in members):
                 raise RuleError("Servono almeno 2 giocatori connessi e tutti pronti.")

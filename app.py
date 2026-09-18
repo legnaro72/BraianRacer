@@ -183,8 +183,11 @@ def dispatch(svc, command):
         if ready_room_id:
             svc.ready(ready_room_id, pid)
             st.session_state.room_id = ready_room_id
-    elif action == "START_ROOM" and rid:
-        svc.start_room(rid, pid)
+    elif action == "START_ROOM":
+        start_room_id = rid or command.get("room_id")
+        if start_room_id:
+            svc.start_room(start_room_id, pid)
+            st.session_state.room_id = start_room_id
     elif action == "EVENTS":
         target = command.get("game_id")
         if target and (rid or target == gid):

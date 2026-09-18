@@ -296,7 +296,7 @@ class BrainUI {
       `<div class="lobby-layout"><section class="panel"><div class="section-heading"><h2>Giocatori</h2><span class="pill">${players.length} / 6</span></div><div class="lobby-players">${players.map(p=>`<div class="lobby-player ${String(p.player_id)===playerId?'is-you':''}"><span class="avatar">${esc(p.nickname.slice(0,2).toUpperCase())}</span><div><strong>${esc(p.nickname)} ${String(p.player_id)===playerId?'<small>TU</small>':''}</strong><small>#${esc(p.tag)} ${String(p.player_id)===String(r.host)?'· HOST':''}</small></div><span class="ready-state ${p.ready?'ready':''}">${p.ready?'✓ Pronto':'○ In attesa'}</span></div>`).join('')}
       ${Array.from({length:Math.max(0,2-players.length)},()=>'<div class="lobby-player empty-slot"><span class="avatar">+</span><span>Un amico sta per unirsi…</span></div>').join('')}</div>
       <div class="lobby-actions">${button(me?.ready?'✓ Sei pronto':'Sono pronto','READY',me?.ready?'secondary':'primary',me?.ready?'disabled':'')}
-      ${host?button('Inizia gara '+icons.arrow,'START_ROOM','primary',players.length<2||!players.every(p=>p.ready)?'disabled':''):'<p>La gara partirà quando l’host darà il via.</p>'}</div></section>
+      ${host?button('Inizia gara '+icons.arrow,'START_ROOM','primary',players.length<2?'disabled':''):'<p>La gara partirà quando l’host darà il via.</p>'}</div></section>
       <aside class="panel invite-panel"><span class="eyebrow">IL VOSTRO CODICE STANZA</span><div class="room-code">${esc(r.code)}</div>${button('Copia codice','COPY','secondary')}<div class="room-facts"><span>01 <b>Stessa pista per tutti</b></span><span>02 <b>5 livelli di sfida</b></span><span>03 <b>Un campione Brain Racer</b></span></div><p>Connessi allo stesso indirizzo dell'app, anche da dispositivi diversi.</p></aside></div>
       <div class="back-row">${button('← Lascia la stanza','LEAVE_ROOM','ghost')}</div>`;
   }
@@ -412,6 +412,10 @@ class BrainUI {
         this.signature='';this.mountView('LOBBY');
       }
       this.send('READY',{room_id:this.data.room?.id});return;
+    }
+    if(action==='START_ROOM'){
+      el.disabled=true;el.textContent='Partenza…';el.setAttribute('aria-busy','true');
+      this.send('START_ROOM',{room_id:this.data.room?.id});return;
     }
     if(action==='RESUME'||(action==='START_SINGLE'&&this.menuOverlay&&(this.data.game||this.data.room))){
       this.menuOverlay=null;this.signature='';this.mountView(this.gameView());return;
