@@ -1,9 +1,9 @@
 """Launch with: streamlit run app.py"""
+import base64
 import logging
 import os
 import secrets
 import time
-import hashlib
 from pathlib import Path
 
 import streamlit as st
@@ -96,6 +96,19 @@ def renderer(asset_revision):
         "brain_racer_arcade", html='<div id="brain-app"></div>',
         css=(assets / "game.css").read_text(encoding="utf-8") + portrait_css,
         js="\n".join((assets / f).read_text(encoding="utf-8") for f in ("course.js", "game.js", "ui.js")),
+        isolate_styles=True,
+    )
+
+
+@st.cache_resource
+def persistent_photo_uploader(asset_revision):
+    """Browser-persistent uploader that survives mobile picker disconnections."""
+    assets = ROOT / "assets"
+    return components.component(
+        "persistent_wedding_photo_uploader",
+        html='<div id="persistent-photo-uploader"></div>',
+        css=(assets / "photo_uploader.css").read_text(encoding="utf-8"),
+        js=(assets / "photo_uploader.js").read_text(encoding="utf-8"),
         isolate_styles=True,
     )
 
@@ -322,53 +335,49 @@ def photo_upload_and_supervisor():
         getattr(st, feedback.get("kind", "info"))(feedback.get("message", ""))
     else:
         ss.pop("photo_feedback", None)
-    upload_generation = int(ss.get("photo_upload_generation", 0))
-    files = st.file_uploader(
-        "Scegli fino a 20 foto",
-        type=["jpg", "jpeg", "png", "webp", "heic", "heif"],
-        accept_multiple_files=True,
-        key=f"event-photo-files-{upload_generation}",
-        help=("Dopo aver premuto Fatto nella galleria, attendi qui la conferma delle foto pronte. "
-              "JPG, PNG, WebP o HEIC; massimo 10 MB per foto."),
+    uploader_revision = tuple(
+        (ROOT / "assets" / name).stat().st_mtime_ns
+        for name in ("photo_uploader.js", "photo_uploader.css")
     )
-    if files:
-        st.success(f"{len(files)} foto pronte per il caricamento.")
-        st.caption("Ora puoi premere Carica le foto. La selezione resta disponibile per riprovare in caso di errore.")
-    else:
-        st.caption("Apri Browse, scegli le foto con calma e premi Fatto nella galleria: qui comparirà la conferma.")
-    submitted = st.button("Carica le foto", type="primary", disabled=not files,
-                          key=f"event-photo-submit-{upload_generation}", width="stretch")
-    if submitted:
-        try:
-            items = [(uploaded.name, uploaded.type, uploaded.getvalue()) for uploaded in files]
-            seen = set(ss.get("photo_upload_fingerprints", []))
-            fresh_items = [item for item in items if hashlib.sha256(item[2]).hexdigest() not in seen]
-            if not fresh_items:
-                st.info("Queste foto sono già state caricate in questa sessione.")
-                return
-            with st.spinner("Carichiamo le foto una alla volta…"):
-                result = album.upload_many(ss.player_id, fresh_items)
-            if result.uploaded:
-                ss.photo_upload_fingerprints = list(seen | {
-                    item.fingerprint for item in result.uploaded
-                })[-200:]
-                ss.photo_gallery_page = 0
-                clear_photo_cache()
-            loaded, failed = len(result.uploaded), len(result.failures)
-            if failed:
-                details = "; ".join(f"{item.filename}: {item.message}" for item in result.failures[:4])
-                message = f"Caricate {loaded} foto su {loaded + failed}. {details}"
-                ss.photo_feedback = {"kind": "warning", "message": message, "at": time.monotonic()}
-                st.warning(message)
-            else:
-                message = f"{loaded} foto caricate: grazie per aver condiviso questo ricordo!"
-                ss.photo_feedback = {"kind": "success", "message": message, "at": time.monotonic()}
-                # A new uploader key clears only after every selected file has
-                # reached Drive and Atlas; failures keep the same selection for retry.
-                ss.photo_upload_generation = upload_generation + 1
-                st.rerun()
-        except PhotoError as exc:
-            st.error(str(exc))
+    upload_state = persistent_photo_uploader(uploader_revision)(
+        data={
+            "owner": ss.player_id,
+            "ack": ss.get("persistent_photo_ack"),
+            "max_files": 20,
+            "max_bytes": 10 * 1024 * 1024,
+        },
+        key="persistent-photo-uploader",
+        default={"item": None},
+        on_item_change=lambda: None,
+        width="stretch",
+    )
+    upload_item = getattr(upload_state, "item", None)
+    if isinstance(upload_item, dict):
+        request_id = str(upload_item.get("request_id") or "")
+        local_id = str(upload_item.get("local_id") or "")
+        if request_id and request_id != ss.get("persistent_photo_request"):
+            ss.persistent_photo_request = request_id
+            try:
+                encoded = upload_item.get("data")
+                if not isinstance(encoded, str):
+                    raise PhotoError("La foto selezionata non può essere letta.")
+                content = base64.b64decode(encoded, validate=True)
+                result = album.upload_many(ss.player_id, [(
+                    upload_item.get("name"), upload_item.get("mime"), content,
+                )])
+                if result.uploaded:
+                    clear_photo_cache()
+                    ss.photo_gallery_page = 0
+                    ack = {"request_id": request_id, "local_id": local_id, "ok": True}
+                else:
+                    message = result.failures[0].message if result.failures else "Caricamento non riuscito. Riprova."
+                    ack = {"request_id": request_id, "local_id": local_id, "ok": False,
+                           "message": message}
+            except (PhotoError, ValueError, TypeError) as exc:
+                ack = {"request_id": request_id, "local_id": local_id, "ok": False,
+                       "message": str(exc) if isinstance(exc, PhotoError) else "La foto non può essere letta."}
+            ss.persistent_photo_ack = ack
+            st.rerun()
 
     try:
         configured_password = st.secrets["SUPERVISOR_PASSWORD"]
