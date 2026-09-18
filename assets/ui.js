@@ -262,11 +262,11 @@ class BrainUI {
   photos() {
     const approved=Math.max(0,Number(this.data.photo_summary?.approved_count||0));
     const flipbookAction=approved?
-      `<div class="flipbook-cta">${button(`♥ Apri il Flipbook (${approved} foto)`,'OPEN_FLIPBOOK','primary flipbook-open-button')}</div>`:
+      `<div class="flipbook-cta"><p>Gli scatti scelti dagli sposi, da sfogliare e far crescere insieme.</p>${button(`✦ L'album di Irene e Daniele · ${approved} foto`,'OPEN_FLIPBOOK','primary flipbook-open-button')}<small>Arricchiscilo con i tuoi contributi! ♥</small></div>`:
       '<p class="flipbook-empty">Gli scatti scelti dagli sposi appariranno qui appena pubblicati.</p>';
     return this.intro('I RICORDI DELLA FESTA','Foto, sorrisi e momenti da rivivere.','Carica le tue foto qui sotto: appariranno nella galleria condivisa.')+
-      `<section class="photo-upload-note panel"><span class="feature-icon">📷</span><div><h2>Condividi i tuoi scatti</h2><p>Puoi scegliere fino a 20 foto alla volta dalla galleria del telefono. Il caricamento e l'album sono qui sotto.</p></div></section>
-      <section class="flipbook"><div class="section-heading"><h2>♥ Flipbook di Irene e Daniele</h2><span>Gli scatti scelti dagli sposi</span></div>${flipbookAction}</section>`+this.back();
+      `<section class="flipbook album-hero"><div class="section-heading"><h2>♥ L'album di Irene e Daniele</h2><span>Un ricordo della festa che cresce con voi</span></div>${flipbookAction}</section>
+      <section class="photo-upload-note panel"><span class="feature-icon">📷</span><div><h2>Condividi i tuoi scatti</h2><p>Puoi scegliere fino a 20 foto alla volta dalla galleria del telefono. Le tue foto possono rendere ancora più bello l'album degli sposi.</p></div></section>`+this.back();
   }
   stats() {
     const s=this.data.stats;

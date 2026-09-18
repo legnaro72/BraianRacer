@@ -52,6 +52,7 @@ class PersistentPhotoUploader {
     this.sending = false;
     this.current = null;
     this.attempt = 0;
+    this.total = 0;
     this.render();
     this.refresh();
     this.update(component);
@@ -75,20 +76,25 @@ class PersistentPhotoUploader {
       <div class="selection" role="status">Nessuna foto selezionata.</div>
       <button class="upload" disabled>Carica le foto</button>
       <button class="clear" disabled>Annulla selezione</button>
+      <div class="progress-track" aria-hidden="true"><i></i></div>
       <div class="progress" aria-live="polite"></div>
     </div>`;
     this.input = this.root.querySelector('input');
     this.selection = this.root.querySelector('.selection');
     this.upload = this.root.querySelector('.upload');
     this.clear = this.root.querySelector('.clear');
+    this.bar = this.root.querySelector('.progress-track i');
     this.progress = this.root.querySelector('.progress');
     this.input.addEventListener('change', event => this.choose([...event.target.files]));
     this.upload.addEventListener('click', () => { this.sending = true; this.sendNext(); });
     this.clear.addEventListener('click', async () => {
       if (this.sending) return;
-      await clearOwner(this.owner); this.input.value = ''; this.progress.textContent = ''; await this.refresh();
+      await clearOwner(this.owner); this.input.value = ''; this.total = 0; this.setProgress(0);
+      this.progress.textContent = ''; await this.refresh();
     });
   }
+
+  setProgress(value) { this.bar.style.width = `${Math.max(0, Math.min(100, value))}%`; }
 
   async choose(files) {
     const maxFiles = Number(this.component.data.max_files || 20);
@@ -102,6 +108,8 @@ class PersistentPhotoUploader {
       this.progress.textContent = `${oversized.name} supera il limite di 10 MB.`; return;
     }
     await clearOwner(this.owner);
+    this.total = 0;
+    this.setProgress(0);
     const stamp = Date.now();
     for (let index = 0; index < files.length; index++) {
       const file = files[index];
@@ -133,13 +141,17 @@ class PersistentPhotoUploader {
     const rows = await this.rows();
     if (!rows.length) {
       this.sending = false;
+      this.setProgress(100);
       this.progress.textContent = '✓ Tutte le foto sono state caricate.';
       await this.refresh();
       return;
     }
+    if (!this.total) this.total = rows.length;
     this.current = rows[0];
     this.attempt += 1;
-    this.progress.textContent = `Caricamento ${this.current.name} · ${rows.length} rimanenti…`;
+    const currentNumber = this.total - rows.length + 1;
+    this.setProgress((currentNumber - 1) / this.total * 100);
+    this.progress.textContent = `Foto ${currentNumber} di ${this.total} · caricamento in corso…`;
     await this.refresh();
     try {
       const data = await fileAsBase64(this.current.blob);
