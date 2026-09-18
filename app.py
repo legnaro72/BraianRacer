@@ -175,8 +175,14 @@ def dispatch(svc, command):
         st.session_state.room_id = svc.create_room(pid)
     elif action == "JOIN_ROOM" and not gid:
         st.session_state.room_id = svc.join_room(command.get("code"), pid)
-    elif action == "READY" and rid:
-        svc.ready(rid, pid)
+    elif action == "READY":
+        # The room id is also sent by the arcade client.  This keeps the host
+        # responsive if Streamlit has just restored the browser session and its
+        # session-state room id has not yet been refreshed.
+        ready_room_id = rid or command.get("room_id")
+        if ready_room_id:
+            svc.ready(ready_room_id, pid)
+            st.session_state.room_id = ready_room_id
     elif action == "START_ROOM" and rid:
         svc.start_room(rid, pid)
     elif action == "EVENTS":

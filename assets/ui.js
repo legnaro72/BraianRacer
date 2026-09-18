@@ -203,7 +203,7 @@ class BrainUI {
       <span class="brand-symbol">${icons.flag}</span><span>BRAIN<span class="brand-light">RACER</span><small>GUIDA. PENSA. VINCI.</small></span></button>
       <nav aria-label="Navigazione principale">${[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥'],['PHOTOS','Foto ♥'],['SUPERVISOR','🔐 Area Sposi']].map(([page,label])=>
         `<button data-action="NAV" data-page="${page}" class="nav-link ${['HOME','LEADERBOARD','HELP'].includes(page)?'nav-main':''} ${['DEDICATIONS','PHOTOS'].includes(page)?'nav-highlight':''} ${page==='SUPERVISOR'?'spouse-area-link':''} ${(this.menuOverlay||d.page)===page?'selected':''}" ${!d.player?'disabled':''}>${label}</button>`).join('')}<a class="nav-link manual-link" href="app/static/manuale-brain-racer.pdf" target="_blank" rel="noopener">Manuale ↗</a></nav>
-      <div class="nav-right"><div class="audio-controls" aria-label="Controlli audio"><button class="sound" data-action="MUSIC" title="Musica di sottofondo" aria-label="${this.audio.musicMuted?'Attiva musica di sottofondo':'Disattiva musica di sottofondo'}"><span>${this.audio.musicMuted?'♪̸':'♫'}</span><small>Musica</small></button><button class="sound" data-action="EFFECTS" title="Effetti sonori" aria-label="${this.audio.effectsMuted?'Attiva effetti sonori':'Disattiva effetti sonori'}"><span>${this.audio.effectsMuted?'🔇':'🔊'}</span><small>Effetti</small></button></div>
+      <div class="nav-right"><div class="audio-controls" aria-label="Controlli audio"><button class="sound" data-action="MUSIC" title="Musica di sottofondo" aria-label="${this.audio.musicMuted?'Attiva musica di sottofondo':'Disattiva musica di sottofondo'}"><span>${this.audio.musicMuted?'🔕':'🎵'}</span><small>Musica</small></button><button class="sound" data-action="EFFECTS" title="Effetti sonori" aria-label="${this.audio.effectsMuted?'Attiva effetti sonori':'Disattiva effetti sonori'}"><span>${this.audio.effectsMuted?'🔇':'🔊'}</span><small>Effetti</small></button></div>
       ${d.player?`<button class="profile" data-action="NAV" data-page="STATS"><span class="avatar">${esc(d.player.nickname.slice(0,2).toUpperCase())}</span><span>${esc(d.player.nickname)}<small>#${esc(d.player.tag)}</small></span></button><button class="switch-player" data-action="LOGOUT" title="Cambia giocatore">⇄<small>Cambia</small></button>`:
       '<span class="edition">ARCADE / VOL. 01</span>'}</div></header><nav class="mobile-nav" aria-label="Menu smartphone">${d.player?[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥'],['PHOTOS','Foto ♥'],['SUPERVISOR','🔐 Area Sposi']].map(([page,label])=>`<button data-action="NAV" data-page="${page}" class="${['HOME','LEADERBOARD','HELP'].includes(page)?'nav-main':''} ${['DEDICATIONS','PHOTOS'].includes(page)?'nav-highlight':''} ${page==='SUPERVISOR'?'spouse-area-link':''} ${(this.menuOverlay||d.page)===page?'selected':''}">${label}</button>`).join(''):''}<a class="manual-link" href="app/static/manuale-brain-racer.pdf" target="_blank" rel="noopener">Manuale ↗</a></nav>${active&&this.menuOverlay?`<div class="active-game-banner"><span>Partita in corso</span>${button('Riprendi subito','RESUME','primary')}</div>`:''}`;
   }
@@ -290,10 +290,10 @@ class BrainUI {
       <section class="panel help-multi"><span class="feature-icon lavender">${icons.people}</span><div><h2>Una griglia, fino a sei rivali.</h2><p>Create una stanza, segnatevi pronti e lasciate partire l'host. Avrete la stessa pista e le stesse domande per 5 livelli. I risultati delle risposte restano nascosti fino alla chiusura della domanda. Chi non arriva entro 85 secondi perde una vita e salta il quiz. Chi esaurisce le vite può restare a guardare.</p><p>In singolo puoi mettere in pausa con Spazio. In multiplayer il tempo condiviso continua anche se cambi scheda. Una disconnessione oltre 40 secondi elimina il pilota. Se l'host lascia la lobby, il comando passa a un altro giocatore.</p></div></section>`+this.back();
   }
   lobby() {
-    const r=this.data.room,players=r.players,me=players.find(p=>p.player_id===this.data.player.id);
-    const host=r.host===this.data.player.id;
+    const r=this.data.room,players=r.players,playerId=String(this.data.player.id),me=players.find(p=>String(p.player_id)===playerId);
+    const host=String(r.host)===playerId;
     return this.intro('LA GRIGLIA SI STA FORMANDO','Il tuo gruppo. La tua gara.','Condividi il codice. Tutti pronti? Si parte.')+
-      `<div class="lobby-layout"><section class="panel"><div class="section-heading"><h2>Giocatori</h2><span class="pill">${players.length} / 6</span></div><div class="lobby-players">${players.map(p=>`<div class="lobby-player ${p.player_id===this.data.player.id?'is-you':''}"><span class="avatar">${esc(p.nickname.slice(0,2).toUpperCase())}</span><div><strong>${esc(p.nickname)} ${p.player_id===this.data.player.id?'<small>TU</small>':''}</strong><small>#${esc(p.tag)} ${p.player_id===r.host?'· HOST':''}</small></div><span class="ready-state ${p.ready?'ready':''}">${p.ready?'✓ Pronto':'○ In attesa'}</span></div>`).join('')}
+      `<div class="lobby-layout"><section class="panel"><div class="section-heading"><h2>Giocatori</h2><span class="pill">${players.length} / 6</span></div><div class="lobby-players">${players.map(p=>`<div class="lobby-player ${String(p.player_id)===playerId?'is-you':''}"><span class="avatar">${esc(p.nickname.slice(0,2).toUpperCase())}</span><div><strong>${esc(p.nickname)} ${String(p.player_id)===playerId?'<small>TU</small>':''}</strong><small>#${esc(p.tag)} ${String(p.player_id)===String(r.host)?'· HOST':''}</small></div><span class="ready-state ${p.ready?'ready':''}">${p.ready?'✓ Pronto':'○ In attesa'}</span></div>`).join('')}
       ${Array.from({length:Math.max(0,2-players.length)},()=>'<div class="lobby-player empty-slot"><span class="avatar">+</span><span>Un amico sta per unirsi…</span></div>').join('')}</div>
       <div class="lobby-actions">${button(me?.ready?'✓ Sei pronto':'Sono pronto','READY',me?.ready?'secondary':'primary',me?.ready?'disabled':'')}
       ${host?button('Inizia gara '+icons.arrow,'START_ROOM','primary',players.length<2||!players.every(p=>p.ready)?'disabled':''):'<p>La gara partirà quando l’host darà il via.</p>'}</div></section>
@@ -374,7 +374,7 @@ class BrainUI {
   click(event) {
     const el=event.target.closest('[data-action]');if(!el||el.disabled)return;
     const action=el.dataset.action;
-    if(action==='MUSIC'){this.audio.toggleMusic();el.textContent=this.audio.musicMuted?'♪̸':'♫';el.setAttribute('aria-label',this.audio.musicMuted?'Attiva musica di sottofondo':'Disattiva musica di sottofondo');return;}
+    if(action==='MUSIC'){this.audio.toggleMusic();el.textContent=this.audio.musicMuted?'🔕':'🎵';el.setAttribute('aria-label',this.audio.musicMuted?'Attiva musica di sottofondo':'Disattiva musica di sottofondo');return;}
     if(action==='EFFECTS'){this.audio.toggleEffects();el.textContent=this.audio.effectsMuted?'🔇':'🔊';el.setAttribute('aria-label',this.audio.effectsMuted?'Attiva effetti sonori':'Disattiva effetti sonori');return;}
     if(action==='LOGOUT'){
       safeStorage.remove('br:identity');this.identitySent=false;this.savedToken=null;this.menuOverlay=null;this.pending=[];
@@ -403,6 +403,15 @@ class BrainUI {
     }
     if(action==='OPEN_FLIPBOOK'){
       el.disabled=true;el.textContent='Apro il Flipbook…';this.send('OPEN_FLIPBOOK');return;
+    }
+    if(action==='READY'){
+      const playerId=String(this.data.player?.id||'');
+      if(this.data.room){
+        this.data.room={...this.data.room,players:this.data.room.players.map(player=>
+          String(player.player_id)===playerId?{...player,ready:true}:player)};
+        this.signature='';this.mountView('LOBBY');
+      }
+      this.send('READY',{room_id:this.data.room?.id});return;
     }
     if(action==='RESUME'||(action==='START_SINGLE'&&this.menuOverlay&&(this.data.game||this.data.room))){
       this.menuOverlay=null;this.signature='';this.mountView(this.gameView());return;
