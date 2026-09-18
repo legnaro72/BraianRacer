@@ -490,8 +490,25 @@ def render_supervisor_selection(album, photos):
     grid_view = st.toggle("Vista a griglia", value=True, key="supervisor-photo-grid")
     selected = []
     if grid_view:
+        st.html("""<style>
+        @media (max-width: 640px) {
+          [data-testid="stHorizontalBlock"]:has([class*="st-key-supervisor-card-"]) {
+            flex-wrap: nowrap !important;
+            gap: .35rem !important;
+          }
+          [data-testid="stHorizontalBlock"]:has([class*="st-key-supervisor-card-"]) > [data-testid="stColumn"] {
+            flex: 1 1 0 !important;
+            width: 0 !important;
+            min-width: 0 !important;
+          }
+          [class*="st-key-supervisor-card-"] [data-testid="stImage"] img { border-radius: 10px !important; }
+          [class*="st-key-supervisor-card-"] p { font-size: .68rem !important; overflow-wrap: anywhere; }
+          [class*="st-key-supervisor-card-"] [data-testid="stCaptionContainer"] { font-size: .62rem !important; }
+          [class*="st-key-supervisor-card-"] label { font-size: .68rem !important; }
+        }
+        </style>""")
         for first in range(0, len(photos), 3):
-            cards = st.columns(3)
+            cards = st.columns(3, gap="small")
             for card, photo in zip(cards, photos[first:first + 3]):
                 with card:
                     if render_supervisor_photo_card(photo, photo["id"] in delete_selection):
