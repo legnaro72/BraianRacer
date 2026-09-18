@@ -282,6 +282,16 @@ test('photo count changes repaint the album entry without navigation',()=>{
   assert.equal(mounts,2);
 });
 
+test('garage starts single player and multiplayer is visibly disabled',()=>{
+  const {ui}=uiHost();
+  ui.data={...ui.data,player:{id:'p',nickname:'Pilota',tag:'1234'},game:null,room:null,page:'HOME',stats:{best:0,level:0,games:0},leaderboard:[]};
+  const home=ui.home(false),play=ui.help();
+  assert.match(home,/data-action="START_SINGLE"/);
+  assert.match(play,/mode-card multi" disabled/);
+  assert.match(play,/IN PROGRESS/);
+  assert.doesNotMatch(play,/data-page="MULTIPLAYER"/);
+});
+
 test('cloud clock corrections do not change the time available in a local quiz',()=>{
   const {ui,timer,setTime}=uiHost();
   ui.localQuizActive=true;ui.quizClockOffset=0;

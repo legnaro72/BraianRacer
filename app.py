@@ -125,10 +125,9 @@ def dispatch(svc, command):
         return
     if action == "REGISTER" and not pid:
         pid, token = svc.register(command.get("nickname"))
-        st.session_state.update(player_id=pid, identity_token=token, booted=True,
-                                page="HELP" if command.get("play") else "DEDICATIONS")
+        st.session_state.update(player_id=pid, identity_token=token, booted=True, page="DEDICATIONS")
         if command.get("play"):
-            st.session_state.pop("game_id", None)
+            st.session_state.game_id = svc.new_game(pid)
         return
     if action == "LOGOUT":
         if pid:
