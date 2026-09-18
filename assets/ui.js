@@ -193,11 +193,11 @@ class BrainUI {
     const d=this.data,active=d.game||d.room;
     return `<header class="nav"><button class="brand" data-action="NAV" data-page="HOME">
       <span class="brand-symbol">${icons.flag}</span><span>BRAIN<span class="brand-light">RACER</span><small>GUIDA. PENSA. VINCI.</small></span></button>
-      <nav aria-label="Navigazione principale">${[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥'],['PHOTOS','Foto ♥']].map(([page,label])=>
-        `<button data-action="NAV" data-page="${page}" class="nav-link ${['HOME','LEADERBOARD','HELP'].includes(page)?'nav-main':''} ${['DEDICATIONS','PHOTOS'].includes(page)?'nav-highlight':''} ${(this.menuOverlay||d.page)===page?'selected':''}" ${!d.player?'disabled':''}>${label}</button>`).join('')}<a class="nav-link manual-link" href="app/static/manuale-brain-racer.pdf" target="_blank" rel="noopener">Manuale ↗</a></nav>
+      <nav aria-label="Navigazione principale">${[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥'],['PHOTOS','Foto ♥'],['SUPERVISOR','🔐 Area Sposi']].map(([page,label])=>
+        `<button data-action="NAV" data-page="${page}" class="nav-link ${['HOME','LEADERBOARD','HELP'].includes(page)?'nav-main':''} ${['DEDICATIONS','PHOTOS'].includes(page)?'nav-highlight':''} ${page==='SUPERVISOR'?'spouse-area-link':''} ${(this.menuOverlay||d.page)===page?'selected':''}" ${!d.player?'disabled':''}>${label}</button>`).join('')}<a class="nav-link manual-link" href="app/static/manuale-brain-racer.pdf" target="_blank" rel="noopener">Manuale ↗</a></nav>
       <div class="nav-right"><div class="audio-controls" aria-label="Controlli audio"><button class="sound" data-action="MUSIC" title="Musica di sottofondo" aria-label="${this.audio.musicMuted?'Attiva musica di sottofondo':'Disattiva musica di sottofondo'}"><span>${this.audio.musicMuted?'♪̸':'♫'}</span><small>Musica</small></button><button class="sound" data-action="EFFECTS" title="Effetti sonori" aria-label="${this.audio.effectsMuted?'Attiva effetti sonori':'Disattiva effetti sonori'}"><span>${this.audio.effectsMuted?'🔇':'🔊'}</span><small>Effetti</small></button></div>
       ${d.player?`<button class="profile" data-action="NAV" data-page="STATS"><span class="avatar">${esc(d.player.nickname.slice(0,2).toUpperCase())}</span><span>${esc(d.player.nickname)}<small>#${esc(d.player.tag)}</small></span></button>`:
-      '<span class="edition">ARCADE / VOL. 01</span>'}</div></header><nav class="mobile-nav" aria-label="Menu smartphone">${d.player?[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥'],['PHOTOS','Foto ♥']].map(([page,label])=>`<button data-action="NAV" data-page="${page}" class="${['HOME','LEADERBOARD','HELP'].includes(page)?'nav-main':''} ${['DEDICATIONS','PHOTOS'].includes(page)?'nav-highlight':''} ${(this.menuOverlay||d.page)===page?'selected':''}">${label}</button>`).join(''):''}<a class="manual-link" href="app/static/manuale-brain-racer.pdf" target="_blank" rel="noopener">Manuale ↗</a></nav>${active&&this.menuOverlay?`<div class="active-game-banner"><span>Partita in corso</span>${button('Riprendi subito','RESUME','primary')}</div>`:''}`;
+      '<span class="edition">ARCADE / VOL. 01</span>'}</div></header><nav class="mobile-nav" aria-label="Menu smartphone">${d.player?[['HOME','Garage'],['LEADERBOARD','Classifica'],['HELP','Come si gioca'],['DEDICATIONS','Dediche ♥'],['PHOTOS','Foto ♥'],['SUPERVISOR','🔐 Area Sposi']].map(([page,label])=>`<button data-action="NAV" data-page="${page}" class="${['HOME','LEADERBOARD','HELP'].includes(page)?'nav-main':''} ${['DEDICATIONS','PHOTOS'].includes(page)?'nav-highlight':''} ${page==='SUPERVISOR'?'spouse-area-link':''} ${(this.menuOverlay||d.page)===page?'selected':''}">${label}</button>`).join(''):''}<a class="manual-link" href="app/static/manuale-brain-racer.pdf" target="_blank" rel="noopener">Manuale ↗</a></nav>${active&&this.menuOverlay?`<div class="active-game-banner"><span>Partita in corso</span>${button('Riprendi subito','RESUME','primary')}</div>`:''}`;
   }
   footer() {return `<footer><span>${icons.flag} BRAIN RACER <i>·</i> Riflessi veloci. Mente accesa.</span><span>Fatto per giocare. Ancora una volta. <span class="tiny-dot"></span></span></footer>`;}
   intro(eyebrow,title,description='') {return `<div class="page-intro with-couple"><div class="intro-copy"><span class="eyebrow">${eyebrow}</span><h1>${title}</h1>${description?`<p>${description}</p>`:''}</div>${coupleArt('page')}</div>`;}
@@ -209,6 +209,7 @@ class BrainUI {
     if(view==='STATS')return this.stats();
     if(view==='DEDICATIONS')return this.dedications();
     if(view==='PHOTOS')return this.photos();
+    if(view==='SUPERVISOR')return this.intro('AREA RISERVATA','Irene e Daniele','Gestite in privato le foto e l’ordine del vostro Flipbook.')+this.back();
     if(view==='HELP')return this.help();
     if(view==='MULTIPLAYER')return this.intro('STESSA STRADA. STESSA SFIDA.','La gara è più bella insieme.','Da 2 a 6 piloti, cinque livelli. Invita i tuoi amici con il codice stanza.')+
       `<div class="two-col room-options"><section class="panel"><span class="feature-icon lime">${icons.flag}</span><h2>La tua griglia di partenza.</h2><p>Crea una stanza privata e condividi il codice. Quando tutti sono pronti, si parte.</p>${button('Crea stanza '+icons.arrow,'CREATE_ROOM')}</section>
@@ -225,7 +226,7 @@ class BrainUI {
   home(welcome) {
     const d=this.data,s=d.stats;
     return `<section class="hero"><div class="hero-copy"><span class="eyebrow"><span class="pulse"></span> IRENE & DANIELE · UNA VITA A TUTTO GAS</span>
-      <h1>Irene <span class="wedding-and">&</span><br><em>Daniele</em></h1><div class="photo-home-invite"><span class="feature-icon">📷</span><div><h3>Condividi le foto della festa</h3><p>I tuoi scatti possono entrare nell'album di Irene e Daniele.</p></div>${welcome?button('Scegli il nick','FOCUS_NAME','secondary'):button('Carica le tue foto','OPEN_PHOTO_UPLOAD','primary')}</div><h2>Oggi si festeggia. Insieme a voi!</h2>
+      <h1>Irene <span class="wedding-and">&</span><br><em>Daniele</em></h1>${welcome?'':`<div class="spouse-home-invite"><span>🔐</span><div><h3>Area Sposi</h3><p>Gestite in privato foto e Flipbook.</p></div>${button('Apri area','NAV','secondary','data-page="SUPERVISOR"')}</div>`}<div class="photo-home-invite"><span class="feature-icon">📷</span><div><h3>Condividi le foto della festa</h3><p>I tuoi scatti possono entrare nell'album di Irene e Daniele.</p></div>${welcome?button('Scegli il nick','FOCUS_NAME','secondary'):button('Carica le tue foto','OPEN_PHOTO_UPLOAD','primary')}</div><h2>Oggi si festeggia. Insieme a voi!</h2>
       <p>Un pensiero da custodire, una corsa da condividere.<br>Lascia un augurio agli sposi e unisciti alla festa!</p>
       <div class="hero-tags"><span>♥ Dediche</span><span>✿ Amici</span><span>★ Una corsa insieme</span></div>
       ${welcome?`<form class="register" data-form="register"><label for="nickname">METTI IL TUO NICK</label><div class="input-row"><input id="nickname" name="nickname" placeholder="Il tuo nickname" minlength="3" maxlength="16" required autocomplete="nickname"><button type="submit" name="intent" value="play" class="btn primary">Gioca</button></div><button type="submit" name="intent" value="dedicate" class="btn secondary">Lascia una dedica ♥</button><small>3–16 caratteri · lettere, numeri, _ e -</small></form>`:
@@ -377,10 +378,10 @@ class BrainUI {
     }
     if(action==='NAV'){
       const page=el.dataset.page;
-      if((this.data.game||this.data.room)&&['HOME','LEADERBOARD','STATS','HELP','DEDICATIONS','PHOTOS'].includes(page)){
+      if((this.data.game||this.data.room)&&['HOME','LEADERBOARD','STATS','HELP','DEDICATIONS','PHOTOS','SUPERVISOR'].includes(page)){
         this.menuOverlay=page;this.signature='';this.mountView(page);return;
       }
-      if(!this.data.game&&!this.data.room&&['HOME','LEADERBOARD','STATS','HELP','MULTIPLAYER','DEDICATIONS','PHOTOS'].includes(page)){
+      if(!this.data.game&&!this.data.room&&['HOME','LEADERBOARD','STATS','HELP','MULTIPLAYER','DEDICATIONS','PHOTOS','SUPERVISOR'].includes(page)){
         this.optimisticPage=page;this.data.page=page;this.signature='';this.mountView(this.view());
       }
       this.send('NAV',{page});return;

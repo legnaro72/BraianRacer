@@ -136,7 +136,7 @@ def dispatch(svc, command):
         st.session_state.pop("identity_token", None)
     elif action == "NAV":
         page = command.get("page")
-        if page in ("HOME", "LEADERBOARD", "STATS", "HELP", "MULTIPLAYER", "DEDICATIONS", "PHOTOS") and not (gid or rid):
+        if page in ("HOME", "LEADERBOARD", "STATS", "HELP", "MULTIPLAYER", "DEDICATIONS", "PHOTOS", "SUPERVISOR") and not (gid or rid):
             st.session_state.page = page
             if page != "PHOTOS":
                 st.session_state.pop("photo_show_flipbook", None)
@@ -352,10 +352,8 @@ def persistent_photo_upload_panel(album, player_id):
 def photo_upload_and_supervisor():
     """Native file transport and private gallery; all Drive access stays server-side."""
     ss = st.session_state
-    if ss.get("page") != "PHOTOS" or not ss.get("player_id") or ss.get("game_id") or ss.get("room_id"):
+    if ss.get("page") not in ("PHOTOS", "SUPERVISOR") or not ss.get("player_id") or ss.get("game_id") or ss.get("room_id"):
         return
-    st.html("<div id='photo-upload-start'></div>")
-    st.subheader("Aggiungi le tue foto")
     album = photo_album()
     if not album.ready:
         st.info("L'album fotografico sarà attivato dagli sposi a breve.")
@@ -372,6 +370,11 @@ def photo_upload_and_supervisor():
         )
     except PhotoError:
         photos, approved = [], []
+    if ss.get("page") == "SUPERVISOR":
+        render_supervisor_area(album, photos)
+        return
+    st.html("<div id='photo-upload-start'></div>")
+    st.subheader("Aggiungi le tue foto")
     if not approved:
         ss.photo_show_flipbook = False
 
@@ -390,42 +393,6 @@ def photo_upload_and_supervisor():
     else:
         ss.pop("photo_feedback", None)
     persistent_photo_upload_panel(album, ss.player_id)
-
-    try:
-        configured_password = st.secrets["SUPERVISOR_PASSWORD"]
-    except (KeyError, FileNotFoundError, st.errors.StreamlitSecretNotFoundError):
-        configured_password = None
-    st.divider()
-    st.markdown("### 🔐 Area riservata Irene e Daniele")
-    st.caption("Gestite le foto della festa, scegliete il Flipbook e decidetene l'ordine.")
-    with st.container(border=True):
-        if not configured_password:
-            st.caption("Area supervisore non ancora configurata.")
-        else:
-            entered = st.text_input("Password sposi", type="password", key="supervisor_password")
-            is_supervisor = entered and secrets.compare_digest(entered, str(configured_password))
-        if configured_password and is_supervisor:
-            st.success("Area supervisore attiva")
-            active_panel = ss.get("supervisor_photo_panel", "SELECT")
-            select_panel, order_panel = st.columns(2)
-            if select_panel.button(
-                    "✓ Scegli foto e Flipbook",
-                    type="primary" if active_panel == "SELECT" else "secondary",
-                    width="stretch", key="supervisor-select-panel"):
-                ss.supervisor_photo_panel = "SELECT"
-                active_panel = "SELECT"
-            if order_panel.button(
-                    "↕ Ordina il Flipbook",
-                    type="primary" if active_panel == "ORDER" else "secondary",
-                    width="stretch", key="supervisor-order-panel"):
-                ss.supervisor_photo_panel = "ORDER"
-                active_panel = "ORDER"
-            pending = [photo for photo in photos if not photo["approved"]]
-            st.caption(f"{len(photos)} foto ricevute · {len(pending)} da selezionare per il Flipbook")
-            if active_panel == "SELECT":
-                render_supervisor_selection(album, photos)
-            else:
-                render_flipbook_ordering(album, photos)
 
     if photos:
         gallery_open = bool(ss.get("photo_gallery_open", False))
@@ -460,6 +427,47 @@ def photo_upload_and_supervisor():
     else:
         st.subheader("Tutte le foto della festa")
         st.caption("La galleria aspetta il primo scatto.")
+
+
+def render_supervisor_area(album, photos):
+    """Password-protected photo curation kept separate from the guest gallery."""
+    ss = st.session_state
+    st.subheader("🔐 Area riservata Irene e Daniele")
+    st.caption("Gestite le foto della festa, scegliete il Flipbook e decidetene l'ordine.")
+    try:
+        configured_password = st.secrets["SUPERVISOR_PASSWORD"]
+    except (KeyError, FileNotFoundError, st.errors.StreamlitSecretNotFoundError):
+        configured_password = None
+    with st.container(border=True):
+        if not configured_password:
+            st.caption("Area supervisore non ancora configurata.")
+            return
+        entered = st.text_input("Password sposi", type="password", key="supervisor_password")
+        is_supervisor = entered and secrets.compare_digest(entered, str(configured_password))
+        if not is_supervisor:
+            st.caption("Inserite la password per accedere alla gestione privata dell'album.")
+            return
+        st.success("Area supervisore attiva")
+        active_panel = ss.get("supervisor_photo_panel", "SELECT")
+        select_panel, order_panel = st.columns(2)
+        if select_panel.button(
+                "✓ Scegli foto e Flipbook",
+                type="primary" if active_panel == "SELECT" else "secondary",
+                width="stretch", key="supervisor-select-panel"):
+            ss.supervisor_photo_panel = "SELECT"
+            active_panel = "SELECT"
+        if order_panel.button(
+                "↕ Ordina il Flipbook",
+                type="primary" if active_panel == "ORDER" else "secondary",
+                width="stretch", key="supervisor-order-panel"):
+            ss.supervisor_photo_panel = "ORDER"
+            active_panel = "ORDER"
+        pending = [photo for photo in photos if not photo["approved"]]
+        st.caption(f"{len(photos)} foto ricevute · {len(pending)} da selezionare per il Flipbook")
+        if active_panel == "SELECT":
+            render_supervisor_selection(album, photos)
+        else:
+            render_flipbook_ordering(album, photos)
 
 
 def preview_storage_id(photo):
