@@ -26,7 +26,7 @@ class PhotoError(ValueError):
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp"}
 HEIC_TYPES = {"image/heic", "image/heif", "image/heic-sequence", "image/heif-sequence"}
 MAX_FILES_PER_UPLOAD = 20
-MAX_FILE_BYTES = 10 * 1024 * 1024
+MAX_FILE_BYTES = 20 * 1024 * 1024
 UPLOAD_TIMEOUT = (5, 35)
 MIME_BY_EXTENSION = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
 LOGGER = logging.getLogger(__name__)
@@ -83,7 +83,7 @@ def prepare_photo(filename, mime_type, content):
     """Validate an upload and convert iPhone HEIC/HEIF photos to displayable JPEG."""
     filename = safe_filename(filename)
     if not isinstance(content, bytes) or not content or len(content) > MAX_FILE_BYTES:
-        raise PhotoError("La foto deve pesare al massimo 10 MB.")
+        raise PhotoError("La foto deve pesare al massimo 20 MB.")
     suffix = PurePosixPath(filename).suffix.lower()
     mime_type = str(mime_type or "").lower().strip()
     if mime_type in HEIC_TYPES or suffix in {".heic", ".heif"}:

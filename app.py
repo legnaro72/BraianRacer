@@ -312,7 +312,7 @@ def persistent_photo_upload_panel(album, player_id):
             "owner": player_id,
             "ack": ss.get("persistent_photo_ack"),
             "max_files": 20,
-            "max_bytes": 10 * 1024 * 1024,
+            "max_bytes": 20 * 1024 * 1024,
         },
         key="persistent-photo-uploader",
         default={"item": None},

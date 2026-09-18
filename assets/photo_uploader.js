@@ -129,14 +129,14 @@ class PersistentPhotoUploader {
 
   async choose(files) {
     const maxFiles = Number(this.component.data.max_files || 20);
-    const maxBytes = Number(this.component.data.max_bytes || 10485760);
+    const maxBytes = Number(this.component.data.max_bytes || 20971520);
     if (!files.length) return;
     if (files.length > maxFiles) {
       this.progress.textContent = `Puoi scegliere al massimo ${maxFiles} foto.`; return;
     }
     const oversized = files.find(file => file.size > maxBytes);
     if (oversized) {
-      this.progress.textContent = `${oversized.name} supera il limite di 10 MB.`; return;
+      this.progress.textContent = `${oversized.name} supera il limite di 20 MB.`; return;
     }
     await clearOwner(this.owner);
     this.total = 0;
