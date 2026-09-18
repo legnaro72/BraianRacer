@@ -402,6 +402,27 @@ def photo_upload_and_supervisor():
             is_supervisor = entered and secrets.compare_digest(entered, str(configured_password))
         if configured_password and is_supervisor:
             st.success("Area supervisore attiva")
+            missing_thumbnails = sum(not photo.get("thumbnail_storage_id") for photo in photos)
+            if missing_thumbnails:
+                st.caption(f"{missing_thumbnails} foto precedenti non hanno ancora la miniatura veloce.")
+                if st.button("⚡ Genera miniature delle foto già presenti", width="stretch",
+                             key="backfill-photo-thumbnails"):
+                    with st.spinner("Creazione anteprime private in corso…"):
+                        created, failed = album.backfill_thumbnails()
+                    clear_photo_cache()
+                    if failed:
+                        ss.photo_feedback = {
+                            "kind": "warning",
+                            "message": f"Create {created} miniature; {failed} foto possono essere ritentate con lo stesso pulsante.",
+                            "at": time.monotonic(),
+                        }
+                    else:
+                        ss.photo_feedback = {
+                            "kind": "success",
+                            "message": f"Create {created} miniature veloci per la galleria.",
+                            "at": time.monotonic(),
+                        }
+                    st.rerun()
             active_panel = ss.get("supervisor_photo_panel", "SELECT")
             select_panel, order_panel = st.columns(2)
             if select_panel.button(

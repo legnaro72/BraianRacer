@@ -267,6 +267,36 @@ class PhotoService:
             raise PhotoError("L'album fotografico non è ancora disponibile.")
         return self.storage.drive_get_photo(storage_id)
 
+    def backfill_thumbnails(self):
+        """Create private lightweight previews for catalog records created before thumbnails."""
+        if not self.storage:
+            raise PhotoError("L'album fotografico non è ancora disponibile.")
+        with self.db.read() as s:
+            pending = [
+                (photo.id, photo.storage_id, photo.filename)
+                for photo in s.find(EventPhoto)
+                if not photo.thumbnail_storage_id
+            ]
+        created, failed = 0, 0
+        for photo_id, storage_id, filename in pending:
+            try:
+                content, _ = self.storage.drive_get_photo(storage_id)
+                thumbnail = make_thumbnail(content)
+                if not thumbnail:
+                    raise PhotoError("La foto non può essere trasformata in anteprima.")
+                stem = PurePosixPath(filename).stem
+                thumbnail_name = safe_filename(f"thumb_{photo_id}_{stem}.jpg")
+                stored = self.storage.drive_upload_photo(thumbnail_name, "image/jpeg", thumbnail)
+                with self.db.transaction() as s:
+                    photo = s.get(EventPhoto, photo_id)
+                    if photo and not photo.thumbnail_storage_id:
+                        photo.thumbnail_storage_id = stored.storage_id
+                created += 1
+            except PhotoError:
+                failed += 1
+                LOGGER.warning("Legacy photo thumbnail could not be created")
+        return created, failed
+
     def list_photos(self, approved_only=False, limit=None):
         with self.db.read() as s:
             rows = s.find(EventPhoto, order_by=("-uploaded_at",))
