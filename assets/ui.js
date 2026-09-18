@@ -225,7 +225,7 @@ class BrainUI {
   home(welcome) {
     const d=this.data,s=d.stats;
     return `<section class="hero"><div class="hero-copy"><span class="eyebrow"><span class="pulse"></span> IRENE & DANIELE · UNA VITA A TUTTO GAS</span>
-      <h1>Irene <span class="wedding-and">&</span><br><em>Daniele</em></h1><div class="photo-home-invite"><span class="feature-icon">📷</span><div><h3>Condividi le foto della festa</h3><p>I tuoi scatti possono entrare nell'album di Irene e Daniele.</p></div>${welcome?button('Scegli il nick','FOCUS_NAME','secondary'):button('Carica le tue foto','NAV','primary','data-page="PHOTOS"')}</div><h2>Oggi si festeggia. Insieme a voi!</h2>
+      <h1>Irene <span class="wedding-and">&</span><br><em>Daniele</em></h1><div class="photo-home-invite"><span class="feature-icon">📷</span><div><h3>Condividi le foto della festa</h3><p>I tuoi scatti possono entrare nell'album di Irene e Daniele.</p></div>${welcome?button('Scegli il nick','FOCUS_NAME','secondary'):button('Carica le tue foto','OPEN_PHOTO_UPLOAD','primary')}</div><h2>Oggi si festeggia. Insieme a voi!</h2>
       <p>Un pensiero da custodire, una corsa da condividere.<br>Lascia un augurio agli sposi e unisciti alla festa!</p>
       <div class="hero-tags"><span>♥ Dediche</span><span>✿ Amici</span><span>★ Una corsa insieme</span></div>
       ${welcome?`<form class="register" data-form="register"><label for="nickname">METTI IL TUO NICK</label><div class="input-row"><input id="nickname" name="nickname" placeholder="Il tuo nickname" minlength="3" maxlength="16" required autocomplete="nickname"><button type="submit" name="intent" value="play" class="btn primary">Gioca</button></div><button type="submit" name="intent" value="dedicate" class="btn secondary">Lascia una dedica ♥</button><small>3–16 caratteri · lettere, numeri, _ e -</small></form>`:
@@ -369,6 +369,12 @@ class BrainUI {
     if(action==='MUSIC'){this.audio.toggleMusic();el.textContent=this.audio.musicMuted?'♪̸':'♫';el.setAttribute('aria-label',this.audio.musicMuted?'Attiva musica di sottofondo':'Disattiva musica di sottofondo');return;}
     if(action==='EFFECTS'){this.audio.toggleEffects();el.textContent=this.audio.effectsMuted?'🔇':'🔊';el.setAttribute('aria-label',this.audio.effectsMuted?'Attiva effetti sonori':'Disattiva effetti sonori');return;}
     this.audio.unlock();
+    if(action==='OPEN_PHOTO_UPLOAD'){
+      this.optimisticPage='PHOTOS';this.data.page='PHOTOS';this.signature='';this.mountView('PHOTOS');this.send('OPEN_PHOTO_UPLOAD');
+      const deadline=Date.now()+10000;
+      const scrollToUpload=()=>{try{const target=window.parent.document.getElementById('photo-upload-start');if(target){target.scrollIntoView({block:'start',behavior:'smooth'});return;}}catch(_e){}if(Date.now()<deadline)setTimeout(scrollToUpload,120);};
+      setTimeout(scrollToUpload,120);return;
+    }
     if(action==='NAV'){
       const page=el.dataset.page;
       if((this.data.game||this.data.room)&&['HOME','LEADERBOARD','STATS','HELP','DEDICATIONS','PHOTOS'].includes(page)){

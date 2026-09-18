@@ -144,6 +144,9 @@ def dispatch(svc, command):
         st.session_state.page = "PHOTOS"
         st.session_state.photo_show_flipbook = True
         st.session_state.flipbook_page = 0
+    elif action == "OPEN_PHOTO_UPLOAD" and not (gid or rid):
+        st.session_state.page = "PHOTOS"
+        st.session_state.photo_show_flipbook = False
     elif action == "DEDICATE":
         svc.dedicate(pid, command.get("message"))
     elif action == "START_SINGLE" and not rid:
@@ -351,6 +354,7 @@ def photo_upload_and_supervisor():
     ss = st.session_state
     if ss.get("page") != "PHOTOS" or not ss.get("player_id") or ss.get("game_id") or ss.get("room_id"):
         return
+    st.html("<div id='photo-upload-start'></div>")
     st.subheader("Aggiungi le tue foto")
     album = photo_album()
     if not album.ready:
