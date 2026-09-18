@@ -41,6 +41,37 @@ function fileAsBase64(blob) {
   });
 }
 
+async function prepareForTransfer(record) {
+  const source = record.blob;
+  const mime = String(record.mime || source.type || '').toLowerCase();
+  // HEIC support is intentionally left to the server-side converter. Browsers
+  // cannot reliably decode it into a canvas on every Android device.
+  if (!mime.startsWith('image/') || mime.includes('heic') || mime.includes('heif')) {
+    return {blob: source, mime: record.mime, name: record.name};
+  }
+  try {
+    const bitmap = await createImageBitmap(source);
+    const longest = Math.max(bitmap.width, bitmap.height);
+    const scale = Math.min(1, 1920 / longest);
+    if (scale === 1 && source.size <= 1600000) {
+      bitmap.close?.();
+      return {blob: source, mime: record.mime, name: record.name};
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close?.();
+    const compressed = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', .84));
+    if (!compressed || compressed.size >= source.size) {
+      return {blob: source, mime: record.mime, name: record.name};
+    }
+    return {blob: compressed, mime: 'image/jpeg', name: record.name.replace(/\.[^.]+$/, '') + '.jpg'};
+  } catch (_) {
+    return {blob: source, mime: record.mime, name: record.name};
+  }
+}
+
 class PersistentPhotoUploader {
   constructor(parent, component) {
     this.parent = parent;
@@ -151,14 +182,16 @@ class PersistentPhotoUploader {
     this.attempt += 1;
     const currentNumber = this.total - rows.length + 1;
     this.setProgress((currentNumber - 1) / this.total * 100);
-    this.progress.textContent = `Foto ${currentNumber} di ${this.total} · caricamento in corso…`;
+    this.progress.textContent = `Foto ${currentNumber} di ${this.total} · ottimizzazione in corso…`;
     await this.refresh();
     try {
-      const data = await fileAsBase64(this.current.blob);
+      const prepared = await prepareForTransfer(this.current);
+      this.progress.textContent = `Foto ${currentNumber} di ${this.total} · invio in corso…`;
+      const data = await fileAsBase64(prepared.blob);
       const requestId = `${this.current.id}:${this.attempt}`;
       this.component.setStateValue('item', {
-        request_id: requestId, local_id: this.current.id, name: this.current.name,
-        mime: this.current.mime, data,
+        request_id: requestId, local_id: this.current.id, name: prepared.name,
+        mime: prepared.mime, data,
       });
     } catch (_) {
       this.sending = false; this.current = null;
